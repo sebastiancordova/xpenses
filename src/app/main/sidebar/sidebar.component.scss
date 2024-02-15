@@ -1,0 +1,142 @@
+@import "src/assets/sass/variables";
+@import "src/assets/sass/mixins";
+
+.sidebar {
+  @include transition(transform 0.2s 0.1s);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0;
+  z-index: 199;
+  background-color: white;
+  box-shadow: 2px 0px 22px rgba(0, 0, 0, 0.15);
+
+  .sidebar-inner {
+    position: relative;
+  }
+  .nav-link {
+    color: $color-brand-secondary;
+    cursor: pointer;
+    &:focus {
+      outline: none;
+    }
+    &:hover {
+      color: $color-brand-primary;
+    }
+  }
+  .active-link {
+    color: white;
+    background-color: $color-brand-primary;
+  }
+}
+.area-logo {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  border-bottom: 1px $color-milkier solid;
+  .xp-title {
+    cursor: pointer;
+    color: $color-brand-primary;
+    text-shadow: 1px 1px black;
+  }
+}
+.area-actions {
+  border-top: 1px $color-milkier solid;
+
+  .link {
+    text-decoration: none;
+    color: $color-brand-quaternary;
+
+    &:hover {
+      text-decoration: none;
+      color: $color-brand-primary;
+    }
+  }
+}
+#btn-sidebar {
+  position: absolute;
+  top: 1rem;
+  right: -4rem;
+  z-index: 99;
+
+  .circle {
+    background-color: $color-brand-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+  }
+  .icon {
+    font-size: 0.9rem;
+
+    &.icon-active-true {
+      display: none;
+    }
+    &.icon-active-false {
+      display: block;
+    }
+  }
+}
+.area-current-user {
+  background-color: $color-brand-tertiary;
+  border-radius: 12px;
+
+  span {
+    display: block;
+  }
+  .greetings {
+    font-size: 16px;
+    color: $color-brand-quaternary;
+  }
+}
+
+// RESPONSIVE (Bottom up)
+@media (min-width: $break-xs) {
+}
+@media (min-width: $break-sm) {
+}
+@media (min-width: $break-md) {
+}
+@media (min-width: $break-lg) {
+}
+@media (min-width: $break-xlg) {
+}
+
+// RESPONSIVE (Top Down)
+@media (max-width: $break-xlg) {
+}
+@media (max-width: $break-lg) {
+}
+@media (max-width: $break-md) {
+}
+@media (max-width: $break-sm) {
+  :host {
+    .sidebar {
+      @include transform(translate(-101%, 0));
+      max-width: 80%;
+      box-shadow: none;
+
+      &.active {
+        @include transform(translate(0, 0));
+        box-shadow: 2px 0px 22px rgba(0, 0, 0, 0.15);
+
+        #btn-sidebar {
+          .icon {
+            &.icon-active-true {
+              display: block;
+            }
+            &.icon-active-false {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@media (max-width: $break-xs) {
+}

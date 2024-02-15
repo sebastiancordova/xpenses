@@ -1,0 +1,85 @@
+<ng-container *ngIf="!loadingPage; else isLoading">
+  <div class="container">
+    <div class="table-container bg-white mt-2">
+      <h4 class="pt-3 pb-0 px-3 m-0 font-weight-bold">Gastos</h4>
+      <div class="filter-section p-3">
+        <form class="" [formGroup]="filtersForm">
+          <div class="d-flex">
+            <input type="text" formControlName="search" class="form-control form-control-sm input-search"
+              placeholder="Buscar..." />
+          </div>
+        </form>
+        <div class="d-flex align-items-center">
+          <div class="add-new">
+            <button class="icon-add btn btn-main-blue" (click)="openCreateModal()">
+              <span class="fas fa-plus fa-xs"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="table-section table-responsive d-flex">
+        <table class="table table-borderless mx-3 my-0">
+          <caption></caption>
+          <thead>
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Monto</th>
+              <th scope="col">Nota</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let expense of expenses$ | async">
+              <td>
+                <span [ngbPopover]="popContent" placement="bottom" class="cursor-pointer">
+                  {{expense.title}}
+                </span>
+              </td>
+              <td>
+                <span [ngbPopover]="popContent" placement="bottom" class="cursor-pointer">
+                  {{expense.createdAt.toDate() | date: 'dd/MM/yyyy'}}
+                </span>
+              </td>
+              <td>
+                <span [ngbPopover]="popContent" placement="bottom" class="cursor-pointer">
+                  {{expense.amount | currency: 'CLP':'$'}}
+                </span>
+              </td>
+              <td>
+                <span [ngbPopover]="popContent" placement="bottom" class="cursor-pointer">
+                  {{expense.comment}}
+                </span>
+              </td>
+
+              <ng-template #popContent>
+                <div class="d-flex flex-column p-1">
+                  <div class="popover-item">
+                    Editar
+                  </div>
+                  <div class="popover-item">
+                    Eliminar...
+                  </div>
+                </div>
+              </ng-template>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-center p-2">
+        <ngb-pagination [collectionSize]="collectionSize" [maxSize]="5" [(page)]="page" (pageChange)="filter()"
+          [pageSize]="pageSize">
+        </ngb-pagination>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #isLoading>
+  <div class="d-flex justify-content-center align-items-center h-100 loading">
+    <div class="d-flex flex-column align-items-center">
+      <span class="fas fa-spinner fa-spin fa-3x mb-2"></span>
+      <h5>Cargando...</h5>
+    </div>
+  </div>
+</ng-template>

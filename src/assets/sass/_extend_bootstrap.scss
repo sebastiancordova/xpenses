@@ -1,0 +1,452 @@
+
+/* ============= Buttons ============= */
+.btn-radius {
+    border-radius: 25px;
+}
+.btn-link {
+    color: $color-brand-main;
+
+    &:hover {
+        color: darken($color-brand-main, 20%);
+    }
+}
+.btn-floating {
+    width: 30px;
+    height: 30px;
+    box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18),
+        0 4px 15px 0 rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 1;
+    vertical-align: middle;
+    display: inline-block;
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    font-size: 1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    i {
+        line-height: 1.2em;
+        display: inline-block;
+        width: inherit;
+        text-align: center;
+        color: white;
+    }
+
+    &.btn-sm {
+        width: 27px;
+        height: 27px;
+        font-size: 0.8em;
+
+        i {
+            line-height: 27px;
+        }
+    }
+}
+.btn-main {
+    color: white;
+    background-color: $color-brand-main;
+    border-color: $color-brand-main;
+
+    &:not(:disabled):not(.disabled):active,
+    &:not(:disabled):not(.disabled).active,
+    &.dropdown-toggle {
+        color: white;
+        background-color: darken($color-brand-main, 10%);
+        border-color: darken($color-brand-main, 10%);
+    }
+
+    &:focus,
+    &.focus {
+        box-shadow: 0 0 0 0.2rem lighten($color-brand-main, 20%);
+    }
+    &:hover {
+        color: white;
+        background-color: darken($color-brand-main, 10%);
+        border-color: darken($color-brand-main, 10%);
+    }
+}
+.btn-blaze,
+.btn-brand {
+    color: white;
+    background-color: $color-brand-blaze;
+    background-image: linear-gradient(
+        135deg,
+        $color-brand-blaze,
+        $color-brand-purple
+    );
+    border: none;
+
+    &:not(:disabled):not(.disabled):active,
+    &:not(:disabled):not(.disabled).active,
+    &.dropdown-toggle {
+        color: white;
+        background-color: darken($color-brand-blaze, 10%);
+        border-color: darken($color-brand-blaze, 10%);
+    }
+
+    &:focus,
+    &.focus {
+        box-shadow: 0 0 0 0.2rem lighten($color-brand-blaze, 20%);
+    }
+    &.disabled,
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.35;
+    }
+    &:hover {
+        color: white;
+        background-image: linear-gradient(
+            135deg,
+            darken($color-brand-blaze, 10%),
+            darken($color-brand-purple, 10%)
+        );
+        border: none;
+    }
+}
+.btn-grey {
+    color: white;
+    background-color: $color-grey-light;
+    border: none;
+
+    &:not(:disabled):not(.disabled):active,
+    &:not(:disabled):not(.disabled).active,
+    &.dropdown-toggle {
+        color: white;
+        background-color: darken($color-grey-light, 10%);
+        border-color: darken($color-grey-light, 10%);
+    }
+
+    &:focus,
+    &.focus {
+        box-shadow: 0 0 0 0.2rem lighten($color-grey-light, 20%);
+    }
+    &.disabled,
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.35;
+    }
+    &:hover {
+        color: white;
+        background-color: darken($color-grey-light, 10%);
+        border: none;
+    }
+}
+.btn-group-special {
+    background: none;
+    border-radius: 25px;
+
+    > .btn {
+        min-width: 45px;
+        background: none;
+        border-right: none;
+        border-top: none;
+        border-bottom: none;
+        border-left-color: rgba(255, 255, 255, 0.3);
+
+        .icon {
+            display: block;
+        }
+
+        &:first {
+            border-left: none;
+        }
+        &:hover {
+            background-color: darken($color-brand-ocean, 20%);
+        }
+    }
+}
+.btn-white {
+    background-color: white;
+    color: $color-brand-primary;
+    &:hover {
+        background-color: $color-brand-primary;
+        color: #ffffff;
+    }
+}
+.btn-blue {
+    background-color: $color-brand-primary;
+    color: #ffffff;
+    &:hover {
+        color: #ffffff;
+    }
+}
+/* FIN Buttons */
+
+
+
+/* ============= Labels ============= */
+span.label,
+div.label {
+    &.label-bordered {
+        background: none;
+
+        &.label-danger {
+            border: 1px $red solid;
+            color: $red;
+        }
+    }
+    &.label-xs {
+        font-size: 10px;
+    }
+}
+.label-default {
+    background-color: $color-grey-light;
+}
+/* FIN Labels */
+
+/* ============= Form ============= */
+.input-group {
+    .form-control {
+        height: 35px;
+    }
+}
+.form-group {
+    label {
+        text-align: left;
+        font-weight: bold;
+        font-size: 0.9rem;
+        color: $color-grey-dark;
+        margin-bottom: 0.2rem;
+
+        &.label-contrast {
+            color: white;
+        }
+    }
+
+    /* enable absolute positioning */
+    .inner-addon {
+        position: relative;
+
+        .inner-addon-item {
+            position: absolute;
+            pointer-events: none;
+            top: 0;
+            height: 100%;
+            padding: 0 0.65em;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        &.clickable {
+            .inner-addon-item {
+                pointer-events: auto;
+            }
+        }
+        &.left-addon {
+            .inner-addon-item {
+                left: 0px;
+            }
+            input {
+                padding-left: 30px;
+            }
+        }
+        &.right-addon {
+            .inner-addon-item {
+                right: 0px;
+            }
+            input {
+                padding-right: 30px;
+            }
+        }
+    }
+}
+/* FIN Form */
+
+/* ============= Tooltip ============= */
+.tooltip {
+    .tooltip-inner {
+        font-family: "Lato", sans-serif;
+        background-color: black;
+        font-size: 1em;
+        color: $color-grey-lightest;
+        border-radius: 0;
+        padding: 0.6em 1em;
+    }
+}
+/* Tooltip */
+
+/* ============= Dropdown ============= */
+.dropdown-menu {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    .dropdown-header {
+        padding: 0.3rem 1.5rem;
+        font-weight: bold;
+        font-size: 10px;
+        color: $color-grey-lightest;
+        text-transform: uppercase;
+    }
+    .dropdown-item {
+        font-size: 14px;
+        color: $color-grey-light;
+        padding: 0.2rem 1rem;
+
+        &.dropdown-item-pink {
+            color: $color-brand-main;
+        }
+        &.active,
+        &:active {
+            color: white;
+            background-color: $color-brand-main;
+        }
+    }
+    .active {
+        background-color: $blue;
+
+        a {
+            color: white;
+        }
+    }
+}
+.dropdown-filter {
+    top: -1em;
+    left: auto;
+    right: -50%;
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    border-radius: 0;
+    border: none;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.3);
+
+    &.left {
+        right: auto;
+        left: 0;
+    }
+
+    ul {
+        margin: 2em 0 0;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+    li {
+        color: $color-grey-light;
+        font-size: 14px;
+
+        &.dropdown-header {
+            font-size: 0.8em;
+            color: $color-grey-lighter;
+        }
+
+        a,
+        label {
+            font-weight: normal;
+            display: block;
+            padding: 0.5em 1.3em 0.5em 1.3em;
+            color: $color-grey-light;
+        }
+        .icono {
+            margin-right: 0.5em;
+        }
+        &.active {
+            a {
+                background: $blue;
+                color: white;
+            }
+        }
+
+        /* Forms */
+        label {
+            cursor: pointer;
+
+            &:hover {
+                color: $color-grey-dark;
+            }
+
+            .icono {
+                margin: -1px 4px 0 0;
+                vertical-align: middle;
+            }
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            display: none;
+
+            &:checked {
+                + label .texto,
+                ~ .texto {
+                    color: $color-grey-dark;
+                }
+                + label .icono,
+                ~ .icono {
+                }
+            }
+            &:disabled {
+                + label .texto,
+                ~ .texto {
+                    color: $color-grey-lighter;
+                    opacity: 0.5;
+                    cursor: not-allowed;
+
+                    &:hover {
+                        color: $color-grey-lighter;
+                    }
+                }
+            }
+        }
+    }
+}
+/* FIN Dropdown */
+
+/* ============= Popover ============= */
+.popover {
+    &.popover-dropdown {
+        .popover-body {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .dropdown-header {
+            padding: 0.3rem 1.5rem;
+            font-weight: bold;
+            font-size: 10px;
+            color: $color-grey-lightest;
+            text-transform: uppercase;
+        }
+        .dropdown-item {
+            font-size: 14px;
+            color: $color-grey-light;
+            padding: 0.2rem 1rem;
+
+            &.dropdown-item-pink {
+                color: $color-brand-main;
+            }
+            &.active,
+            &:active {
+                color: white;
+                background-color: $color-brand-main;
+            }
+        }
+        .active {
+            background-color: $color-brand-main;
+
+            a {
+                color: white;
+            }
+        }
+    }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+@media (max-width: $break-md) {
+    .dropdown-menu {
+        .dropdown-item {
+            // using Modernizer CSS classes to detect if browser supports the W3C Touch Events API
+            &:hover::after {
+                content: none;
+            }
+        }
+    }
+}

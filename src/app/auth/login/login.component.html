@@ -1,0 +1,56 @@
+<span class="bg bg-color"></span>
+<div class="ayr-login">
+    <div class="login-block">
+        <div class="form-login">
+            <h5>Xpenses</h5>
+            <span>Iniciar sesión</span>
+            <form [formGroup]="loginForm" (ngSubmit)="submit()" class="mt-4" novalidate>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" autocomplete="off" id="email" formControlName="email" class="form-control"
+                        placeholder="Ej: nombre@gmail.com" />
+                    <ng-container *ngIf="email?.invalid && email?.touched">
+                        <div class="alert alert-danger mt-2">
+                            <div *ngIf="email?.hasError('required')">
+                                El correo electrónico es obligatorio
+                            </div>
+                            <div *ngIf="email?.hasError('email')">
+                                Ingresa un correo válido
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" formControlName="password" class="form-control"
+                        placeholder="********" />
+                    <ng-container *ngIf="password?.invalid && password?.touched">
+                        <div class="alert alert-danger mt-2">
+                            <div *ngIf="password?.hasError('required')">
+                                La contraseña es obligtoria
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-blue btn-block btn-radius"
+                        [disabled]="loginForm.invalid || loading">
+                        <span class="d-flex justify-content-between align-items-center">
+                            Acceder
+                            <i class="fas fa-arrow-right" *ngIf="!loading"></i><i
+                                class="fas fa-spinner fa-spin text-white" *ngIf="loading"></i>
+                        </span>
+                    </button>
+                    <button type="button" class="btn btn-white btn-block btn-radius">
+                        <span class="d-flex justify-content-between align-items-center" routerLink="/auth/reset">
+                            Olvidé mi contraseña <i class="fas fa-lock"></i>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="d-flex align-items-center justify-content-center mt-2">
+            <span class="text-white">¿No tienes cuenta? <span class="font-weight-bold cursor-pointer" routerLink="/auth/register">¡Registrate!</span></span>
+        </div>
+    </div>
+</div>

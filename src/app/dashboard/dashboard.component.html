@@ -1,0 +1,17 @@
+<div class="p-4">
+  <div class="d-flex justify-content-center align-items-center">
+    <h2>Dashboard</h2>
+  </div>
+  <div class="d-flex justify-content-center align-items-center">
+    <h4>Gastos mensuales</h4>
+  </div>
+  <div class="chart-section mt-2">
+    <canvas baseChart [data]="doughnutChartData" [legend]="true" [type]="doughnutChartType" [options]="barChartOptions">
+    </canvas>
+  </div>
+  <div class="d-flex justify-content-center align-items-center">
+    <div class="">
+      <h4>total = {{total | currency: 'CLP':'$'}}</h4>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,202 @@
+// mixins
+/*
+ * Gradiente de Suift
+ * Usage:
+ * @include background-brand();
+ * @include background-brand(90deg);
+ *
+ */
+@mixin background-brand(
+    $deg: 135deg,
+    $c1: $color-brand-blaze,
+    $c2: $color-brand-purple
+) {
+    background-image: linear-gradient($deg, $c1 0%, $c2 100%);
+}
+
+/*
+ * Cross-browser input-placeholder
+ * Usage:
+ * @include input-placeholder(#898989);
+ *
+ */
+@mixin input-placeholder($color) {
+    &::-webkit-input-placeholder {
+        color: $color;
+    }
+    &:-moz-placeholder {
+        color: $color;
+    }
+    &::-moz-placeholder {
+        color: $color;
+    }
+    &:-ms-input-placeholder {
+        color: $color;
+    }
+    &:input-placeholder {
+        color: $color;
+    }
+}
+
+/*
+ * Cross-browser transitions
+ * Usage:
+ * @include transition(background-color .3s .2s, color .3s ease, ...);
+ *
+ */
+@mixin transition($args...) {
+    -webkit-transition: $args;
+    -moz-transition: $args;
+    -ms-transition: $args;
+    -o-transition: $args;
+    transition: $args;
+}
+
+/*
+ * Cross-browser transform
+ * Usage:
+ * @include transform(translate(-50%, -50%) scale(.5));
+ *
+ */
+@mixin transform($args...) {
+    -webkit-transform: $args;
+    -moz-transform: $args;
+    -ms-transform: $args;
+    -o-transform: $args;
+    transform: $args;
+}
+
+/*
+ * Cross-browser transform-origin
+ * Usage:
+ * @include transform-origin(50% 50%);
+ *
+ */
+@mixin transform-origin($origin) {
+    moz-transform-origin: $origin;
+    -o-transform-origin: $origin;
+    -ms-transform-origin: $origin;
+    -webkit-transform-origin: $origin;
+    transform-origin: $origin;
+}
+
+/*
+ * Cross-browser opacity
+ * Usage:
+ * @include opacity(0.8);
+ *
+ */
+@mixin opacity($opacity) {
+    opacity: $opacity;
+    $opacity-ie: $opacity * 100;
+    filter: alpha(opacity=$opacity-ie); //IE8
+}
+
+/*
+ * Clearfix for cols
+ * Usage:
+ * @extend %clearfix;
+ *
+ */
+%clearfix {
+    *zoom: 1;
+    &:before,
+    &:after {
+        content: ' ';
+        display: table;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+/*
+  This mixin can be used to set the object-fit:
+  @include object-fit(contain);
+
+  or object-fit and object-position:
+  @include object-fit(cover, top);
+*/
+@mixin object-fit($fit: fill, $position: null) {
+    -o-object-fit: $fit;
+    object-fit: $fit;
+    @if $position {
+        -o-object-position: $position;
+        object-position: $position;
+        font-family: 'object-fit: #{$fit}; object-position: #{$position}';
+    } @else {
+        font-family: 'object-fit: #{$fit}';
+    }
+}
+
+/*
+ * Font Family Default
+ * Usage:
+ * @include font-family-default();
+ *
+ */
+@mixin font-family-default() {
+    font-family: $font-default, 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+}
+
+/*
+ * Line Clamp
+ * Usage:
+ * @include line-clamp(3);
+ *
+ * - or -
+ *
+ * <div class="line-clamp-1">Content...</div>
+ *
+ */
+
+@mixin line-clamp(
+    $maxLines: 2,
+    $fgCol: #000,
+    $bgCol: #fff,
+    $lineHeight: $line-height
+) {
+    position: relative;
+    overflow: hidden;
+
+    /* These are technically the same, but use both */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    -ms-word-break: break-all;
+    /* This is the dangerous one in WebKit, as it breaks things wherever */
+    // word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;
+
+    /* Adds a hyphen where the word breaks, if supported (No Blink) */
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $maxLines;
+}
+@mixin scrollbar {
+    /* width */
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 0.2rem;
+    }
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+        background: #aaa;
+    }
+}
