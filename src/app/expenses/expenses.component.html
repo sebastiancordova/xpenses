@@ -7,6 +7,11 @@
           <div class="d-flex">
             <input type="text" formControlName="search" class="form-control form-control-sm input-search"
               placeholder="Buscar..." />
+
+            <select id="category" class="form-control form-control-sm ml-3 input-search" formControlName="category">
+              <option value="">- Categoria -</option>
+              <option *ngFor="let enum of expenseCategory | keyvalue" [value]="enum.key">{{enum.value}}</option>
+            </select>
           </div>
         </form>
         <div class="d-flex align-items-center">
@@ -25,44 +30,33 @@
               <th scope="col">Nombre</th>
               <th scope="col">Fecha</th>
               <th scope="col">Monto</th>
-              <th scope="col">Nota</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let expense of expenses$ | async">
+            <tr *ngFor="let expense of expenses" (click)="openEditModal(expense)" class="cursor-pointer">
               <td>
-                <span [ngbPopover]="popContent" placement="bottom" class="cursor-pointer">
+                <span>
                   {{expense.title}}
                 </span>
               </td>
               <td>
-                <span [ngbPopover]="popContent" placement="bottom" class="cursor-pointer">
+                <span>
                   {{expense.createdAt.toDate() | date: 'dd/MM/yyyy'}}
                 </span>
               </td>
               <td>
-                <span [ngbPopover]="popContent" placement="bottom" class="cursor-pointer">
+                <span>
                   {{expense.amount | currency: 'CLP':'$'}}
                 </span>
               </td>
-              <td>
-                <span [ngbPopover]="popContent" placement="bottom" class="cursor-pointer">
-                  {{expense.comment}}
-                </span>
-              </td>
-
-              <ng-template #popContent>
-                <div class="d-flex flex-column p-1">
-                  <div class="popover-item">
-                    Editar
-                  </div>
-                  <div class="popover-item">
-                    Eliminar...
-                  </div>
-                </div>
-              </ng-template>
-
             </tr>
+            <ng-container *ngIf="totalAmountFiltered !== 0">
+              <tr>
+                <td class="font-weight-bold">Total</td>
+                <td></td>
+                <td class="font-weight-bold">{{totalAmountFiltered | currency: 'CLP':'$'}}</td>
+              </tr>
+            </ng-container>
           </tbody>
         </table>
       </div>

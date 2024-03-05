@@ -31,6 +31,7 @@ export class AddExpenseComponent {
   }
 
   submit() {
+    this.loading = true;
     const newExpense: Expense = this.addExpenseForm.value;
     this.newExpense$.emit(newExpense)
     this.activeModal.close();

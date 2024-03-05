@@ -8,18 +8,18 @@ export interface Expense extends Base {
 }
 
 export enum ExpenseCategory {
-  SUPERMARKET = "Supermercado",
-  SUBSCRIPTIONS = "Subscripciones",
-  TRANSPORT = "Transporte",
-  HOUSE = "Casa",
-  BILLS = "Cuentas",
-  ENTERTAINMENT = "Entretenimiento",
-  OTHERS = "Otros",
-  CLOTHING = "Ropa",
-  SELFCARE = "Auto cuidado"
+  Supermercado = "Supermercado",
+  Subscripciones = "Subscripciones",
+  Transporte = "Transporte",
+  Casa = "Casa",
+  Cuentas = "Cuentas",
+  Entretenimiento = "Entretenimiento",
+  Otros = "Otros",
+  Ropa = "Ropa",
+  "Auto cuidado" = "Auto cuidado"
 }
 
 enum EntertainmentTypes {
-  RESTAURANTS = "restaurants",
-  PUBS = "pubs",
+  Restaurants = "Restaurants",
+  Pubs = "Pubs",
 }
