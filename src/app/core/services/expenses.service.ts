@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { CollectionReference, Firestore, collection, collectionData, Timestamp, addDoc, doc, orderBy, query } from '@angular/fire/firestore';
+import { CollectionReference, Firestore, collection, collectionData, Timestamp, addDoc, doc, orderBy, query, deleteDoc, updateDoc } from '@angular/fire/firestore';
 import { Expense } from '@core/models/expense';
 import { Observable, switchMap, of } from 'rxjs';
 import { UserService } from './user.service';
@@ -19,7 +19,7 @@ export class ExpensesService {
         if (user) {
           const colRef = collection(this.firestore, `users/${user.uid}/expenses`) as CollectionReference<Expense>;
           const queryRef = query(colRef, orderBy('createdAt', 'desc')); // Add the orderBy clause here
-          return collectionData(queryRef); // Use the modified query reference
+          return collectionData(queryRef, { idField: 'uid' }); // Use the modified query reference
         }
         return of([]);
       })
@@ -31,5 +31,17 @@ export class ExpensesService {
     expense.createdAt = Timestamp.now();
     expense.updatedAt = Timestamp.now();
     return addDoc(colRef, expense);
+  }
+
+  update(expense: Expense) {
+    const docRef = doc(this.firestore, `users/${this.userService.currentUserValue.uid}/expenses/${expense.uid}`);
+    expense.updatedAt = Timestamp.now();
+    console.log(expense);
+    return updateDoc(docRef, { ...expense });
+  }
+
+  delete(id: string) {
+    const docRef = doc(this.firestore, `users/${this.userService.currentUserValue.uid}/expenses/${id}`)
+    return deleteDoc(docRef);
   }
 }
