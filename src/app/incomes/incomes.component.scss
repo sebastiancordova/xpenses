@@ -1,134 +1,109 @@
 @import "src/assets/sass/variables";
 
 :host {
-    .container {
-      margin-top: 1.5rem;
-        max-width: 1200px;
-        .table-container {
-            border-radius: 12px;
-            -webkit-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
-            -moz-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
-            box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
-            .filter-section {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                @media (max-width: $break-sm) {
-                    flex-wrap: wrap;
-                }
-                input,
-                select {
-                    border-radius: 5px;
-                    font-size: 0.8rem;
-                }
-                input {
-                    background-color: #f4f5fa;
-                }
-                .input-search {
-                    max-width: 15em;
-                }
-                .filter-facility-selector {
-                    width: 12em;
-                    flex-shrink: 0;
-                }
-                .icon-add {
-                    background-color: $color-brand-primary;
-                    width: 25px;
-                    height: 25px;
-                    border-radius: 50%;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    margin: 0 auto;
-                    cursor: pointer;
+  .container {
+    margin-top: 1.5rem;
+    max-width: 1200px;
+    .table-container {
+      border-radius: 12px;
+      -webkit-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
+      -moz-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
+      box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
+      .title {
+        font-size: 1.5rem;
+      }
+      .icon-add {
+        background-color: $color-brand-primary;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        cursor: pointer;
 
-                    span.fas {
-                        color: white;
-                        font-size: 0.9rem;
-                    }
-                }
-                .btn-export {
-                    background-color: #4b4c5e;
-                    color: #ffffff;
-                    padding: 0.2em 0.7em;
-                    display: flex;
-                    align-items: center;
-                    span.fa-arrow-up {
-                        font-size: 0.9em;
-                    }
-                }
-                ::ng-deep {
-                    ng-select {
-                        &.nqg-guard-select {
-                            min-width: 12em;
-                            min-height: 30px;
-                            max-height: 30px;
-                            .ng-select-container {
-                                min-height: 30px;
-                                max-height: 30px;
-                                .ng-clear-wrapper {
-                                    display: none;
-                                }
-                                .ng-arrow-wrapper {
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            .table-section {
-                .popover-item {
-                    padding: 0.5rem 5rem 0.5rem 0;
-                    color: $color-grey;
-                    &:hover {
-                        cursor: pointer;
-                        color: $color-brand-primary;
-                        font-weight: bolder;
-                    }
-                    &.disabled-link {
-                        &:hover {
-                            color: $color-grey;
-                            cursor: not-allowed;
-                            font-weight: normal;
-                        }
-                    }
-                }
-                .table {
-                    &.table-borderless {
-                        background-color: #f4f5fa;
-                        border-radius: 10px;
-                    }
-                    tbody {
-                        tr {
-                            &:hover {
-                                background-color: #e2e2ea;
-                            }
-                            color: #676d79;
-                            .pending-status {
-                                font-size: 0.4em;
-                                color: #c9c9d5;
-                            }
-                            .approved-status {
-                                color: $color-brand-blue;
-                            }
-                            td {
-                                &.sickLeave-note {
-                                    max-width: 8em;
-                                    white-space: nowrap!important;
-                                    text-overflow: ellipsis;
-                                    overflow: hidden;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        span.fas {
+          color: white;
+          font-size: 0.9rem;
         }
+      }
+      .filter-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        @media (max-width: $break-sm) {
+          flex-wrap: wrap;
+        }
+        input,
+        select {
+          border-radius: 5px;
+          font-size: 0.8rem;
+        }
+        input {
+          background-color: #f4f5fa;
+        }
+        .input-search {
+          max-width: 15em;
+        }
+        .filter-facility-selector {
+          width: 12em;
+          flex-shrink: 0;
+        }
+      }
+      .table-section {
+        .popover-item {
+          padding: 0.5rem 5rem 0.5rem 0;
+          color: $color-grey;
+          &:hover {
+            cursor: pointer;
+            color: $color-brand-primary;
+            font-weight: bolder;
+          }
+          &.disabled-link {
+            &:hover {
+              color: $color-grey;
+              cursor: not-allowed;
+              font-weight: normal;
+            }
+          }
+        }
+        .table {
+          &.table-borderless {
+            background-color: #f4f5fa;
+            border-radius: 10px;
+          }
+          tbody {
+            tr {
+              &:hover {
+                background-color: #e2e2ea;
+              }
+              color: #676d79;
+              .pending-status {
+                font-size: 0.4em;
+                color: #c9c9d5;
+              }
+              .approved-status {
+                color: $color-brand-blue;
+              }
+              td {
+                &.sickLeave-note {
+                  max-width: 8em;
+                  white-space: nowrap !important;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                }
+              }
+            }
+          }
+        }
+      }
     }
-    .loading {
-        color: $color-brand-primary;
-    }
+  }
+  .loading {
+    color: $color-brand-primary;
+  }
 }
 
 @media (max-width: $break-sm) {

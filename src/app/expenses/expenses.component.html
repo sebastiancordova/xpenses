@@ -1,7 +1,15 @@
 <ng-container *ngIf="!loadingPage; else isLoading">
   <div class="container">
     <div class="table-container bg-white mt-2">
-      <h4 class="pt-3 pb-0 px-3 m-0 font-weight-bold">Gastos</h4>
+      <div class="d-flex align-items-center justify-content-between pt-3 px-3">
+        <span class="title font-weight-bold">Gastos</span>
+        <div class="add-new">
+          <button class="icon-add btn btn-main-blue" (click)="openCreateModal()">
+            <span class="fas fa-plus fa-xs"></span>
+          </button>
+        </div>
+      </div>
+
       <div class="filter-section p-3">
         <form class="" [formGroup]="filtersForm">
           <div class="d-flex">
@@ -14,13 +22,7 @@
             </select>
           </div>
         </form>
-        <div class="d-flex align-items-center">
-          <div class="add-new">
-            <button class="icon-add btn btn-main-blue" (click)="openCreateModal()">
-              <span class="fas fa-plus fa-xs"></span>
-            </button>
-          </div>
-        </div>
+
       </div>
       <div class="table-section table-responsive d-flex">
         <table class="table table-borderless mx-3 my-0">

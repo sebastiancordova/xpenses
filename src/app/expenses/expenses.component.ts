@@ -66,8 +66,6 @@ export class ExpensesComponent implements OnDestroy {
     if (category !== '') {
       expenses = expenses.filter(expense => expense.category === category);
       this.totalAmountFiltered = expenses.reduce((acc, expense) => acc + +expense.amount, 0);
-    } else {
-      this.totalAmountFiltered = 0;
     }
     this.collectionSize = expenses.length;
 
