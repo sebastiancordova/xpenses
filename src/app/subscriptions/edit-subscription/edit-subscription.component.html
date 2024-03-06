@@ -1,12 +1,12 @@
 <div class="modal-header text-center">
-  <h5 class="flex-grow-1">Agregar Ingreso</h5>
+  <h5 class="flex-grow-1">Editar Subscripción</h5>
   <div class="cursor-pointer" (click)="activeModal.dismiss()">
     <span class="fas fa-times fa-lg"></span>
   </div>
 </div>
 
 <div class="px-4 pb-4">
-  <form [formGroup]="addIncomeForm" (ngSubmit)="submit()" class="mt-4" novalidate>
+  <form [formGroup]="editSubscriptionForm" (ngSubmit)="submit()" class="mt-4" novalidate>
     <div class="expense-modal-form">
 
       <div class="form-group">
@@ -35,6 +35,13 @@
           <small class="d-flex justify-content-between align-items-center font-weight-bold">
             Confirmar
             <span class="fas fa-check" *ngIf="!loading"></span>
+            <span class="fas fa-spinner fa-spin" *ngIf="loading"></span>
+          </small>
+        </button>
+        <button type="button" class="btn btn-danger btn-block" (click)="delete()">
+          <small class="d-flex justify-content-between align-items-center font-weight-bold">
+            Eliminar
+            <span class="fas fa-trash" *ngIf="!loading"></span>
             <span class="fas fa-spinner fa-spin" *ngIf="loading"></span>
           </small>
         </button>

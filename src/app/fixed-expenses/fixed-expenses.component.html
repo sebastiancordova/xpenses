@@ -2,20 +2,23 @@
   <div class="container">
     <div class="table-container bg-white mt-2">
       <div class="d-flex align-items-center justify-content-between pt-3 px-3">
-        <span class="title font-weight-bold">Ingresos</span>
+        <span class="title font-weight-bold">Gastos Fijos</span>
         <div class="add-new">
           <button class="icon-add btn btn-main-blue" (click)="openCreateModal()">
             <span class="fas fa-plus fa-xs"></span>
           </button>
         </div>
       </div>
+
       <div class="filter-section p-3">
         <form class="" [formGroup]="filtersForm">
           <div class="d-flex">
             <input type="text" formControlName="search" class="form-control form-control-sm input-search"
               placeholder="Buscar..." />
+
           </div>
         </form>
+
       </div>
       <div class="table-section table-responsive d-flex">
         <table class="table table-borderless mx-3 my-0">
@@ -27,15 +30,15 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let income of incomes" (click)="openEditModal(income)" class="cursor-pointer">
+            <tr *ngFor="let fixedExpense of fixedExpenses" (click)="openEditModal(fixedExpense)" class="cursor-pointer">
               <td>
                 <span>
-                  {{income.title}}
+                  {{fixedExpense.title}}
                 </span>
               </td>
               <td>
                 <span>
-                  {{income.amount | currency: 'CLP':'$'}}
+                  {{fixedExpense.amount | currency: 'CLP':'$'}}
                 </span>
               </td>
             </tr>

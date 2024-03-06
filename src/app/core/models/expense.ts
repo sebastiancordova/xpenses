@@ -1,8 +1,11 @@
-import { Base } from "./base";
+import { Base } from './base';
 
-export interface Expense extends Base {
+export interface FixedExpense extends Base {
   title: string;
   amount: string;
+}
+
+export interface Expense extends FixedExpense {
   category: ExpenseCategory,
   comment: string;
 }

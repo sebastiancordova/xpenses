@@ -1,6 +1,9 @@
 import { Component, ViewChild, inject } from '@angular/core';
 import { Expense, ExpenseCategory } from '@core/models/expense';
 import { ExpensesService } from '@core/services/expenses.service';
+import { FixedExpensesService } from '@core/services/fixed-expenses.service';
+import { IncomesService } from '@core/services/incomes.service';
+import { SubscriptionsService } from '@core/services/subscriptions.service';
 import { ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { Subject, takeUntil } from 'rxjs';
@@ -13,6 +16,9 @@ import { Subject, takeUntil } from 'rxjs';
 export class DashboardComponent {
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
   private expensesService: ExpensesService = inject(ExpensesService);
+  private fixedExpensesService: FixedExpensesService = inject(FixedExpensesService);
+  private incomesService: IncomesService = inject(IncomesService);
+  private subscriptionsService: SubscriptionsService = inject(SubscriptionsService);
   private unsubscribe$ = new Subject<boolean>();
   public doughnutChartLabels!: string[];
   public doughnutChartData: ChartData<'doughnut'> = {

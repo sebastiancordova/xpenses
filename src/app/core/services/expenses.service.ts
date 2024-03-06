@@ -18,8 +18,8 @@ export class ExpensesService {
       switchMap(user => {
         if (user) {
           const colRef = collection(this.firestore, `users/${user.uid}/expenses`) as CollectionReference<Expense>;
-          const queryRef = query(colRef, orderBy('createdAt', 'desc')); // Add the orderBy clause here
-          return collectionData(queryRef, { idField: 'uid' }); // Use the modified query reference
+          const queryRef = query(colRef, orderBy('createdAt', 'desc'));
+          return collectionData(queryRef, { idField: 'uid' });
         }
         return of([]);
       })
@@ -36,7 +36,6 @@ export class ExpensesService {
   update(expense: Expense) {
     const docRef = doc(this.firestore, `users/${this.userService.currentUserValue.uid}/expenses/${expense.uid}`);
     expense.updatedAt = Timestamp.now();
-    console.log(expense);
     return updateDoc(docRef, { ...expense });
   }
 

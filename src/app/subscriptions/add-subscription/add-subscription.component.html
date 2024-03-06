@@ -1,12 +1,12 @@
 <div class="modal-header text-center">
-  <h5 class="flex-grow-1">Agregar Ingreso</h5>
+  <h5 class="flex-grow-1">Agregar Subscripción</h5>
   <div class="cursor-pointer" (click)="activeModal.dismiss()">
     <span class="fas fa-times fa-lg"></span>
   </div>
 </div>
 
 <div class="px-4 pb-4">
-  <form [formGroup]="addIncomeForm" (ngSubmit)="submit()" class="mt-4" novalidate>
+  <form [formGroup]="addSubscriptionForm" (ngSubmit)="submit()" class="mt-4" novalidate>
     <div class="expense-modal-form">
 
       <div class="form-group">

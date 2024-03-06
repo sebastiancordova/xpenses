@@ -2,7 +2,7 @@
   <div class="container">
     <div class="table-container bg-white mt-2">
       <div class="d-flex align-items-center justify-content-between pt-3 px-3">
-        <span class="title font-weight-bold">Ingresos</span>
+        <span class="title font-weight-bold">Subscripciones</span>
         <div class="add-new">
           <button class="icon-add btn btn-main-blue" (click)="openCreateModal()">
             <span class="fas fa-plus fa-xs"></span>
@@ -27,15 +27,15 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let income of incomes" (click)="openEditModal(income)" class="cursor-pointer">
+            <tr *ngFor="let subscription of subscriptions" (click)="openEditModal(subscription)" class="cursor-pointer">
               <td>
                 <span>
-                  {{income.title}}
+                  {{subscription.title}}
                 </span>
               </td>
               <td>
                 <span>
-                  {{income.amount | currency: 'CLP':'$'}}
+                  {{subscription.amount | currency: 'CLP':'$'}}
                 </span>
               </td>
             </tr>
