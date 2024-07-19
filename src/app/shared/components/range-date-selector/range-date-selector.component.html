@@ -1,0 +1,24 @@
+<div class="d-flex">
+  <div class="form-group m-0">
+    <div class="input-group position-relative">
+      <input name="datepicker" class="form-control" ngbDatepicker #datepicker="ngbDatepicker" [autoClose]="'outside'"
+        (dateSelect)="onDateSelection($event)" (closed)="onClosed()" [displayMonths]="1" [dayTemplate]="t"
+        outsideDays="hidden" [startDate]="fromDate!" [maxDate]="todayDate" tabindex="-1" readonly
+        value="{{currentMonth}}">
+      <span class="fas fa-calendar-alt calendar-icon cursor-pointer" (click)="datepicker.toggle()"></span>
+      <ng-template #t let-date let-focused="focused">
+        <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)"
+          [class.faded]="isHovered(date) || isInside(date)" (mouseenter)="hoveredDate = date"
+          (mouseleave)="hoveredDate = null">
+          {{ date.day }}
+        </span>
+      </ng-template>
+    </div>
+  </div>
+  <div class="form-group m-0">
+    <select name="months" id="months" class="form-control form-control-sm ml-3">
+      <option *ngFor="let month of months" [value]="month" [selected]="currentMonth" [ngValue]="currentMonth">{{month}}
+      </option>
+    </select>
+  </div>
+</div>

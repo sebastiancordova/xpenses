@@ -1,0 +1,51 @@
+:host {
+  min-width: 13em;
+  display: flex;
+  .form-group {
+    .hidden {
+      width: 0;
+      margin: 0;
+      border: none;
+      padding: 0;
+    }
+    input {
+      min-height: 30px;
+      max-height: 30px;
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #ababb9;
+      background-color: #f4f5fa;
+      border: none;
+    }
+    select {
+      border-radius: 5px;
+      font-size: 0.8rem;
+      background-color: #f4f5fa;
+    }
+    .calendar-icon {
+      color: #ababb9;
+      position: absolute;
+      top: 0.45em;
+      right: 0.5em;
+      z-index: 99;
+    }
+  }
+  .custom-day {
+    text-align: center;
+    padding: 0.185rem 0.25rem;
+    display: inline-block;
+    height: 2rem;
+    width: 2rem;
+  }
+  .custom-day.focused {
+    background-color: #e6e6e6;
+  }
+  .custom-day.range,
+  .custom-day:hover {
+    background-color: rgb(2, 117, 216);
+    color: white;
+  }
+  .custom-day.faded {
+    background-color: rgba(2, 117, 216, 0.5);
+  }
+}

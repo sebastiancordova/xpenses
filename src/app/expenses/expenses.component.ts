@@ -40,7 +40,6 @@ export class ExpensesComponent implements OnDestroy {
 
   ngOnInit(): void {
     this.expensesService.getAll().pipe(takeUntil(this.unsubscribe$)).subscribe((expenses) => {
-      console.log(expenses);
       this.fireExpenses = expenses;
       this.loadingPage = false;
       this.filter();
@@ -74,6 +73,17 @@ export class ExpensesComponent implements OnDestroy {
     this.expenses = expenses;
   }
 
+  filterByDate(date: any) {
+    console.log(date)
+    /*const startDate = new Date(2024, 1, 19);
+    const endDate = new Date();
+    this.expensesService.getAll(startDate, endDate).pipe(takeUntil(this.unsubscribe$)).subscribe((expenses) => {
+      console.log(expenses);
+      this.fireExpenses = expenses;
+      this.loadingPage = false;
+      this.filter();
+    });*/
+  }
 
   openCreateModal() {
     const modalRef = this.modalService.open(AddExpenseComponent, {

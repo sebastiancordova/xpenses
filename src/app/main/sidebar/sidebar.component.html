@@ -71,6 +71,12 @@
     </div>
 
     <div class="area-actions py-3">
+      <div class="nav-link" href="" [routerLink]="'/subscripciones'" (click)="toggleActive()">
+        <span class="d-flex align-items-center">
+          <span class="fa-solid fa-gear mr-2"></span>
+          Configuración
+        </span>
+      </div>
       <a href="" class="link d-flex align-items-center px-3 py-2" (click)="logout()">
         <i class="fa-solid fa-right-from-bracket mr-2"></i> Cerrar sesión
       </a>

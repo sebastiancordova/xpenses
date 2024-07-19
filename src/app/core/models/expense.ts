@@ -19,7 +19,8 @@ export enum ExpenseCategory {
   Entretenimiento = "Entretenimiento",
   Otros = "Otros",
   Ropa = "Ropa",
-  "Auto cuidado" = "Auto cuidado"
+  "Auto cuidado" = "Auto cuidado",
+  "Gasto Fijo" = "Gasto Fijo"
 }
 
 enum EntertainmentTypes {

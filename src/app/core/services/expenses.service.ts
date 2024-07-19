@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { CollectionReference, Firestore, collection, collectionData, Timestamp, addDoc, doc, orderBy, query, deleteDoc, updateDoc } from '@angular/fire/firestore';
+import { CollectionReference, Firestore, collection, collectionData, Timestamp, addDoc, doc, orderBy, query, deleteDoc, updateDoc, where, endAt } from '@angular/fire/firestore';
 import { Expense } from '@core/models/expense';
-import { Observable, switchMap, of } from 'rxjs';
+import { Observable, switchMap, of, skipWhile } from 'rxjs';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -13,17 +13,26 @@ export class ExpensesService {
   private expensesCollection!: CollectionReference<Expense>;
   constructor() { }
 
-  getAll(): Observable<Expense[]> {
-    return this.userService.currentUser.pipe(
-      switchMap(user => {
-        if (user) {
-          const colRef = collection(this.firestore, `users/${user.uid}/expenses`) as CollectionReference<Expense>;
-          const queryRef = query(colRef, orderBy('createdAt', 'desc'));
-          return collectionData(queryRef, { idField: 'uid' });
-        }
-        return of([]);
-      })
-    );
+  getAll(startDate?: Date, endDate?: Date): Observable<Expense[]> {
+    if (!startDate && !endDate) {
+      const date = new Date();
+      const month = date.getMonth();
+      const day = date.getDate();
+      const year = date.getFullYear()
+      if (day > 18) {
+        startDate = new Date(year, month + 1, day);
+      }
+      startDate = new Date(year, 5, 19);
+      //console.log(startDate)
+      endDate = date;
+    }
+    const userId = this.userService.currentUserValue.uid;
+
+
+    const colRef = collection(this.firestore, `users/${userId}/expenses`) as CollectionReference<Expense>;
+    const queryRef = query(colRef, orderBy('createdAt', 'desc'), where('createdAt', '>=', startDate));
+    return collectionData(queryRef, { idField: 'uid' }) as Observable<Expense[]>;
+
   }
 
   save(expense: Expense) {
