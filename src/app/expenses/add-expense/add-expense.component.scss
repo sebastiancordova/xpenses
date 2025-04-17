@@ -1,60 +1,60 @@
 @import "src/assets/sass/variables";
 @import "src/assets/sass/mixins";
 .add-expense-modal {
-    z-index: 9999;
-    .modal-dialog-centered.modal-sm{
-        max-width: 35rem;
-        .modal-content {
-            border-radius: 1rem;
-            .modal-header {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                padding: 1.5rem 1.5rem 0.5rem 1.5rem;
-                color: #ffffff;
-                background-color: #3f3f50;
-
-            }
-            label {
-                color: $color-grey;
-                font-size: 0.8rem;
-                &[for='customFile'] {
-                    font-weight: 600;
-                    margin-bottom: 0.2rem;
-                }
-            }
-            input, textarea {
-                border-radius: 7px;
-            }
-            button {
-                border-radius: 10px;
-            }
-            .btn-active {
-                margin-top: 0.5rem;
-                background-color: #3ad09a;
-                color: #ffffff;
-                &:hover {
-                    color: #ffffff;
-                }
-                &:focus {
-                    box-shadow: 0 0 0 0 transparent;
-                }
-                &.no-answer {
-                    background-color: #e44160;
-                }
-            }
-            .btn-answer {
-                margin-top: 0.5rem;
-                background-color: #8c8c9e;
-                color: #ffffff;
-                &:hover {
-                    color: #ffffff;
-                }
-                &:focus {
-                    box-shadow: 0 0 0 0 transparent;
-                }
-            }
+  z-index: 9999;
+  .modal-dialog-centered.modal-sm {
+    max-width: 35rem;
+    .modal-content {
+      border-radius: 1rem;
+      .modal-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+        color: #ffffff;
+        background-color: $color-brand-primary;
+      }
+      label {
+        color: $color-grey;
+        font-size: 0.8rem;
+        &[for="customFile"] {
+          font-weight: 600;
+          margin-bottom: 0.2rem;
         }
+      }
+      input,
+      textarea {
+        border-radius: 7px;
+      }
+      button {
+        border-radius: 10px;
+      }
+      .btn-active {
+        margin-top: 0.5rem;
+        background-color: #3ad09a;
+        color: #ffffff;
+        &:hover {
+          color: #ffffff;
+        }
+        &:focus {
+          box-shadow: 0 0 0 0 transparent;
+        }
+        &.no-answer {
+          background-color: #e44160;
+        }
+      }
+      .btn-answer {
+        margin-top: 0.5rem;
+        background-color: #8c8c9e;
+        color: #ffffff;
+        &:hover {
+          color: #ffffff;
+        }
+        &:focus {
+          box-shadow: 0 0 0 0 transparent;
+        }
+      }
     }
+  }
 }

@@ -19,7 +19,8 @@
     <div class="section-links">
       <ul class="nav flex-column flex-1">
         <li class="nav-item">
-          <div class="nav-link" href="" [routerLink]="'/dashboard'" (click)="toggleActive()">
+          <div class="nav-link" href="" [routerLink]="'/dashboard'" (click)="toggleActive()"
+            [routerLinkActive]="'active-link'">
             <span class="d-flex align-items-center">
               <span class="fa-solid fa-chart-pie mr-2"></span>
               Dashboard
@@ -27,7 +28,8 @@
           </div>
         </li>
         <li class="nav-item">
-          <div class="nav-link" href="" [routerLink]="'/incomes'" (click)="toggleActive()">
+          <div class="nav-link" href="" [routerLink]="'/ingresos'" (click)="toggleActive()"
+            [routerLinkActive]="'active-link'">
             <span class="d-flex align-items-center">
               <span class="fa-regular fa-coins mr-2"></span>
               Ingresos
@@ -35,7 +37,8 @@
           </div>
         </li>
         <li class="nav-item">
-          <div class="nav-link" href="" [routerLink]="'/expenses'" (click)="toggleActive()">
+          <div class="nav-link" href="" [routerLink]="'/gastos'" (click)="toggleActive()"
+            [routerLinkActive]="'active-link'">
             <span class="d-flex align-items-center">
               <span class="fa-solid fa-receipt mr-2"></span>
               Gastos
@@ -43,7 +46,8 @@
           </div>
         </li>
         <li class="nav-item">
-          <div class="nav-link" href="" [routerLink]="'/expenses'" (click)="toggleActive()">
+          <div class="nav-link" href="" [routerLink]="'/gastos-fijos'" (click)="toggleActive()"
+            [routerLinkActive]="'active-link'">
             <span class="d-flex align-items-center">
               <span class="fa-solid fa-thumbtack mr-2"></span>
               Gastos Fijos
@@ -51,7 +55,8 @@
           </div>
         </li>
         <li class="nav-item">
-          <div class="nav-link" href="" [routerLink]="'/expenses'" (click)="toggleActive()">
+          <div class="nav-link" href="" [routerLink]="'/subscripciones'" (click)="toggleActive()"
+            [routerLinkActive]="'active-link'">
             <span class="d-flex align-items-center">
               <span class="fa-solid fa-repeat mr-2"></span>
               Subscripciones
@@ -66,6 +71,12 @@
     </div>
 
     <div class="area-actions py-3">
+      <div class="nav-link" href="" [routerLink]="'/subscripciones'" (click)="toggleActive()">
+        <span class="d-flex align-items-center">
+          <span class="fa-solid fa-gear mr-2"></span>
+          Configuración
+        </span>
+      </div>
       <a href="" class="link d-flex align-items-center px-3 py-2" (click)="logout()">
         <i class="fa-solid fa-right-from-bracket mr-2"></i> Cerrar sesión
       </a>

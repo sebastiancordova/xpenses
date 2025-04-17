@@ -1,43 +1,39 @@
 import { Component, EventEmitter, inject, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Income } from '@core/models/income';
+import { Subscription } from '@core/models/subscriptions';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'app-add-incomes',
-  templateUrl: './add-incomes.component.html',
-  styleUrls: ['./add-incomes.component.scss'],
+  selector: 'app-add-subscription',
+  templateUrl: './add-subscription.component.html',
+  styleUrls: ['./add-subscription.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class AddIncomesComponent {
-  public addIncomeForm!: FormGroup;
+export class AddSubscriptionComponent {
+  public addSubscriptionForm!: FormGroup;
   public loading = false
   public activeModal: NgbActiveModal = inject(NgbActiveModal);
-  @Output() newIncome$ = new EventEmitter<Income>();
+  @Output() newSubscription$ = new EventEmitter<Subscription>();
   private fb: FormBuilder = inject(FormBuilder);
   constructor() {
-    this.addIncomeForm = this.fb.group({
+    this.addSubscriptionForm = this.fb.group({
       title: ['', Validators.required],
       amount: ['', Validators.required]
     })
 
   }
 
-  ngOnInit(): void {
-
-  }
-
   submit() {
     this.loading = true;
-    const newExpense: Income = this.addIncomeForm.value;
-    this.newIncome$.emit(newExpense)
+    const newSubscription: Subscription = this.addSubscriptionForm.value;
+    this.newSubscription$.emit(newSubscription)
     this.activeModal.close();
   }
 
   get title() {
-    return this.addIncomeForm.get('title');
+    return this.addSubscriptionForm.get('title');
   }
   get amount() {
-    return this.addIncomeForm.get('amount');
+    return this.addSubscriptionForm.get('amount');
   }
 }
