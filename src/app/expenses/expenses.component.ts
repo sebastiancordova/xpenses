@@ -30,6 +30,7 @@ export class ExpensesComponent implements OnDestroy {
   private modalService: NgbModal = inject(NgbModal);
   public totalAmountFiltered = 0;
   public expenseCategory = ExpenseCategory;
+  private orderIndicator = false;
 
   constructor() {
     this.filtersForm = this.fb.group({
@@ -71,6 +72,32 @@ export class ExpensesComponent implements OnDestroy {
     // paginate
     expenses = expenses.slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
     this.expenses = expenses;
+  }
+
+  onOrderBy(type: string) {
+    switch (type) {
+      case 'amount':
+        if(this.orderIndicator){
+          this.fireExpenses.sort((a,b) => +b.amount - +a.amount )  
+        } else {
+          this.fireExpenses.sort((a,b) => +a.amount - +b.amount ) 
+        }
+        this.filter();
+        this.orderIndicator = !this.orderIndicator;
+      break;
+      case 'title':
+        if(this.orderIndicator) {
+          this.fireExpenses.sort((a, b) => a.title.localeCompare(b.title));
+        } else {
+          this.fireExpenses.sort((a, b) => b.title.localeCompare(a.title));
+        }
+        this.filter();
+        this.orderIndicator = !this.orderIndicator;
+      break;
+    
+      default:
+        break;
+    }
   }
 
   filterByDate(date: any) {

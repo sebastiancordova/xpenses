@@ -22,7 +22,7 @@ export class ExpensesService {
       if (day > 18) {
         startDate = new Date(year, month + 1, day);
       }
-      startDate = new Date(year, 5, 19);
+      startDate = new Date(2025, 2, 19);
       //console.log(startDate)
       endDate = date;
     }

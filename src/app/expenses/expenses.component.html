@@ -33,9 +33,9 @@
           <caption></caption>
           <thead>
             <tr>
-              <th scope="col">Nombre</th>
+              <th scope="col" (click)="onOrderBy('title')" class="cursor-pointer">Nombre</th>
               <th scope="col">Fecha</th>
-              <th scope="col">Monto</th>
+              <th scope="col" (click)="onOrderBy('amount')" class="cursor-pointer">Monto</th>
             </tr>
           </thead>
           <tbody>
