@@ -8,7 +8,7 @@
 <div class="px-4 pb-4">
   <form [formGroup]="editExpenseForm" (ngSubmit)="submit()" class="mt-4" novalidate>
     <div class="expense-modal-form">
-
+      <input type="text" class="d-none" autofocus>
       <div class="form-group">
         <label for="title">Titulo</label>
         <input autocomplete="off" type="text" class="form-control form-control-sm" id="title" formControlName="title">

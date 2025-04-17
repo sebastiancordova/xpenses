@@ -1,9 +1,12 @@
 import { Component, ViewChild, inject } from '@angular/core';
 import { Expense, ExpenseCategory } from '@core/models/expense';
 import { ExpensesService } from '@core/services/expenses.service';
+import { FixedExpensesService } from '@core/services/fixed-expenses.service';
+import { IncomesService } from '@core/services/incomes.service';
+import { SubscriptionsService } from '@core/services/subscriptions.service';
 import { ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, combineLatestWith } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,6 +16,9 @@ import { Subject, takeUntil } from 'rxjs';
 export class DashboardComponent {
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
   private expensesService: ExpensesService = inject(ExpensesService);
+  private fixedExpensesService: FixedExpensesService = inject(FixedExpensesService);
+  private incomesService: IncomesService = inject(IncomesService);
+  private subscriptionsService: SubscriptionsService = inject(SubscriptionsService);
   private unsubscribe$ = new Subject<boolean>();
   public doughnutChartLabels!: string[];
   public doughnutChartData: ChartData<'doughnut'> = {
@@ -30,12 +36,17 @@ export class DashboardComponent {
   };
   public total = 0;
   ngOnInit(): void {
-
-    this.expensesService.getAll().pipe(takeUntil(this.unsubscribe$))
-      .subscribe((expenses) => {
-        this.total = expenses.reduce((acc, expense) => acc + +expense.amount, 0);
+    const combined = this.expensesService.getAll().pipe(combineLatestWith(this.fixedExpensesService.getAll(), this.subscriptionsService.getAll()));
+    combined.pipe(takeUntil(this.unsubscribe$))
+      .subscribe(([expenses, fixedExpenses, subscriptions]) => {
+        console.log(subscriptions)
+        const totalFixedExpenses = fixedExpenses.reduce((acc, expense) => acc + +expense.amount, 0);
+        const totalSubscriptions = subscriptions.reduce((acc, subscription) => acc + +subscription.amount, 0);
+        this.total = expenses.reduce((acc, expense) => acc + +expense.amount, 0) + totalFixedExpenses + totalSubscriptions;
 
         const graphData = this.getTotalAmountperCategory(expenses)
+        graphData.push({ category: ExpenseCategory.Subscripciones, amount: '' + totalSubscriptions })
+        graphData.push({ category: ExpenseCategory['Gasto Fijo'], amount: '' + totalFixedExpenses })
         this.doughnutChartData.labels = graphData.map(expense => expense.category);
         this.doughnutChartData.datasets[0].data = graphData.map(expense => +expense.amount);
         this.chart?.update();

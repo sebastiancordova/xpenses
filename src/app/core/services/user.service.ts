@@ -20,10 +20,18 @@ export class UserService {
   }
 
   set user(user: IUser) {
-    this.loggedUser.next(user);
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      this.loggedUser.next(user);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    }
   }
 
   get currentUser() {
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      this.loggedUser.next(JSON.parse(currentUser));
+    }
     return this.loggedUser.asObservable();
   }
 

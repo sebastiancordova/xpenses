@@ -1,11 +1,10 @@
 @import "src/assets/sass/variables";
 @import "src/assets/sass/mixins";
-.add-income-modal {
+.edit-income-modal {
   z-index: 9999;
   .modal-dialog-centered.modal-sm {
-    max-width: 25rem;
+    max-width: 35rem;
     .modal-content {
-      overflow: hidden;
       border-radius: 1rem;
       .modal-header {
         display: flex;
@@ -30,6 +29,31 @@
       }
       button {
         border-radius: 10px;
+      }
+      .btn-active {
+        margin-top: 0.5rem;
+        background-color: #3ad09a;
+        color: #ffffff;
+        &:hover {
+          color: #ffffff;
+        }
+        &:focus {
+          box-shadow: 0 0 0 0 transparent;
+        }
+        &.no-answer {
+          background-color: #e44160;
+        }
+      }
+      .btn-answer {
+        margin-top: 0.5rem;
+        background-color: #8c8c9e;
+        color: #ffffff;
+        &:hover {
+          color: #ffffff;
+        }
+        &:focus {
+          box-shadow: 0 0 0 0 transparent;
+        }
       }
     }
   }

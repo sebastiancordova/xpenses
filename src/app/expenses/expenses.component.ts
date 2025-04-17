@@ -30,6 +30,7 @@ export class ExpensesComponent implements OnDestroy {
   private modalService: NgbModal = inject(NgbModal);
   public totalAmountFiltered = 0;
   public expenseCategory = ExpenseCategory;
+  private orderIndicator = false;
 
   constructor() {
     this.filtersForm = this.fb.group({
@@ -40,7 +41,6 @@ export class ExpensesComponent implements OnDestroy {
 
   ngOnInit(): void {
     this.expensesService.getAll().pipe(takeUntil(this.unsubscribe$)).subscribe((expenses) => {
-      console.log(expenses);
       this.fireExpenses = expenses;
       this.loadingPage = false;
       this.filter();
@@ -66,8 +66,6 @@ export class ExpensesComponent implements OnDestroy {
     if (category !== '') {
       expenses = expenses.filter(expense => expense.category === category);
       this.totalAmountFiltered = expenses.reduce((acc, expense) => acc + +expense.amount, 0);
-    } else {
-      this.totalAmountFiltered = 0;
     }
     this.collectionSize = expenses.length;
 
@@ -76,6 +74,43 @@ export class ExpensesComponent implements OnDestroy {
     this.expenses = expenses;
   }
 
+  onOrderBy(type: string) {
+    switch (type) {
+      case 'amount':
+        if(this.orderIndicator){
+          this.fireExpenses.sort((a,b) => +b.amount - +a.amount )  
+        } else {
+          this.fireExpenses.sort((a,b) => +a.amount - +b.amount ) 
+        }
+        this.filter();
+        this.orderIndicator = !this.orderIndicator;
+      break;
+      case 'title':
+        if(this.orderIndicator) {
+          this.fireExpenses.sort((a, b) => a.title.localeCompare(b.title));
+        } else {
+          this.fireExpenses.sort((a, b) => b.title.localeCompare(a.title));
+        }
+        this.filter();
+        this.orderIndicator = !this.orderIndicator;
+      break;
+    
+      default:
+        break;
+    }
+  }
+
+  filterByDate(date: any) {
+    console.log(date)
+    /*const startDate = new Date(2024, 1, 19);
+    const endDate = new Date();
+    this.expensesService.getAll(startDate, endDate).pipe(takeUntil(this.unsubscribe$)).subscribe((expenses) => {
+      console.log(expenses);
+      this.fireExpenses = expenses;
+      this.loadingPage = false;
+      this.filter();
+    });*/
+  }
 
   openCreateModal() {
     const modalRef = this.modalService.open(AddExpenseComponent, {

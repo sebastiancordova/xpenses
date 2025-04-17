@@ -28,6 +28,12 @@
   .active-link {
     color: white;
     background-color: $color-brand-primary;
+    &:focus {
+      outline: none;
+    }
+    &:hover {
+      color: white;
+    }
   }
 }
 .area-logo {
