@@ -67,6 +67,7 @@ export class ExpensesComponent implements OnDestroy {
       expenses = expenses.filter(expense => expense.category === category);
       this.totalAmountFiltered = expenses.reduce((acc, expense) => acc + +expense.amount, 0);
     }
+    this.totalAmountFiltered = expenses.reduce((acc, expense) => acc + +expense.amount, 0);
     this.collectionSize = expenses.length;
 
     // paginate
@@ -77,39 +78,35 @@ export class ExpensesComponent implements OnDestroy {
   onOrderBy(type: string) {
     switch (type) {
       case 'amount':
-        if(this.orderIndicator){
-          this.fireExpenses.sort((a,b) => +b.amount - +a.amount )  
+        if (this.orderIndicator) {
+          this.fireExpenses.sort((a, b) => +b.amount - +a.amount)
         } else {
-          this.fireExpenses.sort((a,b) => +a.amount - +b.amount ) 
+          this.fireExpenses.sort((a, b) => +a.amount - +b.amount)
         }
         this.filter();
         this.orderIndicator = !this.orderIndicator;
-      break;
+        break;
       case 'title':
-        if(this.orderIndicator) {
+        if (this.orderIndicator) {
           this.fireExpenses.sort((a, b) => a.title.localeCompare(b.title));
         } else {
           this.fireExpenses.sort((a, b) => b.title.localeCompare(a.title));
         }
         this.filter();
         this.orderIndicator = !this.orderIndicator;
-      break;
-    
+        break;
+
       default:
         break;
     }
   }
 
-  filterByDate(date: any) {
-    console.log(date)
-    /*const startDate = new Date(2024, 1, 19);
-    const endDate = new Date();
-    this.expensesService.getAll(startDate, endDate).pipe(takeUntil(this.unsubscribe$)).subscribe((expenses) => {
-      console.log(expenses);
+  filterByDate(date: { from: Date, to: Date }) {
+    this.expensesService.getAll(date.from, date.to).pipe(take(1)).subscribe((expenses) => {
       this.fireExpenses = expenses;
       this.loadingPage = false;
       this.filter();
-    });*/
+    });
   }
 
   openCreateModal() {

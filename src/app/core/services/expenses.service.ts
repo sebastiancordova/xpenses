@@ -14,25 +14,35 @@ export class ExpensesService {
   constructor() { }
 
   getAll(startDate?: Date, endDate?: Date): Observable<Expense[]> {
-    if (!startDate && !endDate) {
-      const date = new Date();
-      const month = date.getMonth();
-      const day = date.getDate();
-      const year = date.getFullYear()
-      if (day > 18) {
-        startDate = new Date(year, month + 1, day);
-      }
-      startDate = new Date(2025, 2, 19);
-      //console.log(startDate)
-      endDate = date;
-    }
     const userId = this.userService.currentUserValue.uid;
+    if(!userId){
+      return of([]);
+    }
+    let finalStartDate: Date;
+    let finalEndDate: Date;
+    if (startDate && endDate) {
+      finalStartDate = startDate;
+      finalEndDate = endDate;
+      finalEndDate.setHours(23, 59, 59, 999);
+    } else {
+      const date = new Date();
+      const currentMonth = date.getMonth();
+      const currentDay = date.getDate();
+      const currentYear = date.getFullYear()
 
+      if (currentDay >= 19) {
+        finalStartDate = new Date(currentYear, currentMonth, 19, 0, 0, 0, 0);
+        finalEndDate = new Date(currentYear, currentMonth + 1, 18, 23, 59, 59, 999);
+      } else {
+        finalStartDate = new Date(currentYear, currentMonth - 1, 19, 0, 0, 0, 0);
+        finalEndDate = new Date(currentYear, currentMonth, 18, 23, 59, 59, 999);
+      }
+    }
+    console.log(`Buscando gastos entre: ${finalStartDate.toLocaleDateString()} y ${finalEndDate.toLocaleDateString()}`)
 
     const colRef = collection(this.firestore, `users/${userId}/expenses`) as CollectionReference<Expense>;
-    const queryRef = query(colRef, orderBy('createdAt', 'desc'), where('createdAt', '>=', startDate));
+    const queryRef = query(colRef, orderBy('createdAt', 'desc'), where('createdAt', '>=', finalStartDate), where('createdAt', '<=', finalEndDate));
     return collectionData(queryRef, { idField: 'uid' }) as Observable<Expense[]>;
-
   }
 
   save(expense: Expense) {
