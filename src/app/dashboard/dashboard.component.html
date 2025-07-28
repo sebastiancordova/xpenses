@@ -1,9 +1,11 @@
 <div class="p-4">
   <div class="d-flex justify-content-center align-items-center">
-    <h2>Dashboard</h2>
+    <h2>Gastos mensuales</h2>
   </div>
   <div class="d-flex justify-content-center align-items-center">
-    <h4>Gastos mensuales</h4>
+    <span class="fa-solid fa-chevron-left cursor-pointer" (click)="goToPreviousMonth()"></span>
+    <h3 class="mx-2 w-50 text-center">{{displayMonthName}} - {{displayYear}}</h3>
+    <span class="fa-solid fa-chevron-right cursor-pointer" (click)="goToNextMonth()"></span>
   </div>
   <div class="chart-section mt-2">
     <canvas baseChart [data]="doughnutChartData" [legend]="true" [type]="doughnutChartType" [options]="barChartOptions">
