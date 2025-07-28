@@ -2,11 +2,10 @@ import { Component, ViewChild, inject } from '@angular/core';
 import { Expense, ExpenseCategory } from '@core/models/expense';
 import { ExpensesService } from '@core/services/expenses.service';
 import { FixedExpensesService } from '@core/services/fixed-expenses.service';
-import { IncomesService } from '@core/services/incomes.service';
 import { SubscriptionsService } from '@core/services/subscriptions.service';
 import { ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { Subject, takeUntil, combineLatestWith } from 'rxjs';
+import { Subject, combineLatestWith, take } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +16,6 @@ export class DashboardComponent {
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
   private expensesService: ExpensesService = inject(ExpensesService);
   private fixedExpensesService: FixedExpensesService = inject(FixedExpensesService);
-  private incomesService: IncomesService = inject(IncomesService);
   private subscriptionsService: SubscriptionsService = inject(SubscriptionsService);
   private unsubscribe$ = new Subject<boolean>();
   public doughnutChartLabels!: string[];
@@ -35,11 +33,35 @@ export class DashboardComponent {
     maintainAspectRatio: false
   };
   public total = 0;
+  private months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembere", "Octubre", "Noviembre", "Diciembre"];
+  public selectedMonth = new Date().getMonth();
+  public displayMonthName = this.months[this.selectedMonth];
+  public displayYear: number = new Date().getFullYear();
+  private displayDate: Date = new Date();
+
   ngOnInit(): void {
-    const combined = this.expensesService.getAll().pipe(combineLatestWith(this.fixedExpensesService.getAll(), this.subscriptionsService.getAll()));
-    combined.pipe(takeUntil(this.unsubscribe$))
+    this.loadExpenses();
+  }
+
+  loadExpenses() {
+    const year = this.displayDate.getFullYear();
+    const month = this.displayDate.getMonth();
+    const currentDay = this.displayDate.getDate();
+    let startDate: Date;
+    let endDate: Date;
+
+    if (currentDay >= 19) {
+      startDate = new Date(year, month, 19, 0, 0, 0, 0);
+      endDate = new Date(year, month + 1, 18, 23, 59, 59, 999);
+    } else {
+      startDate = new Date(year, month - 1, 19, 0, 0, 0, 0);
+      endDate = new Date(year, month, 18, 23, 59, 59, 999);
+    }
+
+    const combined = this.expensesService.getAll(startDate, endDate).pipe(combineLatestWith(this.fixedExpensesService.getAll(), this.subscriptionsService.getAll()));
+    combined.pipe(take(1))
       .subscribe(([expenses, fixedExpenses, subscriptions]) => {
-        console.log(subscriptions)
         const totalFixedExpenses = fixedExpenses.reduce((acc, expense) => acc + +expense.amount, 0);
         const totalSubscriptions = subscriptions.reduce((acc, subscription) => acc + +subscription.amount, 0);
         this.total = expenses.reduce((acc, expense) => acc + +expense.amount, 0) + totalFixedExpenses + totalSubscriptions;
@@ -72,6 +94,26 @@ export class DashboardComponent {
 
     }
     return graphData;
+  }
+
+  private updateDisplayInfo() {
+    const monthIndex = this.displayDate.getMonth();
+    this.displayMonthName = this.months[monthIndex];
+    this.displayYear = this.displayDate.getFullYear();
+  }
+
+  goToPreviousMonth() {
+    this.displayDate.setMonth(this.displayDate.getMonth() - 1);
+    this.displayDate = new Date(this.displayDate);
+    this.updateDisplayInfo();
+    this.loadExpenses();
+  }
+
+  goToNextMonth() {
+    this.displayDate.setMonth(this.displayDate.getMonth() + 1);
+    this.displayDate = new Date(this.displayDate);
+    this.updateDisplayInfo();
+    this.loadExpenses();
   }
 
   ngOnDestroy() {
