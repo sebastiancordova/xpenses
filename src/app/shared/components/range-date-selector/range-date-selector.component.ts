@@ -1,5 +1,4 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { CustomDateParserFormatterService } from '@core/services/custom-date-parserformatter.service';
 import { NgbCalendar, NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -8,7 +7,7 @@ import { NgbCalendar, NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-b
   styleUrls: ['./range-date-selector.component.scss']
 })
 export class RangeDateSelectorComponent implements OnInit {
-  @Output() rangeSelected = new EventEmitter<{ from: string; to: string }>();
+  @Output() rangeSelected = new EventEmitter<{ from: Date; to: Date }>();
   public hoveredDate: NgbDate | null = null;
   public fromDate!: NgbDate | null;
   public fromDateValue = '';
@@ -17,17 +16,17 @@ export class RangeDateSelectorComponent implements OnInit {
   public todayDate: NgbDate = this.calendar.getToday();
   public months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
     "Julio", "Agosto", "Septiembere", "Octubre", "Noviembre", "Diciembre"];
-  public currentMonth = "";
+  public currentPeriod = "";
   constructor(private calendar: NgbCalendar, public formatter: NgbDateParserFormatter) { }
 
 
   ngOnInit(): void {
     const today = this.calendar.getToday();
     this.fromDate = today;
-    if (this.fromDate.day < 19) {
-      this.currentMonth = this.months[today.month - 1]
+    if (this.fromDate.day >= 19) {
+      this.currentPeriod = `${this.months[today.month - 1]} - ${this.months[today.month]}`
     } else {
-      this.currentMonth = this.months[today.month]
+      this.currentPeriod = `${this.months[today.month - 2]} - ${this.months[today.month - 1]}`
     }
     this.fromDate.day = 19;
     this.fromDate.month = new Date().getMonth();
@@ -53,10 +52,16 @@ export class RangeDateSelectorComponent implements OnInit {
     if (this.toDate?.equals(this.calendar.getToday())) {
       this.toDateValue = 'Hoy';
     }
+
+    if (this.fromDate && this.toDate) {
+      const startDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
+      const endDate = new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
+      this.rangeSelected.emit({ from: startDate, to: endDate })
+    }
   }
 
   onClosed() {
-    this.rangeSelected.emit({ from: this.fromDateValue, to: this.formatter.format(this.toDate) })
+    //this.rangeSelected.emit({ from: this.fromDateValue, to: this.formatter.format(this.toDate) })
   }
 
   isHovered(date: NgbDate) {
