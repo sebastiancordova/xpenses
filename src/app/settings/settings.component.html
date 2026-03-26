@@ -1,0 +1,77 @@
+<div class="settings-wrapper">
+
+  <div class="settings-header">
+    <h1 class="settings-title mb-0">Configuración</h1>
+    <p class="settings-subtitle mb-0">Personaliza el comportamiento de tu dashboard</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+
+    <!-- Billing cycle -->
+    <div class="settings-card">
+      <p class="settings-card__title"><i class="fas fa-calendar-alt mr-2"></i>Ciclo de facturación</p>
+      <p class="settings-card__desc">Día del mes en que comienza tu ciclo (ej: día en que recibes tu sueldo o se cierra tu tarjeta).</p>
+      <div class="form-group settings-field">
+        <label class="field-label" for="billingCycleDay">Día de inicio del ciclo</label>
+        <input
+          type="number" id="billingCycleDay" min="1" max="28"
+          class="form-control field-input field-input--short"
+          formControlName="billingCycleDay"
+          placeholder="19">
+        <small class="field-hint">Entre 1 y 28. Actualmente el ciclo va del día {{ billingCycleDay?.value }} al {{ billingCycleDay?.value - 1 }} del mes siguiente.</small>
+        <small class="field-error" *ngIf="billingCycleDay?.invalid && billingCycleDay?.touched">Debe ser un número entre 1 y 28.</small>
+      </div>
+    </div>
+
+    <!-- Budget allocation -->
+    <div class="settings-card">
+      <p class="settings-card__title"><i class="fas fa-sliders-h mr-2"></i>Distribución del presupuesto</p>
+      <p class="settings-card__desc">Define cómo quieres distribuir tu ingreso mensual. El porcentaje restante ({{ 100 - totalAllocated }}%) corresponde a gastos fijos y suscripciones.</p>
+
+      <div class="form-group settings-field">
+        <label class="field-label" for="savingsRate">Meta de ahorro (%)</label>
+        <div class="range-input-wrapper">
+          <input type="range" id="savingsRate" min="0" max="70" step="5"
+            class="range-input" formControlName="savingsRate">
+          <span class="range-value">{{ savingsRate?.value }}%</span>
+        </div>
+      </div>
+
+      <div class="form-group settings-field">
+        <label class="field-label" for="variableRate">Gastos variables (%)</label>
+        <div class="range-input-wrapper">
+          <input type="range" id="variableRate" min="0" max="80" step="5"
+            class="range-input" formControlName="variableRate">
+          <span class="range-value">{{ variableRate?.value }}%</span>
+        </div>
+      </div>
+
+      <div class="allocation-summary" [ngClass]="{ 'allocation-summary--warning': allocationWarning }">
+        <span class="allocation-bar">
+          <span class="allocation-bar__savings" [style.width.%]="savingsRate?.value"></span>
+          <span class="allocation-bar__variable" [style.width.%]="variableRate?.value"></span>
+        </span>
+        <div class="allocation-legend">
+          <span class="legend-dot legend-dot--savings"></span> Ahorro {{ savingsRate?.value }}%
+          <span class="legend-dot legend-dot--variable ml-3"></span> Variables {{ variableRate?.value }}%
+          <span class="legend-dot legend-dot--fixed ml-3"></span> Fijos/Subs {{ 100 - totalAllocated }}%
+        </div>
+        <small class="field-error" *ngIf="allocationWarning">
+          La suma de ahorro + variables supera el 100%. Ajusta los valores.
+        </small>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="settings-actions">
+      <div *ngIf="saved" class="save-feedback">
+        <i class="fas fa-check-circle mr-1"></i> Configuración guardada
+      </div>
+      <button type="submit" class="btn-save" [disabled]="form.invalid || loading || allocationWarning">
+        <span *ngIf="!loading">Guardar cambios</span>
+        <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1"></i>Guardando...</span>
+      </button>
+    </div>
+
+  </form>
+</div>

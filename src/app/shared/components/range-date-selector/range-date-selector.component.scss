@@ -1,51 +1,166 @@
+@import "src/assets/sass/variables";
+
 :host {
-  min-width: 13em;
-  display: flex;
-  .form-group {
-    .hidden {
-      width: 0;
-      margin: 0;
-      border: none;
-      padding: 0;
-    }
-    input {
-      min-height: 30px;
-      max-height: 30px;
-      font-size: 0.9em;
-      font-weight: bold;
-      color: #ababb9;
-      background-color: #f4f5fa;
-      border: none;
-    }
-    select {
-      border-radius: 5px;
-      font-size: 0.8rem;
-      background-color: #f4f5fa;
-    }
-    .calendar-icon {
-      color: #ababb9;
-      position: absolute;
-      top: 0.45em;
-      right: 0.5em;
-      z-index: 99;
+  display: inline-block;
+}
+
+// ─── Wrapper ──────────────────────────────────────────────────────────────────
+.date-selector-wrapper {
+  position: relative;
+}
+
+// ─── Hidden datepicker input ──────────────────────────────────────────────────
+.datepicker-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  border: none;
+  padding: 0;
+  pointer-events: none;
+}
+
+// ─── Trigger pill ─────────────────────────────────────────────────────────────
+.date-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 36px;
+  padding: 0 0.85rem;
+  background-color: $color-milkier;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: $color-grey-dark;
+  cursor: pointer;
+  transition: border-color 0.18s, background-color 0.18s;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: $color-brand-secondary;
+    background-color: white;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-brand-secondary;
+    box-shadow: 0 0 0 3px rgba(189, 153, 136, 0.2);
+    background-color: white;
+  }
+
+  &__icon {
+    font-size: 0.78rem;
+    color: $color-brand-primary;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    font-weight: 600;
+    color: $color-grey-dark;
+  }
+
+  &__from,
+  &__to {
+    font-weight: 500;
+    color: $color-grey-dark;
+  }
+
+  &__arrow {
+    font-size: 0.6rem;
+    color: $color-grey-lighter;
+    flex-shrink: 0;
+  }
+
+  &__clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-left: 0.1rem;
+    padding: 0;
+    background-color: $color-grey-lightest;
+    border: none;
+    border-radius: 50%;
+    font-size: 0.55rem;
+    color: $color-grey;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.15s, color 0.15s;
+
+    &:hover {
+      background-color: $color-brand-primary;
+      color: white;
     }
   }
-  .custom-day {
-    text-align: center;
-    padding: 0.185rem 0.25rem;
-    display: inline-block;
-    height: 2rem;
-    width: 2rem;
+}
+
+// ─── Custom day cells ─────────────────────────────────────────────────────────
+.custom-day {
+  text-align: center;
+  padding: 0.185rem 0.25rem;
+  display: inline-block;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 6px;
+  line-height: 1.65rem;
+  transition: background-color 0.12s;
+
+  &.focused {
+    background-color: $color-milky;
   }
-  .custom-day.focused {
-    background-color: #e6e6e6;
-  }
-  .custom-day.range,
-  .custom-day:hover {
-    background-color: rgb(2, 117, 216);
+
+  &.range,
+  &:hover {
+    background-color: $color-brand-primary;
     color: white;
+    border-radius: 6px;
   }
-  .custom-day.faded {
-    background-color: rgba(2, 117, 216, 0.5);
+
+  &.faded {
+    background-color: $color-brand-tertiary;
+    color: $color-brand-primary;
+    border-radius: 0;
+  }
+}
+
+// ─── Datepicker footer ────────────────────────────────────────────────────────
+.datepicker-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  border-top: 1px solid $color-milkier;
+}
+
+.dp-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 0.85rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &--secondary {
+    background-color: $color-milkier;
+    color: $color-grey;
+
+    &:hover {
+      background-color: $color-milky;
+    }
+  }
+
+  &--primary {
+    background-color: $color-brand-primary;
+    color: white;
+
+    &:hover {
+      background-color: darken(#876656, 8%);
+    }
   }
 }

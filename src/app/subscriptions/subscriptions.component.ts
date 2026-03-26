@@ -24,7 +24,7 @@ export class SubscriptionsComponent {
   private fb: FormBuilder = inject(FormBuilder);
   private toastr: ToastrService = inject(ToastrService);
   private modalService: NgbModal = inject(NgbModal);
-  private fireSubscriptions: Subscription[] = [];
+  public fireSubscriptions: Subscription[] = [];
   public subscriptions: Subscription[] = [];
   public totalAmountFiltered = 0;
 

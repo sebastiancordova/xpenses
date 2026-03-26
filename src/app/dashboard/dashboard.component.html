@@ -1,19 +1,187 @@
-<div class="p-4">
-  <div class="d-flex justify-content-center align-items-center">
-    <h2>Gastos mensuales</h2>
-  </div>
-  <div class="d-flex justify-content-center align-items-center">
-    <span class="fa-solid fa-chevron-left cursor-pointer" (click)="goToPreviousMonth()"></span>
-    <h3 class="mx-2 w-50 text-center">{{displayMonthName}} - {{displayYear}}</h3>
-    <span class="fa-solid fa-chevron-right cursor-pointer" (click)="goToNextMonth()"></span>
-  </div>
-  <div class="chart-section mt-2">
-    <canvas baseChart [data]="doughnutChartData" [legend]="true" [type]="doughnutChartType" [options]="barChartOptions">
-    </canvas>
-  </div>
-  <div class="d-flex justify-content-center align-items-center">
-    <div class="">
-      <h4>total = {{total | currency: 'CLP':'$'}}</h4>
+<div class="dashboard-wrapper">
+
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="d-flex align-items-center justify-content-between flex-wrap">
+      <div>
+        <h1 class="dashboard-title mb-0">Dashboard</h1>
+        <p class="dashboard-subtitle mb-0">Resumen del período de facturación</p>
+      </div>
+      <div class="month-nav d-flex align-items-center">
+        <button class="month-nav__btn" type="button" (click)="goToPreviousMonth()">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <span class="month-nav__label">{{ displayMonthName }} {{ displayYear }}</span>
+        <button class="month-nav__btn" type="button" (click)="goToNextMonth()">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state d-flex justify-content-center align-items-center py-5">
+    <div class="spinner-border loading-state__spinner" role="status">
+      <span class="sr-only">Cargando...</span>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+
+    <!-- ROW 1: Hero metric cards -->
+    <div class="row stats-row">
+
+      <!-- Net Balance — primary hero card -->
+      <div class="col-lg-3 col-sm-6 mb-3">
+        <div class="stat-card stat-card--gradient">
+          <p class="stat-card__label">Balance neto</p>
+          <p class="stat-card__value" [ngClass]="netBalanceClass">
+            {{ (insights?.netBalance ?? 0) | currency: 'CLP':'$':'1.0-0' }}
+          </p>
+          <p class="stat-card__sub">{{ displayMonthName }} {{ displayYear }}</p>
+        </div>
+      </div>
+
+      <!-- Income -->
+      <div class="col-lg-3 col-sm-6 mb-3">
+        <div class="stat-card">
+          <p class="stat-card__label">
+            <i class="fas fa-arrow-down stat-card__icon stat-card__icon--income mr-1"></i>
+            Ingresos del período
+          </p>
+          <p class="stat-card__value stat-card__value--dark">
+            {{ totalIncome | currency: 'CLP':'$':'1.0-0' }}
+          </p>
+          <p class="stat-card__sub" *ngIf="totalIncome > 0">Registrado en el período</p>
+          <p class="stat-card__sub" *ngIf="totalIncome === 0">Sin ingresos registrados</p>
+        </div>
+      </div>
+
+      <!-- Total expenses -->
+      <div class="col-lg-3 col-sm-6 mb-3">
+        <div class="stat-card">
+          <p class="stat-card__label">
+            <i class="fas fa-arrow-up stat-card__icon stat-card__icon--expense mr-1"></i>
+            Total gastos
+          </p>
+          <p class="stat-card__value stat-card__value--dark">{{ total | currency: 'CLP':'$':'1.0-0' }}</p>
+          <p class="stat-card__sub">{{ variableExpensesCount }} gastos variables + recurrentes</p>
+        </div>
+      </div>
+
+      <!-- Safe to spend -->
+      <div class="col-lg-3 col-sm-6 mb-3">
+        <div class="stat-card" [ngClass]="{ 'stat-card--warning': (insights?.safeToSpend ?? 0) === 0 }">
+          <p class="stat-card__label">Disponible para gastar</p>
+          <p class="stat-card__value stat-card__value--dark">
+            {{ (insights?.safeToSpend ?? 0) | currency: 'CLP':'$':'1.0-0' }}
+          </p>
+          <p class="stat-card__sub">
+            <ng-container *ngIf="(insights?.daysRemaining ?? 0) > 0">
+              ~{{ (insights?.dailySafeToSpend ?? 0) | currency: 'CLP':'$':'1.0-0' }}/día · {{ insights?.daysRemaining }} días restantes
+            </ng-container>
+            <ng-container *ngIf="(insights?.daysRemaining ?? 0) === 0">Período completado</ng-container>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Budget health bar + quick stats -->
+    <div class="budget-health-card mb-3" *ngIf="insights">
+      <div class="budget-health-card__top">
+        <div class="budget-health-card__left">
+          <span class="budget-health-card__label">Consumo del presupuesto</span>
+          <span class="budget-health-card__pct" [ngClass]="budgetBarClass.replace('fill','pct')">
+            {{ insights.budgetPct | number: '1.0-1' }}%
+          </span>
+        </div>
+        <div class="budget-health-card__kpis">
+          <span class="kpi">
+            <span class="kpi__label">Tasa de ahorro</span>
+            <span class="kpi__value" [ngClass]="insights.savingsRate >= (prefs.savingsRate) ? 'kpi__value--good' : 'kpi__value--bad'">
+              {{ insights.savingsRate | number: '1.0-1' }}%
+            </span>
+          </span>
+          <span class="kpi kpi--divider"></span>
+          <span class="kpi">
+            <span class="kpi__label">Gasto diario</span>
+            <span class="kpi__value">{{ insights.burnRate | currency: 'CLP':'$':'1.0-0' }}/día</span>
+          </span>
+          <span class="kpi kpi--divider"></span>
+          <span class="kpi">
+            <span class="kpi__label">Proyección</span>
+            <span class="kpi__value" [ngClass]="insights.projectedExpenses > totalIncome && totalIncome > 0 ? 'kpi__value--bad' : ''">
+              {{ insights.projectedExpenses | currency: 'CLP':'$':'1.0-0' }}
+            </span>
+          </span>
+        </div>
+      </div>
+      <div class="budget-bar">
+        <div class="budget-bar__fill" [ngClass]="budgetBarClass" [style.width.%]="insights.budgetPct > 100 ? 100 : insights.budgetPct"></div>
+      </div>
+    </div>
+
+    <!-- ROW 3: Alert strip -->
+    <div class="alert-strip mb-3"
+         *ngIf="insights?.alertMessage"
+         [ngClass]="{
+           'alert-strip--ok': insights?.alertLevel === 'ok',
+           'alert-strip--warn': insights?.alertLevel === 'warn',
+           'alert-strip--danger': insights?.alertLevel === 'danger'
+         }">
+      <i class="fas mr-2"
+         [ngClass]="{
+           'fa-check-circle': insights?.alertLevel === 'ok',
+           'fa-exclamation-triangle': insights?.alertLevel === 'warn',
+           'fa-times-circle': insights?.alertLevel === 'danger'
+         }"></i>
+      {{ insights?.alertMessage }}
+    </div>
+
+    <!-- ROW 4: Chart + Breakdown -->
+    <ng-container *ngIf="total > 0; else emptyState">
+      <div class="row">
+        <div class="col-lg-5 mb-4">
+          <div class="dashboard-card h-100">
+            <p class="dashboard-card__header">Distribución por categoría</p>
+            <div class="chart-container">
+              <canvas baseChart
+                [data]="doughnutChartData"
+                [legend]="false"
+                [type]="doughnutChartType"
+                [options]="chartOptions">
+              </canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-7 mb-4">
+          <div class="dashboard-card h-100">
+            <p class="dashboard-card__header">Detalle por categoría</p>
+            <div class="category-list">
+              <div class="category-item" *ngFor="let item of categoryBreakdown">
+                <div class="category-item__info">
+                  <span class="category-item__dot" [style.background-color]="item.color"></span>
+                  <span class="category-item__name">{{ item.category }}</span>
+                </div>
+                <div class="category-item__right">
+                  <span class="category-item__amount">{{ item.amount | currency: 'CLP':'$':'1.0-0' }}</span>
+                  <span class="category-item__pct">{{ item.percentage | number: '1.0-1' }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #emptyState>
+      <div class="empty-state text-center py-5">
+        <i class="fa-regular fa-chart-pie empty-state__icon mb-3"></i>
+        <p class="empty-state__title">Sin gastos registrados</p>
+        <p class="empty-state__sub">No hay gastos para {{ displayMonthName }} {{ displayYear }}.</p>
+      </div>
+    </ng-template>
+
+  </ng-container>
+
 </div>

@@ -1,115 +1,81 @@
 @import "src/assets/sass/variables";
 
-:host {
-  .container {
-    margin-top: 1.5rem;
-    max-width: 1200px;
-    .table-container {
-      border-radius: 12px;
-      -webkit-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
-      -moz-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
-      box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
-      .title {
-        font-size: 1.5rem;
-      }
-      .icon-add {
-        background-color: $color-brand-primary;
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        margin: 0 auto;
-        cursor: pointer;
+:host { display: block; }
 
-        span.fas {
-          color: white;
-          font-size: 0.9rem;
-        }
-      }
-      .filter-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        @media (max-width: $break-sm) {
-          flex-wrap: wrap;
-        }
-        input,
-        select {
-          border-radius: 5px;
-          font-size: 0.8rem;
-        }
-        input {
-          background-color: #f4f5fa;
-        }
-        .input-search {
-          max-width: 15em;
-        }
-        .filter-facility-selector {
-          width: 12em;
-          flex-shrink: 0;
-        }
-      }
-      .table-section {
-        .popover-item {
-          padding: 0.5rem 5rem 0.5rem 0;
-          color: $color-grey;
-          &:hover {
-            cursor: pointer;
-            color: $color-brand-primary;
-            font-weight: bolder;
-          }
-          &.disabled-link {
-            &:hover {
-              color: $color-grey;
-              cursor: not-allowed;
-              font-weight: normal;
-            }
-          }
-        }
-        .table {
-          &.table-borderless {
-            background-color: #f4f5fa;
-            border-radius: 10px;
-          }
-          tbody {
-            tr {
-              &:hover {
-                background-color: #e2e2ea;
-              }
-              color: #676d79;
-              .pending-status {
-                font-size: 0.4em;
-                color: #c9c9d5;
-              }
-              .approved-status {
-                color: $color-brand-blue;
-              }
-              td {
-                &.sickLeave-note {
-                  max-width: 8em;
-                  white-space: nowrap !important;
-                  text-overflow: ellipsis;
-                  overflow: hidden;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  .loading {
-    color: $color-brand-primary;
-  }
+.module-wrapper {
+  padding: 2rem;
+  max-width: 1200px;
+  @media (max-width: $break-sm) { padding: 1rem; }
 }
 
+.module-header { margin-bottom: 1.5rem; }
+.module-title { font-size: 1.5rem; font-weight: 700; color: $color-grey-darker; line-height: 1.2; }
+.module-subtitle { font-size: 0.8rem; color: $color-grey-light; margin-top: 0.2rem; }
+
+.btn-add {
+  display: inline-flex; align-items: center; padding: 0.45rem 1.1rem;
+  border: none; border-radius: 8px; background-color: $color-brand-primary;
+  color: white; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background-color 0.18s;
+  &:hover { background-color: darken(#876656, 8%); }
+  &:focus { outline: none; box-shadow: 0 0 0 3px rgba(135, 102, 86, 0.3); }
+}
+
+.filters-card {
+  background-color: white; border-radius: 12px; padding: 1rem 1.25rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 1.25rem;
+}
+.filter-input-wrapper { position: relative;
+  .filter-icon { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); color: $color-grey-lighter; font-size: 0.75rem; pointer-events: none; }
+}
+.filter-input {
+  height: 36px; font-size: 0.82rem; background-color: $color-milkier;
+  border: 1px solid transparent; border-radius: 8px; padding-left: 2rem;
+  min-width: 14rem; color: $color-grey-dark; transition: border-color 0.18s;
+  &:focus { outline: none; border-color: $color-brand-secondary; box-shadow: 0 0 0 3px rgba(189,153,136,0.2); background-color: white; }
+}
+
+.table-card { background-color: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); overflow: hidden; }
+
+.module-table {
+  thead th {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    color: $color-grey-light; border-bottom: 1px solid $color-milkier; border-top: none;
+    padding: 0.85rem 1rem; white-space: nowrap;
+  }
+  tbody td { padding: 0.85rem 1rem; border-top: 1px solid $color-milkier; vertical-align: middle; font-size: 0.875rem; color: $color-grey-dark; }
+}
+
+.item-row {
+  cursor: pointer; transition: background-color 0.14s;
+  &:hover { background-color: $color-milkiest; }
+}
+.item-title { font-weight: 500; color: $color-grey-darker; }
+.item-amount { font-weight: 600; color: $color-grey-darker; white-space: nowrap; }
+
+.total-row td { padding: 0.85rem 1rem; border-top: 2px solid $color-milky; font-size: 0.875rem; color: $color-grey-darker; background-color: $color-milkiest; }
+
+.table-footer {
+  padding: 0.6rem 1rem; border-top: 1px solid $color-milkier;
+  small { color: $color-grey-lighter; }
+  ::ng-deep ngb-pagination .page-link { border-radius: 6px; font-size: 0.8rem; color: $color-brand-primary; border: none; background: transparent;
+    &:hover { background-color: $color-milkier; }
+  }
+  ::ng-deep ngb-pagination .page-item.active .page-link { background-color: $color-brand-primary; color: white; }
+}
+
+.empty-state {
+  background-color: white; border-radius: 12px; padding: 3rem 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  &__icon { display: block; font-size: 3rem; color: $color-grey-lightest; }
+  &__title { font-size: 1rem; font-weight: 600; color: $color-grey; margin-bottom: 0.25rem; }
+  &__sub { font-size: 0.85rem; color: $color-grey-lighter; margin-bottom: 1.25rem; }
+}
+
+.loading-state__spinner { color: $color-brand-primary; width: 2.5rem; height: 2.5rem; }
+
 @media (max-width: $break-sm) {
-  :host {
-    .container {
-      margin-top: 4rem !important;
-    }
+  .module-header .btn-add { width: 100%; justify-content: center; }
+  .filter-input { min-width: unset; width: 100%; }
+  .table-footer { flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem;
+    ::ng-deep ngb-pagination .pagination { margin-bottom: 0; }
   }
 }

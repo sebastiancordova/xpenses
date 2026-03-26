@@ -1,67 +1,88 @@
-<ng-container *ngIf="!loadingPage; else isLoading">
-  <div class="container">
-    <div class="table-container bg-white mt-2">
-      <div class="d-flex align-items-center justify-content-between pt-3 px-3">
-        <span class="title font-weight-bold">Ingresos</span>
-        <div class="add-new">
-          <button class="icon-add btn btn-main-blue" (click)="openCreateModal()">
-            <span class="fas fa-plus fa-xs"></span>
-          </button>
+<div class="module-wrapper">
+
+  <!-- Header -->
+  <div class="module-header d-flex align-items-center justify-content-between flex-wrap">
+    <div>
+      <h1 class="module-title mb-0">Ingresos</h1>
+      <p class="module-subtitle mb-0">Período de facturación actual</p>
+    </div>
+    <button class="btn-add" (click)="openCreateModal()">
+      <i class="fas fa-plus mr-2"></i>Nuevo ingreso
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <form [formGroup]="filtersForm">
+      <div class="d-flex flex-wrap align-items-center">
+        <div class="filter-input-wrapper">
+          <i class="fas fa-search filter-icon"></i>
+          <input type="text" formControlName="search" class="form-control filter-input" placeholder="Buscar..." />
         </div>
       </div>
-      <div class="filter-section p-3">
-        <form class="" [formGroup]="filtersForm">
-          <div class="d-flex">
-            <input type="text" formControlName="search" class="form-control form-control-sm input-search"
-              placeholder="Buscar..." />
-          </div>
-        </form>
-      </div>
-      <div class="table-section table-responsive d-flex">
-        <table class="table table-borderless mx-3 my-0">
-          <caption></caption>
-          <thead>
-            <tr>
-              <th scope="col">Nombre</th>
-              <th scope="col">Monto</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let income of incomes" (click)="openEditModal(income)" class="cursor-pointer">
-              <td>
-                <span>
-                  {{income.title}}
-                </span>
-              </td>
-              <td>
-                <span>
-                  {{income.amount | currency: 'CLP':'$'}}
-                </span>
-              </td>
-            </tr>
-            <ng-container *ngIf="totalAmountFiltered !== 0">
-              <tr>
-                <td class="font-weight-bold">Total</td>
-                <td class="font-weight-bold">{{totalAmountFiltered | currency: 'CLP':'$'}}</td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-      <div class="d-flex justify-content-center p-2">
-        <ngb-pagination [collectionSize]="collectionSize" [maxSize]="5" [(page)]="page" (pageChange)="filter()"
-          [pageSize]="pageSize">
-        </ngb-pagination>
-      </div>
-    </div>
+    </form>
   </div>
-</ng-container>
 
-<ng-template #isLoading>
-  <div class="d-flex justify-content-center align-items-center h-100 loading">
-    <div class="d-flex flex-column align-items-center">
-      <span class="fas fa-spinner fa-spin fa-3x mb-2"></span>
-      <h5>Cargando...</h5>
+  <!-- Loading -->
+  <div *ngIf="loadingPage" class="loading-state d-flex justify-content-center align-items-center py-5">
+    <div class="spinner-border loading-state__spinner" role="status">
+      <span class="sr-only">Cargando...</span>
     </div>
   </div>
-</ng-template>
+
+  <ng-container *ngIf="!loadingPage">
+
+    <ng-container *ngIf="fireIncomes.length > 0; else emptyState">
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table module-table mb-0">
+            <caption class="sr-only">Lista de ingresos</caption>
+            <thead>
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col" class="text-right">Monto</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let income of incomes" (click)="openEditModal(income)" class="item-row">
+                <td>
+                  <div class="item-title">{{ income.title }}</div>
+                </td>
+                <td class="item-amount text-right">{{ income.amount | currency: 'CLP':'$':'1.0-0' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td class="font-weight-bold">Total</td>
+                <td class="font-weight-bold text-right">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="table-footer d-flex justify-content-between align-items-center">
+          <small class="text-muted">{{ collectionSize }} ingreso{{ collectionSize !== 1 ? 's' : '' }}</small>
+          <ngb-pagination
+            [collectionSize]="collectionSize"
+            [maxSize]="5"
+            [(page)]="page"
+            (pageChange)="filter()"
+            [pageSize]="pageSize">
+          </ngb-pagination>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #emptyState>
+      <div class="empty-state text-center py-5">
+        <i class="fas fa-coins empty-state__icon mb-3"></i>
+        <p class="empty-state__title">Sin ingresos registrados</p>
+        <p class="empty-state__sub">No hay ingresos para este período.</p>
+        <button class="btn-add" (click)="openCreateModal()">
+          <i class="fas fa-plus mr-2"></i>Agregar primer ingreso
+        </button>
+      </div>
+    </ng-template>
+
+  </ng-container>
+
+</div>

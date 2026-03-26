@@ -1,0 +1,222 @@
+@import "src/assets/sass/variables";
+
+.settings-wrapper {
+  padding: 1.5rem;
+  max-width: 700px;
+}
+
+.settings-header {
+  margin-bottom: 2rem;
+}
+
+.settings-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: $color-grey-darker;
+}
+
+.settings-subtitle {
+  font-size: 0.875rem;
+  color: $color-grey-light;
+  margin-top: 0.2rem;
+}
+
+.settings-card {
+  background: white;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid $color-milky;
+  margin-bottom: 1.25rem;
+
+  &__title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: $color-grey-darker;
+    margin-bottom: 0.25rem;
+  }
+
+  &__desc {
+    font-size: 0.8rem;
+    color: $color-grey-light;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.settings-field {
+  margin-bottom: 0;
+}
+
+.field-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: $color-grey;
+  margin-bottom: 0.35rem;
+  display: block;
+}
+
+.field-input {
+  font-size: 0.875rem;
+  border-radius: 8px;
+  border: 1px solid $color-milky;
+  background-color: $color-milkier;
+  color: $color-grey-darker;
+  height: auto;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.18s, box-shadow 0.18s;
+
+  &--short { max-width: 120px; }
+  &--amount { padding-left: 2rem; }
+
+  &:focus {
+    border-color: $color-brand-secondary;
+    box-shadow: 0 0 0 3px rgba(189, 153, 136, 0.2);
+    background-color: white;
+    outline: none;
+  }
+}
+
+.field-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: $color-grey-lighter;
+  margin-top: 0.25rem;
+}
+
+.field-error {
+  display: block;
+  font-size: 0.75rem;
+  color: #c62828;
+  margin-top: 0.25rem;
+}
+
+.amount-input-wrapper {
+  position: relative;
+
+  .amount-prefix {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $color-grey-light;
+    font-size: 0.875rem;
+    pointer-events: none;
+  }
+}
+
+// Range sliders
+.range-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.range-input {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: $color-milky;
+  outline: none;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: $color-brand-primary;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+}
+
+.range-value {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: $color-brand-primary;
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+// Allocation summary
+.allocation-summary {
+  margin-top: 1.25rem;
+
+  &--warning .allocation-bar { border-color: #c62828; }
+}
+
+.allocation-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: $color-milky;
+  margin-bottom: 0.6rem;
+
+  &__savings {
+    background-color: $color-brand-primary;
+    transition: width 0.3s;
+  }
+
+  &__variable {
+    background-color: $color-brand-secondary;
+    transition: width 0.3s;
+  }
+}
+
+.allocation-legend {
+  font-size: 0.75rem;
+  color: $color-grey;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+
+  &--savings { background-color: $color-brand-primary; }
+  &--variable { background-color: $color-brand-secondary; }
+  &--fixed { background-color: $color-milky; border: 1px solid $color-grey-lightest; }
+}
+
+// Actions
+.settings-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.save-feedback {
+  font-size: 0.85rem;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background-color: $color-brand-primary;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover { background-color: darken(#876656, 8%); }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

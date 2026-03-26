@@ -37,6 +37,10 @@ const routes: Routes = [
       {
         path: 'subscripciones',
         loadChildren: () => import('../subscriptions/subscriptions.module').then(m => m.SubscriptionsModule)
+      },
+      {
+        path: 'configuracion',
+        loadChildren: () => import('../settings/settings.module').then(m => m.SettingsModule)
       }
     ]
   }

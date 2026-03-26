@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { CollectionReference, Firestore, collection, collectionData, Timestamp, addDoc, doc, orderBy, query, deleteDoc, updateDoc, where, endAt } from '@angular/fire/firestore';
+import { CollectionReference, Firestore, collection, collectionData, Timestamp, addDoc, doc, orderBy, query, deleteDoc, updateDoc, where } from '@angular/fire/firestore';
 import { Expense } from '@core/models/expense';
-import { Observable, switchMap, of, skipWhile } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -21,8 +21,8 @@ export class ExpensesService {
     let finalStartDate: Date;
     let finalEndDate: Date;
     if (startDate && endDate) {
-      finalStartDate = startDate;
-      finalEndDate = endDate;
+      finalStartDate = new Date(startDate);
+      finalEndDate = new Date(endDate);
       finalEndDate.setHours(23, 59, 59, 999);
     } else {
       const date = new Date();

@@ -3,5 +3,9 @@
 :host {
     main {
         background-color: $color-milkiest;
+
+        @media (max-width: $break-sm) {
+            padding-top: 4rem;
+        }
     }
 }

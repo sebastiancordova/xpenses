@@ -1,0 +1,379 @@
+@import "src/assets/sass/variables";
+
+// ─── Wrapper ──────────────────────────────────────────────────────────────────
+.dashboard-wrapper {
+  padding: 2rem;
+
+  @media (max-width: $break-sm) {
+    padding: 1rem;
+  }
+}
+
+// ─── Header ───────────────────────────────────────────────────────────────────
+.dashboard-header {
+  margin-bottom: 1.75rem;
+}
+
+.dashboard-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $color-grey-darker;
+  line-height: 1.2;
+}
+
+.dashboard-subtitle {
+  font-size: 0.8rem;
+  color: $color-grey-light;
+  margin-top: 0.2rem;
+}
+
+// ─── Month navigation ─────────────────────────────────────────────────────────
+.month-nav {
+  gap: 0.5rem;
+
+  &__btn {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: $color-milkier;
+    color: $color-brand-primary;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.18s, color 0.18s;
+
+    &:hover {
+      background-color: $color-brand-primary;
+      color: white;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $color-grey-darker;
+    min-width: 11rem;
+    text-align: center;
+  }
+}
+
+// ─── Stat cards ───────────────────────────────────────────────────────────────
+.stats-row {
+  margin-bottom: 0.25rem;
+}
+
+.stat-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  height: 100%;
+
+  &--gradient {
+    background: linear-gradient(135deg, $color-brand-primary 0%, $color-brand-secondary 100%);
+    color: white;
+
+    .stat-card__label,
+    .stat-card__sub {
+      opacity: 0.85;
+    }
+
+    .stat-card__value {
+      color: white;
+    }
+  }
+
+  &__label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $color-grey-light;
+    margin-bottom: 0.4rem;
+  }
+
+  &__value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 0.3rem;
+    color: $color-brand-primary;
+
+    &--dark {
+      color: $color-grey-darker;
+    }
+  }
+
+  &__sub {
+    font-size: 0.78rem;
+    color: $color-grey-light;
+    margin-bottom: 0;
+  }
+}
+
+// ─── Content cards ────────────────────────────────────────────────────────────
+.dashboard-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $color-grey-light;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid $color-milkier;
+    margin-bottom: 1rem;
+  }
+}
+
+// ─── Chart ────────────────────────────────────────────────────────────────────
+.chart-container {
+  position: relative;
+  flex: 1;
+  min-height: 280px;
+}
+
+// ─── Category breakdown list ──────────────────────────────────────────────────
+.category-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid $color-milkier;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    margin-right: 1rem;
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-right: 0.6rem;
+  }
+
+  &__name {
+    font-size: 0.875rem;
+    color: $color-grey-dark;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__amount {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $color-grey-darker;
+    margin-right: 0.75rem;
+  }
+
+  &__pct {
+    font-size: 0.75rem;
+    color: $color-grey-light;
+    min-width: 3.2rem;
+    text-align: right;
+  }
+}
+
+// ─── Empty state ──────────────────────────────────────────────────────────────
+.empty-state {
+  &__icon {
+    display: block;
+    font-size: 3rem;
+    color: $color-grey-lightest;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $color-grey;
+    margin-bottom: 0.25rem;
+  }
+
+  &__sub {
+    font-size: 0.85rem;
+    color: $color-grey-lighter;
+    margin-bottom: 0;
+  }
+}
+
+// ─── Loading ──────────────────────────────────────────────────────────────────
+.loading-state {
+  &__spinner {
+    color: $color-brand-primary;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+// ─── Stat card extras ─────────────────────────────────────────────────────────
+.stat-card {
+  &--warning {
+    border-left: 3px solid #f9a825;
+  }
+
+  &__icon {
+    font-size: 0.7rem;
+
+    &--income { color: #2e7d32; }
+    &--expense { color: #c62828; }
+  }
+
+  &__value {
+    &--positive { color: #2e7d32; }
+    &--negative { color: #c62828; }
+  }
+}
+
+// ─── Budget health card ───────────────────────────────────────────────────────
+.budget-health-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  padding: 1.25rem 1.5rem;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+  }
+
+  &__left {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  &__label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $color-grey-light;
+  }
+
+  &__pct {
+    font-size: 1.1rem;
+    font-weight: 700;
+
+    &--ok { color: #2e7d32; }
+    &--warn { color: #f9a825; }
+    &--danger { color: #c62828; }
+  }
+
+  &__kpis {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  &__label {
+    font-size: 0.68rem;
+    color: $color-grey-lighter;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__value {
+    font-size: 0.825rem;
+    font-weight: 700;
+    color: $color-grey-darker;
+
+    &--good { color: #2e7d32; }
+    &--bad  { color: #c62828; }
+  }
+
+  &--divider {
+    width: 1px;
+    height: 2rem;
+    background: $color-milky;
+    align-self: center;
+  }
+}
+
+.budget-bar {
+  height: 8px;
+  background: $color-milkier;
+  border-radius: 4px;
+  overflow: hidden;
+
+  &__fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease, background-color 0.3s;
+
+    &--ok     { background-color: #4caf50; }
+    &--warn   { background-color: #f9a825; }
+    &--danger { background-color: #c62828; }
+  }
+}
+
+// ─── Alert strip ─────────────────────────────────────────────────────────────
+.alert-strip {
+  border-radius: 10px;
+  padding: 0.75rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  &--ok {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-left: 4px solid #4caf50;
+  }
+
+  &--warn {
+    background-color: #fffde7;
+    color: #f57f17;
+    border-left: 4px solid #f9a825;
+  }
+
+  &--danger {
+    background-color: #ffebee;
+    color: #c62828;
+    border-left: 4px solid #ef5350;
+  }
+}
+

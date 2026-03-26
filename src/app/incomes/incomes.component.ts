@@ -25,7 +25,7 @@ export class IncomesComponent {
   private fb: FormBuilder = inject(FormBuilder);
   private toastr: ToastrService = inject(ToastrService);
   private modalService: NgbModal = inject(NgbModal);
-  private fireIncomes: Income[] = [];
+  public fireIncomes: Income[] = [];
   public incomes: Income[] = [];
   public totalAmountFiltered = 0;
 

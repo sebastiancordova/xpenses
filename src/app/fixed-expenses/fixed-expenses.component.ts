@@ -39,7 +39,6 @@ export class FixedExpensesComponent implements OnDestroy {
 
   ngOnInit(): void {
     this.fixedExpensesService.getAll().pipe(takeUntil(this.unsubscribe$)).subscribe((fixedExpenses) => {
-      console.log(fixedExpenses);
       this.fireFixedExpenses = fixedExpenses;
       this.filter();
     });

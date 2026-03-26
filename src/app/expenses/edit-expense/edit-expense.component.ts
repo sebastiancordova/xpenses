@@ -31,7 +31,6 @@ export class EditExpenseComponent {
   }
 
   ngOnInit(): void {
-    console.log(this.expense);
     this.title?.setValue(this.expense.title);
     this.amount?.setValue(this.expense.amount);
     this.category?.setValue(this.expense.category);

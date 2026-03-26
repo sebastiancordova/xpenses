@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { IUser } from '@core/models/user';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, debounceTime, take, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, Subject, debounceTime, filter, switchMap, take, takeUntil, tap } from 'rxjs';
 import { AddExpenseComponent } from './add-expense/add-expense.component';
 import { ExpensesService } from '@core/services/expenses.service';
 import { Expense, ExpenseCategory } from '@core/models/expense';
@@ -31,6 +31,7 @@ export class ExpensesComponent implements OnDestroy {
   public totalAmountFiltered = 0;
   public expenseCategory = ExpenseCategory;
   private orderIndicator = false;
+  private dateFilter$ = new BehaviorSubject<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
 
   constructor() {
     this.filtersForm = this.fb.group({
@@ -39,8 +40,15 @@ export class ExpensesComponent implements OnDestroy {
     });
   }
 
+  getCategoryClass(category: string): string {
+    return 'category--' + category.toLowerCase().replace(/\s+/g, '-');
+  }
+
   ngOnInit(): void {
-    this.expensesService.getAll().pipe(takeUntil(this.unsubscribe$)).subscribe((expenses) => {
+    this.dateFilter$.pipe(
+      takeUntil(this.unsubscribe$),
+      switchMap(({ from, to }) => this.expensesService.getAll(from, to))
+    ).subscribe((expenses) => {
       this.fireExpenses = expenses;
       this.loadingPage = false;
       this.filter();
@@ -101,12 +109,9 @@ export class ExpensesComponent implements OnDestroy {
     }
   }
 
-  filterByDate(date: { from: Date, to: Date }) {
-    this.expensesService.getAll(date.from, date.to).pipe(take(1)).subscribe((expenses) => {
-      this.fireExpenses = expenses;
-      this.loadingPage = false;
-      this.filter();
-    });
+  filterByDate(date: { from: Date | undefined; to: Date | undefined }) {
+    this.page = 1;
+    this.dateFilter$.next(date);
   }
 
   openCreateModal() {
