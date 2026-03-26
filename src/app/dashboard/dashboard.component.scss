@@ -92,10 +92,10 @@
 
   &__label {
     font-size: 0.72rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: $color-grey-light;
+    color: $color-grey-darker;
     margin-bottom: 0.4rem;
   }
 
@@ -112,8 +112,8 @@
   }
 
   &__sub {
-    font-size: 0.78rem;
-    color: $color-grey-light;
+    font-size: 0.72rem;
+    color: $color-grey-lighter;
     margin-bottom: 0;
   }
 }

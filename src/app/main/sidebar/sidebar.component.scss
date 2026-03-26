@@ -1,6 +1,7 @@
 @import "src/assets/sass/variables";
 @import "src/assets/sass/mixins";
 
+// ── Sidebar shell ─────────────────────────────────────────────────────
 .sidebar {
   @include transition(transform 0.2s 0.1s);
   position: fixed;
@@ -9,57 +10,167 @@
   left: 0;
   padding: 0;
   z-index: 199;
-  background-color: white;
-  box-shadow: 2px 0px 22px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(175deg, darken($color-brand-primary, 22%) 0%, $color-brand-primary 55%, lighten($color-brand-primary, 10%) 100%);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.22);
 
   .sidebar-inner {
     position: relative;
   }
+
+  // ── Nav links ─────────────────────────────────────────────────────
   .nav-link {
-    color: $color-brand-secondary;
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    margin: 2px 10px;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.65);
     cursor: pointer;
-    &:focus {
-      outline: none;
-    }
+    transition: background 0.15s ease, color 0.15s ease;
+    line-height: 1.4;
+
+    &:focus { outline: none; }
+
     &:hover {
-      color: $color-brand-primary;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .nav-icon {
+      width: 18px;
+      text-align: center;
+      margin-right: 10px;
+      font-size: 0.82rem;
+      flex-shrink: 0;
     }
   }
+
   .active-link {
-    color: white;
-    background-color: $color-brand-primary;
-    &:focus {
-      outline: none;
-    }
+    color: $color-brand-primary !important;
+    background: #fff !important;
+    font-weight: 600;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+
     &:hover {
-      color: white;
+      color: $color-brand-primary !important;
+      background: #fff !important;
     }
   }
 }
+
+// ── Logo ──────────────────────────────────────────────────────────────
 .area-logo {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  border-bottom: 1px $color-milkier solid;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 1.1rem 1.25rem;
+
   .xp-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     cursor: pointer;
-    color: $color-brand-primary;
-    text-shadow: 1px 1px black;
+    text-decoration: none;
+  }
+
+  .sidebar-logo-img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+  }
+
+  .sidebar-logo-text {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.4px;
   }
 }
-.area-actions {
-  border-top: 1px $color-milkier solid;
 
-  .link {
+// ── Section label ─────────────────────────────────────────────────────
+.nav-section-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+  margin: 0.75rem 0 0.2rem 1.35rem;
+}
+
+// ── User card ─────────────────────────────────────────────────────────
+.area-current-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 10px;
+
+  .user-avatar {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .user-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-label {
+    font-size: 0.67rem;
+    color: rgba(255, 255, 255, 0.48);
+  }
+}
+
+// ── Actions ───────────────────────────────────────────────────────────
+.area-actions {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 6px 0;
+
+  .logout-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    margin: 2px 10px;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.55);
     text-decoration: none;
-    color: $color-brand-quaternary;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    .nav-icon {
+      width: 18px;
+      text-align: center;
+      margin-right: 10px;
+      font-size: 0.82rem;
+    }
 
     &:hover {
+      color: #ff8f8f;
+      background: rgba(255, 80, 80, 0.14);
       text-decoration: none;
-      color: $color-brand-primary;
     }
   }
 }
+
+// ── Mobile toggle ─────────────────────────────────────────────────────
 #btn-sidebar {
   text-decoration: none;
   position: absolute;
@@ -76,28 +187,37 @@
     height: 40px;
     border-radius: 50%;
     color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
   }
+
   .icon {
     font-size: 0.9rem;
 
-    &.icon-active-true {
-      display: none;
-    }
-    &.icon-active-false {
-      display: block;
-    }
+    &.icon-active-true  { display: none; }
+    &.icon-active-false { display: block; }
   }
 }
-.area-current-user {
-  background-color: $color-brand-tertiary;
-  border-radius: 12px;
 
-  span {
-    display: block;
-  }
-  .greetings {
-    font-size: 16px;
-    color: $color-brand-quaternary;
+// ── Responsive ────────────────────────────────────────────────────────
+@media (max-width: $break-sm) {
+  :host {
+    .sidebar {
+      @include transform(translate(-101%, 0));
+      max-width: 80%;
+      box-shadow: none;
+
+      &.active {
+        @include transform(translate(0, 0));
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+
+        #btn-sidebar {
+          .icon {
+            &.icon-active-true  { display: block; }
+            &.icon-active-false { display: none; }
+          }
+        }
+      }
+    }
   }
 }
 

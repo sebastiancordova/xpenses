@@ -1,5 +1,7 @@
 <nav class="col-md-3 col-lg-2 d-md-block sidebar" [ngClass]="{ active: isActive }">
   <div class="sidebar-inner d-flex flex-column justify-content-between h-100">
+
+    <!-- Mobile toggle -->
     <a href="" class="d-block d-md-none" id="btn-sidebar"
       (click)="toggleActive();$event.preventDefault();$event.stopPropagation()">
       <div class="circle">
@@ -7,79 +9,78 @@
         <i class="icon icon-active-true fas fa-times"></i>
       </div>
     </a>
-    <div class="area-logo py-3">
-      <div class="d-flex flex-row justify-content-center align-items-baseline xp-title"
-        (click)="toggleActive(); goToRoute('/dashboard')">
-        <h3 class="font-weight-bold">X</h3>
-        <i class="mx-2 fa-2x fa-regular fa-pen"></i>
-        <h4 class="font-weight-bold">ses</h4>
+
+    <!-- Logo -->
+    <div class="area-logo">
+      <div class="xp-title" (click)="toggleActive(); goToRoute('/dashboard')">
+        <img src="/assets/img/iso-white.png" class="sidebar-logo-img" alt="Xpenses">
+        <span class="sidebar-logo-text">Xpenses</span>
       </div>
     </div>
 
+    <!-- Nav links -->
     <div class="section-links">
-      <ul class="nav flex-column flex-1">
+      <p class="nav-section-label">Menú</p>
+      <ul class="nav flex-column">
         <li class="nav-item">
-          <div class="nav-link" href="" [routerLink]="'/dashboard'" (click)="toggleActive()"
+          <div class="nav-link" [routerLink]="'/dashboard'" (click)="toggleActive()"
             [routerLinkActive]="'active-link'">
-            <span class="d-flex align-items-center">
-              <span class="fa-solid fa-chart-pie mr-2"></span>
-              Dashboard
-            </span>
+            <i class="fa-solid fa-chart-pie nav-icon"></i>
+            <span>Dashboard</span>
           </div>
         </li>
         <li class="nav-item">
-          <div class="nav-link" href="" [routerLink]="'/ingresos'" (click)="toggleActive()"
+          <div class="nav-link" [routerLink]="'/ingresos'" (click)="toggleActive()"
             [routerLinkActive]="'active-link'">
-            <span class="d-flex align-items-center">
-              <span class="fa-regular fa-coins mr-2"></span>
-              Ingresos
-            </span>
+            <i class="fa-solid fa-coins nav-icon"></i>
+            <span>Ingresos</span>
           </div>
         </li>
         <li class="nav-item">
-          <div class="nav-link" href="" [routerLink]="'/gastos'" (click)="toggleActive()"
+          <div class="nav-link" [routerLink]="'/gastos'" (click)="toggleActive()"
             [routerLinkActive]="'active-link'">
-            <span class="d-flex align-items-center">
-              <span class="fa-solid fa-receipt mr-2"></span>
-              Gastos
-            </span>
+            <i class="fa-solid fa-receipt nav-icon"></i>
+            <span>Gastos</span>
           </div>
         </li>
         <li class="nav-item">
-          <div class="nav-link" href="" [routerLink]="'/gastos-fijos'" (click)="toggleActive()"
+          <div class="nav-link" [routerLink]="'/gastos-fijos'" (click)="toggleActive()"
             [routerLinkActive]="'active-link'">
-            <span class="d-flex align-items-center">
-              <span class="fa-solid fa-thumbtack mr-2"></span>
-              Gastos Fijos
-            </span>
+            <i class="fa-solid fa-thumbtack nav-icon"></i>
+            <span>Gastos Fijos</span>
           </div>
         </li>
         <li class="nav-item">
-          <div class="nav-link" href="" [routerLink]="'/subscripciones'" (click)="toggleActive()"
+          <div class="nav-link" [routerLink]="'/subscripciones'" (click)="toggleActive()"
             [routerLinkActive]="'active-link'">
-            <span class="d-flex align-items-center">
-              <span class="fa-solid fa-repeat mr-2"></span>
-              Subscripciones
-            </span>
+            <i class="fa-solid fa-repeat nav-icon"></i>
+            <span>Subscripciones</span>
           </div>
         </li>
       </ul>
     </div>
 
-    <div class="area-current-user p-3 m-3 text-center" *ngIf="currentUser">
-      <span class="greetings mb-1">¡Hola {{currentUser.name}}!</span>
+    <!-- User card -->
+    <div class="area-current-user mx-3 mb-2" *ngIf="currentUser">
+      <div class="user-avatar">{{ userInitials }}</div>
+      <div class="user-info">
+        <span class="user-name">{{ currentUser.name }}</span>
+        <span class="user-label">Mi cuenta</span>
+      </div>
     </div>
 
-    <div class="area-actions py-3">
-      <div class="nav-link" href="" [routerLink]="'/configuracion'" (click)="toggleActive()" [routerLinkActive]="'active-link'">
-        <span class="d-flex align-items-center">
-          <span class="fa-solid fa-gear mr-2"></span>
-          Configuración
-        </span>
+    <!-- Actions -->
+    <div class="area-actions">
+      <div class="nav-link" [routerLink]="'/configuracion'" (click)="toggleActive()"
+        [routerLinkActive]="'active-link'">
+        <i class="fa-solid fa-gear nav-icon"></i>
+        <span>Configuración</span>
       </div>
-      <a href="" class="link d-flex align-items-center px-3 py-2" (click)="logout()">
-        <i class="fa-solid fa-right-from-bracket mr-2"></i> Cerrar sesión
+      <a href="" class="logout-link" (click)="logout();$event.preventDefault()">
+        <i class="fa-solid fa-right-from-bracket nav-icon"></i>
+        <span>Cerrar sesión</span>
       </a>
     </div>
+
   </div>
 </nav>

@@ -12,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 export class LoginComponent {
   public loginForm: FormGroup;
   public loading: boolean;
+  public showPassword = false;
   private toastr: ToastrService = inject(ToastrService);
   private authService: AuthService = inject(AuthService);
   private fb: FormBuilder = inject(FormBuilder);

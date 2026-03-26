@@ -16,6 +16,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
   public isActive = false;
   public currentUser!: IUser;
 
+  get userInitials(): string {
+    if (!this.currentUser?.name) return '?';
+    return this.currentUser.name.trim().charAt(0).toUpperCase();
+  }
+
   ngOnInit(): void {
     this.userService.currentUser.subscribe(user => {
       this.currentUser = user;

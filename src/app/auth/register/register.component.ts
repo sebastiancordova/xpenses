@@ -14,6 +14,8 @@ import { CustomValidator } from '@core/validators/custom.validators';
 export class RegisterComponent {
   public registerForm: FormGroup;
   public loading: boolean;
+  public showPassword = false;
+  public showConfirmPassword = false;
   private userService: UserService = inject(UserService);
   private authService: AuthService = inject(AuthService);
   private fb: FormBuilder = inject(FormBuilder);
@@ -35,17 +37,11 @@ export class RegisterComponent {
 
       this.authService.register(email, password)
           .then((user: UserCredential) => {
-            console.log(user)
               this.loading = false;
               this.userService.storeUser(name, user);
               this.router.navigate(['/']);
           })
           .catch((err: any) => {
-              if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-                  console.log('Usuario o contraseña incorrectos.');
-              } else {
-                  console.log('Ocurrió un error');
-              }
               this.loading = false;
           });
   }

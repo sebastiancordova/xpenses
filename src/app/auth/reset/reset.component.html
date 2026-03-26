@@ -1,39 +1,42 @@
-<span class="bg bg-color"></span>
-<div class="ayr-login">
-    <div class="login-block">
-        <div class="form-login">
-            <h5>Xpenses</h5>
-            <span>Restaurar contraseña</span>
-            <form [formGroup]="resetForm" (ngSubmit)="submit()" class="mt-4" novalidate>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" autocomplete="off" id="email" formControlName="email" class="form-control"
-                        placeholder="Ej: nombre@gmail.com" />
-                    <ng-container *ngIf="email?.invalid && email?.touched">
-                        <div class="alert alert-danger mt-2">
-                            <div *ngIf="email?.hasError('required')">
-                                El correo electrónico es obligatorio
-                            </div>
-                            <div *ngIf="email?.hasError('email')">
-                                Ingresa un correo válido
-                            </div>
-                        </div>
-                    </ng-container>
-                </div>
-                <div class="actions">
-                    <button type="submit" class="btn btn-blue btn-block btn-radius"
-                        [disabled]="resetForm.invalid || loading">
-                        <span class="d-flex justify-content-between align-items-center">
-                            Enviar email
-                            <i class="fas fa-arrow-right" *ngIf="!loading"></i><i
-                                class="fas fa-spinner fa-spin text-white" *ngIf="loading"></i>
-                        </span>
-                    </button>
-                </div>
-            </form>
+<div class="auth-wrapper">
+
+  <!-- Left: brand panel (desktop only) -->
+  <div class="brand-panel">
+    <img src="/assets/img/iso-white.png" class="brand-panel__logo" alt="Xpenses">
+    <h1 class="brand-panel__title">Xpenses</h1>
+    <p class="brand-panel__tagline">Tus finanzas personales, claras y bajo control</p>
+  </div>
+
+  <!-- Right: form panel -->
+  <div class="form-panel">
+    <div class="form-card">
+
+      <img src="/assets/img/iso-color.png" class="form-card__mobile-logo" alt="Xpenses">
+      <h2 class="form-card__title">Recuperar contraseña</h2>
+      <p class="form-card__subtitle">Te enviaremos un enlace para restablecer tu contraseña</p>
+
+      <form [formGroup]="resetForm" (ngSubmit)="submit()" novalidate>
+
+        <div class="form-group mb-0">
+          <label class="field-label" for="email">Correo electrónico</label>
+          <input type="email" autocomplete="email" id="email" formControlName="email"
+            class="form-control field-input" placeholder="nombre@gmail.com">
+          <small class="field-error" *ngIf="email?.invalid && email?.touched && email?.hasError('required')">El correo electrónico es obligatorio</small>
+          <small class="field-error" *ngIf="email?.invalid && email?.touched && email?.hasError('email')">Ingresa un correo válido</small>
         </div>
-        <div class="d-flex align-items-center justify-content-center mt-2">
-          <span class="text-white">¿Ya tienes cuenta? <span class="font-weight-bold cursor-pointer" routerLink="/auth/login">Inicia sesión</span></span>
-      </div>
+
+        <button type="submit" class="btn-auth" [disabled]="resetForm.invalid || loading">
+          <span *ngIf="!loading">Enviar enlace</span>
+          <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1"></i>Enviando...</span>
+        </button>
+
+      </form>
+
+      <p class="auth-footer">
+        ¿Ya tienes cuenta? <a routerLink="/auth/login">Inicia sesión</a>
+      </p>
+
     </div>
+  </div>
+
 </div>
