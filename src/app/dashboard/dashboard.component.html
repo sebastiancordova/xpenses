@@ -2,7 +2,7 @@
 
   <!-- Header -->
   <div class="dashboard-header">
-    <div class="d-flex align-items-center justify-content-between flex-wrap">
+    <div class="dashboard-header__inner d-flex align-items-center justify-content-between flex-wrap">
       <div>
         <h1 class="dashboard-title mb-0">Dashboard</h1>
         <p class="dashboard-subtitle mb-0">Resumen del período de facturación</p>
@@ -12,7 +12,7 @@
           <i class="fa-solid fa-chevron-left"></i>
         </button>
         <span class="month-nav__label">{{ displayMonthName }} {{ displayYear }}</span>
-        <button class="month-nav__btn" type="button" (click)="goToNextMonth()">
+        <button class="month-nav__btn" type="button" (click)="goToNextMonth()" [disabled]="isCurrentMonth">
           <i class="fa-solid fa-chevron-right"></i>
         </button>
       </div>
@@ -32,7 +32,7 @@
     <div class="row stats-row">
 
       <!-- Net Balance — primary hero card -->
-      <div class="col-lg-3 col-sm-6 mb-3">
+      <div class="col-6 col-lg-3 mb-3">
         <div class="stat-card stat-card--gradient">
           <p class="stat-card__label">Balance neto</p>
           <p class="stat-card__value" [ngClass]="netBalanceClass">
@@ -43,7 +43,7 @@
       </div>
 
       <!-- Income -->
-      <div class="col-lg-3 col-sm-6 mb-3">
+      <div class="col-6 col-lg-3 mb-3">
         <div class="stat-card">
           <p class="stat-card__label">
             <i class="fas fa-arrow-down stat-card__icon stat-card__icon--income mr-1"></i>
@@ -58,7 +58,7 @@
       </div>
 
       <!-- Total expenses -->
-      <div class="col-lg-3 col-sm-6 mb-3">
+      <div class="col-6 col-lg-3 mb-3">
         <div class="stat-card">
           <p class="stat-card__label">
             <i class="fas fa-arrow-up stat-card__icon stat-card__icon--expense mr-1"></i>
@@ -70,7 +70,7 @@
       </div>
 
       <!-- Safe to spend -->
-      <div class="col-lg-3 col-sm-6 mb-3">
+      <div class="col-6 col-lg-3 mb-3">
         <div class="stat-card" [ngClass]="{ 'stat-card--warning': (insights?.safeToSpend ?? 0) === 0 }">
           <p class="stat-card__label">Disponible para gastar</p>
           <p class="stat-card__value stat-card__value--dark">

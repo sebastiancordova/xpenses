@@ -98,6 +98,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .pipe(take(1))
       .subscribe(prefs => {
         this.prefs = prefs;
+        console.log('Loaded preferences:', prefs);
         this.loadData();
       });
   }
@@ -187,8 +188,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const daysElapsed = Math.max(Math.floor(msElapsed / (1000 * 60 * 60 * 24)), 1);
     const daysRemaining = Math.max(daysInPeriod - daysElapsed, 0);
     const totalExpenses = totalVariable + totalRecurring;
-    const burnRate = daysElapsed > 0 ? totalExpenses / daysElapsed : 0;
-    const projectedExpenses = burnRate * daysInPeriod;
+    const burnRate = daysElapsed > 0 ? totalVariable / daysElapsed : 0;
+    const projectedExpenses = (burnRate * daysInPeriod) + totalRecurring;
     const hasIncome = totalIncome > 0;
 
     const netBalance = totalIncome - totalExpenses;
@@ -223,6 +224,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       alertLevel, alertMessage, daysRemaining,
       savingsTarget, variablesBudget, hasIncome
     };
+  }
+
+  get isCurrentMonth(): boolean {
+    const now = new Date();
+    return this.displayDate.getFullYear() === now.getFullYear() &&
+           this.displayDate.getMonth() === now.getMonth();
   }
 
   get budgetBarClass(): string {
@@ -266,6 +273,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   goToNextMonth(): void {
+    if (this.isCurrentMonth) return;
     this.displayDate = new Date(this.displayDate.getFullYear(), this.displayDate.getMonth() + 1, 1);
     this.updateDisplayInfo();
     this.loadData();
