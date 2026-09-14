@@ -18,6 +18,20 @@ export class EditExpenseComponent {
   public loading = false
   public activeModal: NgbActiveModal = inject(NgbActiveModal);
   public expenseCategory = ExpenseCategory;
+  public confirmingDelete = false;
+  public maxCommentLength = 120;
+  readonly categoryIcons: Record<string, string> = {
+    'Supermercado':    'fa-cart-shopping',
+    'Subscripciones':  'fa-tv',
+    'Transporte':      'fa-car',
+    'Casa':            'fa-house',
+    'Cuentas':         'fa-receipt',
+    'Entretenimiento': 'fa-film',
+    'Otros':           'fa-tag',
+    'Ropa':            'fa-shirt',
+    'Auto cuidado':    'fa-heart',
+    'Gasto Fijo':      'fa-thumbtack',
+  };
   private fb: FormBuilder = inject(FormBuilder);
 
   constructor() {
@@ -25,7 +39,7 @@ export class EditExpenseComponent {
       title: ['', Validators.required],
       amount: ['', Validators.required],
       category: ['', Validators.required],
-      comment: ['']
+      comment: ['', Validators.maxLength(120)]
     })
 
   }
@@ -45,9 +59,22 @@ export class EditExpenseComponent {
   }
 
   delete() {
+    if (!this.confirmingDelete) {
+      this.confirmingDelete = true;
+      return;
+    }
     this.loading = true;
     this.deleteExpense$.emit(this.expense.uid);
     this.activeModal.close();
+  }
+
+  getCategoryClass(key: string): string {
+    return 'category--' + key.toLowerCase().replace(/\s+/g, '-');
+  }
+
+  selectCategory(key: string): void {
+    this.editExpenseForm.patchValue({ category: key });
+    this.category?.markAsTouched();
   }
 
   get title() {

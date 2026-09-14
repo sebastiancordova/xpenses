@@ -14,6 +14,19 @@ export class AddExpenseComponent {
   public loading = false
   public activeModal: NgbActiveModal = inject(NgbActiveModal);
   public expenseCategory = ExpenseCategory;
+  public maxCommentLength = 120;
+  readonly categoryIcons: Record<string, string> = {
+    'Supermercado':    'fa-cart-shopping',
+    'Subscripciones':  'fa-tv',
+    'Transporte':      'fa-car',
+    'Casa':            'fa-house',
+    'Cuentas':         'fa-receipt',
+    'Entretenimiento': 'fa-film',
+    'Otros':           'fa-tag',
+    'Ropa':            'fa-shirt',
+    'Auto cuidado':    'fa-heart',
+    'Gasto Fijo':      'fa-thumbtack',
+  };
   @Output() newExpense$ = new EventEmitter<Expense>();
   private fb: FormBuilder = inject(FormBuilder);
   constructor() {
@@ -21,7 +34,7 @@ export class AddExpenseComponent {
       title: ['', Validators.required],
       amount: ['', Validators.required],
       category: ['', Validators.required],
-      comment: ['']
+      comment: ['', Validators.maxLength(120)]
     })
 
   }
@@ -30,11 +43,25 @@ export class AddExpenseComponent {
 
   }
 
-  submit() {
+  submit(): void {
+    if (this.addExpenseForm.invalid || this.loading) {
+      this.addExpenseForm.markAllAsTouched();
+      return;
+    }
+
     this.loading = true;
     const newExpense: Expense = this.addExpenseForm.value;
     this.newExpense$.emit(newExpense)
     this.activeModal.close();
+  }
+
+  getCategoryClass(key: string): string {
+    return 'category--' + key.toLowerCase().replace(/\s+/g, '-');
+  }
+
+  selectCategory(key: string): void {
+    this.addExpenseForm.patchValue({ category: key });
+    this.category?.markAsTouched();
   }
 
   get title() {

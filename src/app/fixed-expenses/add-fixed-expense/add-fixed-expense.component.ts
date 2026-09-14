@@ -27,7 +27,12 @@ export class AddFixedExpenseComponent {
 
   }
 
-  submit() {
+  submit(): void {
+    if (this.addFixedExpenseForm.invalid || this.loading) {
+      this.addFixedExpenseForm.markAllAsTouched();
+      return;
+    }
+
     this.loading = true;
     const newExpense: Expense = this.addFixedExpenseForm.value;
     this.newFixedExpense$.emit(newExpense)

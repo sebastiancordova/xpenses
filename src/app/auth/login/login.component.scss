@@ -155,7 +155,7 @@
     line-height: 1;
     font-size: 0.85rem;
 
-    &:focus { outline: none; }
+    &:focus-visible { outline: 3px solid $color-brand-primary; outline-offset: 3px; border-radius: 4px; }
     &:hover { color: $color-grey; }
   }
 }

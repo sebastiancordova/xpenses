@@ -1,5 +1,5 @@
 export interface UserPreferences {
-  billingCycleDay: number; // 1–28, day of month billing cycle starts
+  billingCycleDay: number; // 1–28, day of month the billing statement closes
   savingsRate: number;     // 0–100 (%), target savings from income
   variableRate: number;    // 0–100 (%), budget allocated to variable expenses
 }

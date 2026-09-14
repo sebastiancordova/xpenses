@@ -41,11 +41,6 @@
     }
   }
 
-  // ─── Body ──────────────────────────────────────────────────────────────────
-  .expense-modal-body {
-    padding: 1.5rem;
-  }
-
   // ─── Fields ────────────────────────────────────────────────────────────────
   .field-label {
     font-size: 0.78rem;
@@ -145,6 +140,116 @@
       color: #c62828;
       &:hover { background-color: #fce4ec; }
     }
+
+    &--danger-confirm {
+      background-color: #fce4ec;
+      color: #c62828;
+      border: 1.5px solid #c62828;
+      &:hover { background-color: #ffcdd2; }
+    }
+
+    &--ghost {
+      background: transparent;
+      color: $color-grey-lighter;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+      min-height: unset;
+      &:hover { color: $color-grey; background: $color-milkier; }
+    }
+  }
+
+  .delete-zone {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  // ─── Entrance animation ────────────────────────────────────────────────────
+  @keyframes modalFadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .expense-modal-body {
+    padding: 1.5rem;
+    animation: modalFadeUp 0.2s ease-out both;
+    @media (prefers-reduced-motion: reduce) { animation: none; }
+  }
+
+  // ─── Category pill grid ───────────────────────────────────────────────────
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.45rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .category-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.65rem;
+    min-height: 38px;
+    border: 1.5px solid $color-milky;
+    border-radius: 8px;
+    background: $color-milkiest;
+    color: $color-grey;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+    width: 100%;
+    text-align: left;
+
+    i { font-size: 0.75rem; flex-shrink: 0; }
+
+    &:hover {
+      background: $color-milkier;
+      border-color: $color-grey-lightest;
+    }
+
+    &:focus { outline: none; }
+    &:focus-visible { box-shadow: 0 0 0 2px rgba(135, 102, 86, 0.35); }
+
+    &.category-pill--active {
+      font-weight: 600;
+      &.category--supermercado   { background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
+      &.category--transporte     { background: #e3f2fd; color: #1565c0; border-color: #1565c0; }
+      &.category--casa           { background: #fff3e0; color: #e65100; border-color: #e65100; }
+      &.category--cuentas        { background: #fce4ec; color: #c62828; border-color: #c62828; }
+      &.category--entretenimiento { background: #f3e5f5; color: #6a1b9a; border-color: #6a1b9a; }
+      &.category--subscripciones { background: #e0f7fa; color: #006064; border-color: #00838f; }
+      &.category--ropa           { background: #fce4ec; color: #ad1457; border-color: #ad1457; }
+      &.category--auto-cuidado   { background: #e8eaf6; color: #283593; border-color: #283593; }
+      &.category--gasto-fijo     { background: #fbe9e7; color: #bf360c; border-color: #bf360c; }
+      &.category--otros          { background: #f5f5f5; color: #424242; border-color: #9e9e9e; }
+    }
+  }
+
+  // ─── Valid state ──────────────────────────────────────────────────────────
+  .field-input--valid {
+    border-color: rgba(46, 125, 50, 0.5) !important;
+    &:focus { box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12); }
+  }
+
+  // ─── Label row ────────────────────────────────────────────────────────────
+  .field-label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+    .field-label { margin-bottom: 0; }
+  }
+
+  .field-char-count {
+    font-size: 0.7rem;
+    color: $color-grey-lightest;
+    transition: color 0.18s;
+    &--near { color: #f57f17; }
+  }
+
+  textarea.field-input {
+    resize: none;
   }
 }
 

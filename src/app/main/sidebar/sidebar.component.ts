@@ -31,8 +31,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.isActive = !this.isActive;
   }
 
-  goToRoute(route: string) {
-    this.router.navigate([`/${route}`]);
+  closeSidebar(): void {
+    this.isActive = false;
+  }
+
+  onNavigate(): void {
+    this.closeSidebar();
   }
 
   logout() {

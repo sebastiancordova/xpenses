@@ -23,7 +23,12 @@ export class AddSubscriptionComponent {
 
   }
 
-  submit() {
+  submit(): void {
+    if (this.addSubscriptionForm.invalid || this.loading) {
+      this.addSubscriptionForm.markAllAsTouched();
+      return;
+    }
+
     this.loading = true;
     const newSubscription: Subscription = this.addSubscriptionForm.value;
     this.newSubscription$.emit(newSubscription)

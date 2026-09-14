@@ -1,0 +1,137 @@
+@import "src/assets/sass/variables";
+
+.add-installment-purchase-modal {
+  z-index: 9999;
+
+  .modal-dialog-centered.modal-sm { max-width: 32rem; }
+
+  .modal-content { border: 1px solid $color-milkier; border-radius: 16px; overflow: hidden; }
+
+  // ─── Header ────────────────────────────────────────────────────────────────
+  .modal-header-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background-color: white; border-bottom: 1px solid $color-milkier; color: $color-grey-darker;
+
+    &__title { margin: 0; font-size: 1.05rem; font-weight: 700; }
+    &__close {
+      align-items: center; background: $color-milkier; border: none; border-radius: 50%; color: $color-grey;
+      cursor: pointer; display: inline-flex; height: 44px; justify-content: center; padding: 0; width: 44px;
+      line-height: 1; transition: color 0.15s;
+      &:hover { background: $color-milky; color: $color-grey-darker; }
+      &:focus-visible { outline: 3px solid rgba(135,102,86,0.4); outline-offset: 2px; }
+    }
+  }
+
+  // ─── Body ──────────────────────────────────────────────────────────────────
+  @keyframes modalFadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .modal-body-content {
+    padding: 1.5rem;
+    animation: modalFadeUp 0.2s ease-out both;
+    @media (prefers-reduced-motion: reduce) { animation: none; }
+  }
+
+  // ─── Fields ────────────────────────────────────────────────────────────────
+  .field-label {
+    font-size: 0.78rem; font-weight: 600; color: $color-grey;
+    margin-bottom: 0.35rem; display: block;
+  }
+
+  .field-input {
+    font-size: 1rem; border-radius: 8px; border: 1px solid $color-milky;
+    background-color: $color-milkier; color: $color-grey-darker;
+    transition: border-color 0.18s, box-shadow 0.18s; min-height: 44px; padding: 0.5rem 0.75rem;
+
+    &:focus {
+      border-color: $color-brand-secondary;
+      box-shadow: 0 0 0 3px rgba(189,153,136,0.2);
+      background-color: white; outline: none;
+    }
+    &--amount { padding-left: 2rem; }
+    &--valid {
+      border-color: rgba(46,125,50,0.5) !important;
+      &:focus { box-shadow: 0 0 0 3px rgba(46,125,50,0.12); }
+    }
+  }
+
+  input[type="date"].field-input { cursor: pointer; }
+
+  .amount-input-wrapper {
+    position: relative;
+    .amount-prefix {
+      position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);
+      color: $color-grey-light; font-size: 0.875rem; pointer-events: none;
+    }
+  }
+
+  .field-error { display: block; margin-top: 0.3rem; font-size: 0.75rem; color: #c62828; }
+  .billing-cycle-note {
+    display: flex; align-items: flex-start; gap: .55rem; margin: -.25rem 0 1rem; padding: .75rem;
+    border: 1px solid #e5ded9; border-radius: 10px; background: #fffaf7; color: $color-grey;
+    font-size: .78rem; line-height: 1.45;
+    i { margin-top: .1rem; color: $color-brand-primary; }
+    strong { color: $color-grey-darker; }
+  }
+  .category-fieldset { border: 0; margin: 0 0 1rem; min-width: 0; padding: 0; }
+
+  // ─── Category pill grid ─────────────────────────────────────────────────────
+  .category-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.45rem; margin-bottom: 0.25rem;
+  }
+
+  .category-pill {
+    display: flex; align-items: center; gap: 0.45rem; padding: 0.4rem 0.65rem; min-height: 44px;
+    border: 1.5px solid $color-milky; border-radius: 8px; background: $color-milkiest;
+    color: $color-grey; font-size: 0.78rem; font-weight: 500; cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+    width: 100%; text-align: left;
+    i { font-size: 0.75rem; flex-shrink: 0; }
+    &:hover { background: $color-milkier; border-color: $color-grey-lightest; }
+    &:focus { outline: none; }
+    &:focus-visible { box-shadow: 0 0 0 2px rgba(135,102,86,0.35); }
+    &.category-pill--active {
+      font-weight: 600;
+      &.category--supermercado    { background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
+      &.category--transporte      { background: #e3f2fd; color: #1565c0; border-color: #1565c0; }
+      &.category--casa            { background: #fff3e0; color: #e65100; border-color: #e65100; }
+      &.category--cuentas         { background: #fce4ec; color: #c62828; border-color: #c62828; }
+      &.category--entretenimiento { background: #f3e5f5; color: #6a1b9a; border-color: #6a1b9a; }
+      &.category--subscripciones  { background: #e0f7fa; color: #006064; border-color: #00838f; }
+      &.category--ropa            { background: #fce4ec; color: #ad1457; border-color: #ad1457; }
+      &.category--auto-cuidado    { background: #e8eaf6; color: #283593; border-color: #283593; }
+      &.category--gasto-fijo      { background: #fbe9e7; color: #bf360c; border-color: #bf360c; }
+      &.category--otros           { background: #f5f5f5; color: #424242; border-color: #9e9e9e; }
+    }
+  }
+
+  // ─── Actions ───────────────────────────────────────────────────────────────
+  .modal-actions {
+    display: flex; justify-content: flex-end; align-items: center;
+    gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem;
+    border-top: 1px solid $color-milkier;
+  }
+
+  .btn-modal {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0.5rem 1.25rem;
+    border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 600;
+    cursor: pointer; transition: background-color 0.18s, opacity 0.18s;
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+    &:focus-visible { outline: 3px solid rgba(135,102,86,0.4); outline-offset: 2px; }
+    &--primary {
+      background-color: $color-brand-primary; color: white; min-width: 7.5rem;
+      &:hover:not(:disabled) { background-color: darken(#876656, 8%); }
+    }
+    &--secondary {
+      background-color: $color-milkier; color: $color-grey;
+      &:hover { background-color: $color-milky; }
+    }
+  }
+
+  @media (max-width: $break-sm) {
+    .modal-dialog { margin: 0.75rem; }
+    .modal-body-content { padding: 1.25rem; }
+  }
+}

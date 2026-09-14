@@ -1,0 +1,87 @@
+<div class="modal-header-bar">
+  <h2 class="modal-header-bar__title">Nueva compra en cuotas</h2>
+  <button type="button" class="modal-header-bar__close" (click)="activeModal.dismiss()" aria-label="Cerrar formulario de compra en cuotas">
+    <i class="fas fa-times" aria-hidden="true"></i>
+  </button>
+</div>
+
+<div class="modal-body-content">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate [attr.aria-busy]="loading">
+
+    <div class="form-group">
+      <label class="field-label" for="ip-title">Título</label>
+      <input autocomplete="off" type="text" class="form-control field-input" id="ip-title"
+        formControlName="title" placeholder="Ej: Notebook Samsung" ngbAutofocus aria-describedby="ip-title-error"
+        [attr.aria-invalid]="title?.invalid && title?.touched"
+        [class.field-input--valid]="title?.valid && title?.touched">
+      <small id="ip-title-error" class="field-error" role="alert" *ngIf="title?.invalid && title?.touched">
+        El título es obligatorio
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label" for="ip-amount">Monto por cuota</label>
+      <div class="amount-input-wrapper">
+        <span class="amount-prefix">$</span>
+        <input autocomplete="off" type="text" pattern="[0-9]*" inputmode="numeric"
+          class="form-control field-input field-input--amount" id="ip-amount"
+          formControlName="installmentAmount" placeholder="0" aria-describedby="ip-amount-error"
+          [attr.aria-invalid]="installmentAmount?.invalid && installmentAmount?.touched"
+          [class.field-input--valid]="installmentAmount?.valid && installmentAmount?.touched">
+      </div>
+      <small id="ip-amount-error" class="field-error" role="alert" *ngIf="installmentAmount?.invalid && installmentAmount?.touched">
+        El monto es obligatorio
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label" for="ip-total">Nº de cuotas</label>
+      <input type="number" class="form-control field-input" id="ip-total"
+        formControlName="totalInstallments" min="2" max="120" inputmode="numeric" aria-describedby="ip-total-error"
+        [class.field-input--valid]="totalInstallments?.valid && totalInstallments?.touched">
+      <small id="ip-total-error" class="field-error" role="alert" *ngIf="totalInstallments?.invalid && totalInstallments?.touched">
+        Mínimo 2, máximo 120
+      </small>
+    </div>
+
+    <aside class="billing-cycle-note" role="status">
+      <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+      <span>Las cuotas se calculan con tu día de facturación: <strong>{{ billingCycleDay }}</strong>. Puedes cambiarlo en Configuración.</span>
+    </aside>
+
+    <div class="form-group">
+      <label class="field-label" for="ip-start">Fecha de inicio</label>
+      <input type="date" class="form-control field-input" id="ip-start"
+        formControlName="startDate" aria-describedby="ip-start-error"
+        [class.field-input--valid]="startDate?.valid && startDate?.touched">
+      <small id="ip-start-error" class="field-error" role="alert" *ngIf="startDate?.invalid && startDate?.touched">
+        La fecha de inicio es obligatoria
+      </small>
+    </div>
+
+    <fieldset class="form-group category-fieldset" aria-describedby="ip-category-error">
+      <legend class="field-label">Categoría</legend>
+      <div class="category-grid">
+        <button type="button" class="category-pill"
+                *ngFor="let cat of expenseCategory | keyvalue"
+                [ngClass]="[getCategoryClass(cat.key), category?.value === cat.key ? 'category-pill--active' : '']"
+                (click)="selectCategory(cat.key)" [attr.aria-pressed]="category?.value === cat.key">
+          <i class="fas" [ngClass]="categoryIcons[cat.key] || 'fa-tag'" aria-hidden="true"></i>
+          <span>{{ cat.value }}</span>
+        </button>
+      </div>
+      <small id="ip-category-error" class="field-error" role="alert" *ngIf="category?.invalid && category?.touched">
+        La categoría es obligatoria
+      </small>
+    </fieldset>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-modal btn-modal--secondary" (click)="activeModal.dismiss()">Cancelar</button>
+      <button type="submit" class="btn-modal btn-modal--primary" [disabled]="form.invalid || loading">
+        <span *ngIf="!loading">Guardar</span>
+        <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1"></i>Guardando...</span>
+      </button>
+    </div>
+
+  </form>
+</div>

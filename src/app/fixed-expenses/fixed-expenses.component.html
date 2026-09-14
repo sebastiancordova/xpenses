@@ -6,7 +6,7 @@
       <h1 class="module-title mb-0">Gastos Fijos</h1>
       <p class="module-subtitle mb-0">Gastos recurrentes del mes</p>
     </div>
-    <button class="btn-add" (click)="openCreateModal()">
+    <button type="button" class="btn-add" (click)="openCreateModal()">
       <i class="fas fa-plus mr-2"></i>Nuevo gasto fijo
     </button>
   </div>
@@ -17,7 +17,8 @@
       <div class="d-flex flex-wrap align-items-center">
         <div class="filter-input-wrapper">
           <i class="fas fa-search filter-icon"></i>
-          <input type="text" formControlName="search" class="form-control filter-input" placeholder="Buscar..." />
+          <label class="sr-only" for="fixed-expense-search">Buscar gastos fijos</label>
+          <input id="fixed-expense-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar gastos fijos" />
         </div>
       </div>
     </form>
@@ -33,7 +34,28 @@
   <ng-container *ngIf="!loadingPage">
 
     <ng-container *ngIf="fireFixedExpenses.length > 0; else emptyState">
-      <div class="table-card">
+      <section class="module-summary" aria-label="Resumen de gastos fijos">
+        <span class="module-summary__label">Gastos fijos del mes</span>
+        <strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong>
+        <span class="module-summary__meta">{{ collectionSize }} gasto{{ collectionSize !== 1 ? 's' : '' }} recurrente{{ collectionSize !== 1 ? 's' : '' }}</span>
+      </section>
+
+      <div class="module-mobile-list d-md-none" aria-label="Lista de gastos fijos">
+        <button type="button" *ngFor="let fixedExpense of fixedExpenses" class="module-mobile-card"
+          (click)="openEditModal(fixedExpense)" [attr.aria-label]="'Editar gasto fijo ' + fixedExpense.title">
+          <span class="module-mobile-card__content">
+            <span class="module-mobile-card__title">{{ fixedExpense.title }}</span>
+            <span class="module-mobile-card__meta">Gasto recurrente</span>
+          </span>
+          <span class="module-mobile-card__amount">{{ fixedExpense.amount | currency: 'CLP':'$':'1.0-0' }}<small>/mes</small></span>
+        </button>
+      </div>
+
+      <div class="mobile-pagination d-md-none">
+        <ngb-pagination [collectionSize]="collectionSize" [maxSize]="5" [(page)]="page" (pageChange)="filter()" [pageSize]="pageSize"></ngb-pagination>
+      </div>
+
+      <div class="table-card d-none d-md-block">
         <div class="table-responsive">
           <table class="table module-table mb-0">
             <caption class="sr-only">Lista de gastos fijos</caption>
@@ -77,7 +99,7 @@
         <i class="fas fa-file-invoice-dollar empty-state__icon mb-3"></i>
         <p class="empty-state__title">Sin gastos fijos registrados</p>
         <p class="empty-state__sub">Añade tus gastos recurrentes para llevar un mejor control.</p>
-        <button class="btn-add" (click)="openCreateModal()">
+        <button type="button" class="btn-add" (click)="openCreateModal()">
           <i class="fas fa-plus mr-2"></i>Agregar primer gasto fijo
         </button>
       </div>

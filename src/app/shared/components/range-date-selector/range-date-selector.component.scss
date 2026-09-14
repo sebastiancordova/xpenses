@@ -24,16 +24,14 @@
 .date-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  height: 36px;
-  padding: 0 0.85rem;
+  min-height: 44px;
+  padding: 0;
   background-color: $color-milkier;
   border: 1px solid transparent;
   border-radius: 8px;
   font-size: 0.82rem;
   font-weight: 500;
   color: $color-grey-dark;
-  cursor: pointer;
   transition: border-color 0.18s, background-color 0.18s;
   white-space: nowrap;
 
@@ -42,12 +40,8 @@
     background-color: white;
   }
 
-  &:focus {
-    outline: none;
-    border-color: $color-brand-secondary;
-    box-shadow: 0 0 0 3px rgba(189, 153, 136, 0.2);
-    background-color: white;
-  }
+  &__open { align-items: center; background: transparent; border: 0; color: inherit; cursor: pointer; display: inline-flex; font: inherit; gap: .4rem; min-height: 42px; padding: 0 .85rem; }
+  &__open:focus-visible, &__clear:focus-visible { outline: 3px solid $color-brand-primary; outline-offset: 2px; }
 
   &__icon {
     font-size: 0.78rem;
@@ -76,9 +70,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 16px;
-    height: 16px;
-    margin-left: 0.1rem;
+    width: 32px;
+    height: 32px;
+    margin: 0 .35rem 0 0;
     padding: 0;
     background-color: $color-grey-lightest;
     border: none;
@@ -137,7 +131,7 @@
 .dp-btn {
   display: inline-flex;
   align-items: center;
-  height: 30px;
+  min-height: 36px;
   padding: 0 0.85rem;
   border: none;
   border-radius: 6px;

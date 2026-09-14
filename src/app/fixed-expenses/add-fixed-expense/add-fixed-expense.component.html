@@ -1,37 +1,38 @@
 <div class="modal-header-bar">
-  <h5 class="modal-header-bar__title">Nuevo gasto fijo</h5>
-  <button type="button" class="modal-header-bar__close" (click)="activeModal.dismiss()" aria-label="Cerrar">
-    <i class="fas fa-times"></i>
+  <h2 class="modal-header-bar__title">Nuevo gasto fijo</h2>
+  <button type="button" class="modal-header-bar__close" (click)="activeModal.dismiss()" aria-label="Cerrar formulario de gasto fijo">
+    <i class="fas fa-times" aria-hidden="true"></i>
   </button>
 </div>
 
 <div class="modal-body-content">
-  <form [formGroup]="addFixedExpenseForm" (ngSubmit)="submit()" novalidate>
+  <form [formGroup]="addFixedExpenseForm" (ngSubmit)="submit()" novalidate [attr.aria-busy]="loading">
 
     <div class="form-group">
       <label class="field-label" for="title">Título</label>
-      <input autocomplete="off" type="text" class="form-control field-input" id="title"
-        formControlName="title" placeholder="Ej: Arriendo">
-      <small class="field-error" *ngIf="title?.invalid && title?.touched && title?.hasError('required')">
+      <input autocomplete="off" type="text" class="form-control field-input" id="title" formControlName="title"
+        placeholder="Ej: Arriendo" ngbAutofocus aria-describedby="fixed-expense-title-error" [attr.aria-invalid]="title?.invalid && title?.touched">
+      <small id="fixed-expense-title-error" class="field-error" role="alert" *ngIf="title?.invalid && title?.touched && title?.hasError('required')">
         El título es obligatorio
       </small>
     </div>
 
     <div class="form-group">
-      <label class="field-label" for="amount">Monto</label>
+      <label class="field-label" for="amount">Monto mensual</label>
       <div class="amount-input-wrapper">
         <span class="amount-prefix">$</span>
         <input autocomplete="off" type="text" pattern="[0-9]*" inputmode="numeric"
-          class="form-control field-input field-input--amount" id="amount" formControlName="amount" placeholder="0">
+          class="form-control field-input field-input--amount" id="amount" formControlName="amount" placeholder="0"
+          aria-describedby="fixed-expense-amount-error" [attr.aria-invalid]="amount?.invalid && amount?.touched">
       </div>
-      <small class="field-error" *ngIf="amount?.invalid && amount?.touched && amount?.hasError('required')">
+      <small id="fixed-expense-amount-error" class="field-error" role="alert" *ngIf="amount?.invalid && amount?.touched && amount?.hasError('required')">
         El monto es obligatorio
       </small>
     </div>
 
     <div class="modal-actions">
       <button type="button" class="btn-modal btn-modal--secondary" (click)="activeModal.dismiss()">Cancelar</button>
-      <button type="submit" class="btn-modal btn-modal--primary" [disabled]="addFixedExpenseForm.invalid">
+      <button type="submit" class="btn-modal btn-modal--primary" [disabled]="addFixedExpenseForm.invalid || loading">
         <span *ngIf="!loading">Guardar</span>
         <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1"></i>Guardando...</span>
       </button>

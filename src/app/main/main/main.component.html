@@ -1,6 +1,17 @@
 <div class="container-fluid h-100">
   <div class="row h-100">
-      <app-sidebar></app-sidebar>
+      <app-sidebar #sidebar></app-sidebar>
+      <header class="mobile-app-bar d-md-none">
+        <a routerLink="/dashboard" class="mobile-app-bar__brand" aria-label="Ir al dashboard">
+          <img src="/assets/brand/xpenses-mark-color.svg" alt="">
+          <span>Xpenses</span>
+        </a>
+        <button type="button" class="mobile-app-bar__menu" (click)="sidebar.toggleActive()"
+          [attr.aria-expanded]="sidebar.isActive" aria-controls="primary-navigation"
+          [attr.aria-label]="sidebar.isActive ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'">
+          <i class="fa-solid" [ngClass]="sidebar.isActive ? 'fa-xmark' : 'fa-bars'" aria-hidden="true"></i>
+        </button>
+      </header>
       <main class="col-md-9 ml-sm-auto ml-auto col-lg-10">
           <router-outlet></router-outlet>
       </main>

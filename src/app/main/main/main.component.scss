@@ -1,11 +1,36 @@
 @import "src/assets/sass/variables";
 
 :host {
+    .mobile-app-bar { display: none; }
+
     main {
         background-color: $color-milkiest;
 
         @media (max-width: $break-sm) {
-            padding-top: 4rem;
+            padding-top: 4.5rem;
         }
+    }
+
+    @media (max-width: $break-sm) {
+        .mobile-app-bar {
+            align-items: center;
+            background: #fff;
+            border-bottom: 1px solid $color-milky;
+            display: flex;
+            height: 3.75rem;
+            justify-content: space-between;
+            left: 0;
+            padding: 0 .9rem;
+            position: fixed;
+            right: 0;
+            top: 0;
+            z-index: 200;
+        }
+
+        .mobile-app-bar__brand { align-items: center; color: $color-grey-darker; display: inline-flex; font-size: 1rem; font-weight: 800; gap: .5rem; text-decoration: none; }
+        .mobile-app-bar__brand img { height: 1.55rem; width: 1.55rem; }
+        .mobile-app-bar__menu { align-items: center; background: transparent; border: 0; border-radius: 8px; color: $color-grey-darker; cursor: pointer; display: inline-flex; font-size: 1.05rem; height: 44px; justify-content: center; padding: 0; width: 44px; }
+        .mobile-app-bar__menu:focus-visible { outline: 3px solid $color-brand-primary; outline-offset: 2px; }
+        .mobile-app-bar__menu:hover { background: $color-milkier; }
     }
 }

@@ -1,21 +1,22 @@
-<nav class="col-md-3 col-lg-2 d-md-block sidebar" [ngClass]="{ active: isActive }">
-  <div class="sidebar-inner d-flex flex-column justify-content-between h-100">
+<button
+  *ngIf="isActive"
+  class="sidebar-backdrop d-md-none"
+  type="button"
+  aria-label="Cerrar menú de navegación"
+  (click)="closeSidebar()"></button>
 
-    <!-- Mobile toggle -->
-    <a href="" class="d-block d-md-none" id="btn-sidebar"
-      (click)="toggleActive();$event.preventDefault();$event.stopPropagation()">
-      <div class="circle">
-        <i class="icon icon-active-false fas fa-bars"></i>
-        <i class="icon icon-active-true fas fa-times"></i>
-      </div>
-    </a>
+<nav id="primary-navigation" class="col-md-3 col-lg-2 d-md-block sidebar" [ngClass]="{ active: isActive }" aria-label="Navegación principal">
+  <div class="sidebar-inner d-flex flex-column justify-content-between h-100">
+    <button type="button" class="sidebar-mobile-close d-md-none" (click)="closeSidebar()" aria-label="Cerrar menú de navegación">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
 
     <!-- Logo -->
     <div class="area-logo">
-      <div class="xp-title" (click)="toggleActive(); goToRoute('/dashboard')">
-        <img src="/assets/img/iso-white.png" class="sidebar-logo-img" alt="Xpenses">
+      <a class="xp-title" routerLink="/dashboard" (click)="onNavigate()" aria-label="Ir al dashboard">
+        <img src="/assets/brand/xpenses-mark-white.svg" class="sidebar-logo-img" alt="Xpenses">
         <span class="sidebar-logo-text">Xpenses</span>
-      </div>
+      </a>
     </div>
 
     <!-- Nav links -->
@@ -23,39 +24,47 @@
       <p class="nav-section-label">Menú</p>
       <ul class="nav flex-column">
         <li class="nav-item">
-          <div class="nav-link" [routerLink]="'/dashboard'" (click)="toggleActive()"
+          <a class="nav-link" routerLink="/dashboard" (click)="onNavigate()"
             [routerLinkActive]="'active-link'">
             <i class="fa-solid fa-chart-pie nav-icon"></i>
             <span>Dashboard</span>
-          </div>
+          </a>
         </li>
         <li class="nav-item">
-          <div class="nav-link" [routerLink]="'/ingresos'" (click)="toggleActive()"
+          <a class="nav-link" routerLink="/ingresos" (click)="onNavigate()"
             [routerLinkActive]="'active-link'">
             <i class="fa-solid fa-coins nav-icon"></i>
             <span>Ingresos</span>
-          </div>
+          </a>
         </li>
         <li class="nav-item">
-          <div class="nav-link" [routerLink]="'/gastos'" (click)="toggleActive()"
+          <a class="nav-link" routerLink="/gastos" (click)="onNavigate()"
             [routerLinkActive]="'active-link'">
             <i class="fa-solid fa-receipt nav-icon"></i>
             <span>Gastos</span>
-          </div>
+          </a>
         </li>
+        <li class="nav-section-label nav-section-label--nested" aria-hidden="true">Compromisos</li>
         <li class="nav-item">
-          <div class="nav-link" [routerLink]="'/gastos-fijos'" (click)="toggleActive()"
+          <a class="nav-link" routerLink="/gastos-fijos" (click)="onNavigate()"
             [routerLinkActive]="'active-link'">
             <i class="fa-solid fa-thumbtack nav-icon"></i>
             <span>Gastos Fijos</span>
-          </div>
+          </a>
         </li>
         <li class="nav-item">
-          <div class="nav-link" [routerLink]="'/subscripciones'" (click)="toggleActive()"
+          <a class="nav-link" routerLink="/subscripciones" (click)="onNavigate()"
             [routerLinkActive]="'active-link'">
             <i class="fa-solid fa-repeat nav-icon"></i>
             <span>Subscripciones</span>
-          </div>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/cuotas" (click)="onNavigate()"
+            [routerLinkActive]="'active-link'">
+            <i class="fa-solid fa-credit-card nav-icon"></i>
+            <span>Compras en cuotas</span>
+          </a>
         </li>
       </ul>
     </div>
@@ -71,15 +80,15 @@
 
     <!-- Actions -->
     <div class="area-actions">
-      <div class="nav-link" [routerLink]="'/configuracion'" (click)="toggleActive()"
+      <a class="nav-link" routerLink="/configuracion" (click)="onNavigate()"
         [routerLinkActive]="'active-link'">
         <i class="fa-solid fa-gear nav-icon"></i>
         <span>Configuración</span>
-      </div>
-      <a href="" class="logout-link" (click)="logout();$event.preventDefault()">
+      </a>
+      <button type="button" class="logout-link" (click)="logout()">
         <i class="fa-solid fa-right-from-bracket nav-icon"></i>
         <span>Cerrar sesión</span>
-      </a>
+      </button>
     </div>
 
   </div>

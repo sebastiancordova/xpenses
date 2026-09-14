@@ -2,7 +2,7 @@
 
   <!-- Left: brand panel (desktop only) -->
   <div class="brand-panel">
-    <img src="/assets/img/iso-white.png" class="brand-panel__logo" alt="Xpenses">
+    <img src="/assets/brand/xpenses-mark-white.svg" class="brand-panel__logo" alt="Xpenses">
     <h1 class="brand-panel__title">Xpenses</h1>
     <p class="brand-panel__tagline">Tus finanzas personales, claras y bajo control</p>
   </div>
@@ -11,7 +11,7 @@
   <div class="form-panel">
     <div class="form-card">
 
-      <img src="/assets/img/iso-color.png" class="form-card__mobile-logo" alt="Xpenses">
+      <img src="/assets/brand/xpenses-mark-color.svg" class="form-card__mobile-logo" alt="Xpenses">
       <h2 class="form-card__title">Crear cuenta</h2>
       <p class="form-card__subtitle">Regístrate para empezar a controlar tus finanzas</p>
 
@@ -37,7 +37,8 @@
           <div class="password-wrapper">
             <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
               class="form-control field-input field-input--pw" placeholder="••••••••">
-            <button type="button" class="pw-toggle" (click)="showPassword = !showPassword" tabindex="-1">
+            <button type="button" class="pw-toggle" (click)="showPassword = !showPassword"
+              [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
               <i class="fas" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
             </button>
           </div>
@@ -49,7 +50,8 @@
           <div class="password-wrapper">
             <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" formControlName="confirmPassword"
               class="form-control field-input field-input--pw" placeholder="••••••••">
-            <button type="button" class="pw-toggle" (click)="showConfirmPassword = !showConfirmPassword" tabindex="-1">
+            <button type="button" class="pw-toggle" (click)="showConfirmPassword = !showConfirmPassword"
+              [attr.aria-label]="showConfirmPassword ? 'Ocultar confirmación de contraseña' : 'Mostrar confirmación de contraseña'">
               <i class="fas" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
             </button>
           </div>
@@ -72,4 +74,3 @@
   </div>
 
 </div>
-

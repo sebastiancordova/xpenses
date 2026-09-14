@@ -1,0 +1,143 @@
+@import "src/assets/sass/variables";
+
+:host { display: block; }
+
+.module-wrapper {
+  padding: 2rem;
+  max-width: 1200px;
+  @media (max-width: $break-sm) { padding: 1rem; }
+}
+
+.module-header { margin-bottom: 1.5rem; }
+.module-title { font-size: 1.5rem; font-weight: 700; color: $color-grey-darker; line-height: 1.2; }
+.module-subtitle { font-size: 0.8rem; color: $color-grey-light; margin-top: 0.2rem; }
+
+.btn-add {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0.45rem 1.1rem;
+  border: none; border-radius: 8px; background-color: $color-brand-primary;
+  color: white; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background-color 0.18s;
+  &:hover { background-color: darken(#876656, 8%); }
+  &:focus-visible { outline: 3px solid $color-brand-primary; outline-offset: 3px; }
+}
+
+.filters-card {
+  background-color: white; border-radius: 12px; padding: 1rem 1.25rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 1.25rem;
+  .gap-2 { gap: 0.5rem; }
+}
+.filter-input-wrapper {
+  position: relative;
+  .filter-icon { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); color: $color-grey-lighter; font-size: 0.75rem; pointer-events: none; }
+}
+.filter-input {
+  min-height: 44px; font-size: 0.875rem; background-color: $color-milkier;
+  border: 1px solid transparent; border-radius: 8px; padding-left: 2rem;
+  min-width: 14rem; color: $color-grey-dark; transition: border-color 0.18s;
+  &:focus { outline: none; border-color: $color-brand-secondary; box-shadow: 0 0 0 3px rgba(189,153,136,0.2); background-color: white; }
+}
+.filter-select {
+  min-height: 44px; font-size: 0.875rem; background-color: $color-milkier;
+  border: 1px solid transparent; border-radius: 8px; padding: 0 0.75rem;
+  color: $color-grey-dark; width: auto; transition: border-color 0.18s;
+  &:focus { outline: none; border-color: $color-brand-secondary; box-shadow: 0 0 0 3px rgba(189,153,136,0.2); background-color: white; }
+}
+
+.table-card { background-color: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); overflow: hidden; }
+
+.installment-summary {
+  display: none; padding: 1rem; border: 1px solid rgba(135, 102, 86, 0.16); border-radius: 14px;
+  background: linear-gradient(135deg, #fff 0%, #f7f1ee 100%); color: $color-grey-darker; margin-bottom: 1rem;
+}
+.installment-summary__label { font-size: .75rem; font-weight: 700; letter-spacing: .06em; color: $color-grey-light; text-transform: uppercase; }
+.installment-summary strong { display: block; font-size: 1.55rem; font-variant-numeric: tabular-nums; font-weight: 700; line-height: 1.25; margin: .2rem 0; }
+.installment-summary span:last-child { color: $color-grey-light; font-size: .82rem; }
+.installment-mobile-list { display: none; }
+.installment-mobile-card {
+  background: #fff; border: 1px solid $color-milky; border-radius: 12px; color: $color-grey-darker; cursor: pointer;
+  display: flex; flex-direction: column; gap: .35rem; min-height: 94px; padding: .9rem 1rem; text-align: left; touch-action: manipulation; width: 100%;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  &:active { background: $color-milkiest; transform: scale(.985); }
+  &:focus-visible { outline: 3px solid rgba(135, 102, 86, .4); outline-offset: 2px; }
+}
+.installment-mobile-card--completed { opacity: .7; }
+.installment-mobile-card__topline { align-items: center; display: flex; gap: .75rem; justify-content: space-between; }
+.installment-mobile-card__title { font-size: .98rem; font-weight: 650; overflow-wrap: anywhere; }
+.installment-mobile-card__amount { font-size: 1rem; font-variant-numeric: tabular-nums; font-weight: 700; margin: .2rem 0; }
+.installment-mobile-card__amount small { color: $color-grey-light; font-size: .72rem; font-weight: 500; margin-left: .15rem; }
+.installment-mobile-card__meta { color: $color-grey-light; font-size: .8rem; line-height: 1.45; }
+.installment-mobile-card__period { color: $color-grey-dark; font-weight: 700; }
+.installment-mobile-card__last { color: #2e7d32; font-weight: 700; }
+.installment-mobile-card__meta > span + span::before { content: ' · '; color: $color-grey-lightest; }
+.installment-mobile-card__ending { display: block; margin-top: .1rem; }
+.installment-mobile-card__ending::before { content: '' !important; }
+.mobile-pagination { display: none; justify-content: center; margin-top: 1rem; }
+
+.module-table {
+  thead th {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    color: $color-grey-light; border-bottom: 1px solid $color-milkier; border-top: none;
+    padding: 0.85rem 1rem; white-space: nowrap;
+  }
+  tbody td { padding: 0.85rem 1rem; border-top: 1px solid $color-milkier; vertical-align: middle; font-size: 0.875rem; color: $color-grey-dark; }
+}
+
+.item-row {
+  cursor: pointer; transition: background-color 0.14s;
+  &:hover { background-color: $color-milkiest; }
+  &--completed { opacity: 0.6; }
+}
+.item-title { font-weight: 500; color: $color-grey-darker; }
+.item-meta { font-size: 0.72rem; color: $color-grey-lighter; margin-top: 0.2rem; }
+.item-amount {
+  font-weight: 600; color: $color-grey-darker; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  &--dimmed { color: $color-grey-lighter; text-decoration: line-through; }
+}
+.item-ending { font-size: 0.7rem; color: $color-grey-lighter; margin-top: 0.15rem; white-space: nowrap; }
+
+.status-badge {
+  display: inline-block; padding: 0.2rem 0.55rem; border-radius: 20px;
+  font-size: 0.7rem; font-weight: 600;
+  &--active { background-color: #e8f5e9; color: #2e7d32; }
+  &--completed { background-color: $color-milky; color: $color-grey-lighter; }
+}
+
+.total-row td { padding: 0.85rem 1rem; border-top: 2px solid $color-milky; font-size: 0.875rem; color: $color-grey-darker; background-color: $color-milkiest; }
+
+.table-footer {
+  padding: 0.6rem 1rem; border-top: 1px solid $color-milkier;
+  small { color: $color-grey-lighter; }
+  ::ng-deep ngb-pagination .page-link { border-radius: 6px; font-size: 0.8rem; color: $color-brand-primary; border: none; background: transparent;
+    &:hover { background-color: $color-milkier; }
+  }
+  ::ng-deep ngb-pagination .page-item.active .page-link { background-color: $color-brand-primary; color: white; }
+}
+
+.empty-state {
+  background-color: white; border-radius: 12px; padding: 3rem 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  &__icon { display: block; font-size: 3rem; color: $color-grey-lightest; }
+  &__title { font-size: 1rem; font-weight: 600; color: $color-grey; margin-bottom: 0.25rem; }
+  &__sub { font-size: 0.85rem; color: $color-grey-lighter; margin-bottom: 1.25rem; }
+}
+
+.loading-state__spinner { color: $color-brand-primary; width: 2.5rem; height: 2.5rem; }
+
+@media (max-width: $break-sm) {
+  .module-wrapper { padding: 1rem; }
+  .module-header { align-items: stretch !important; gap: 1rem; margin-bottom: 1rem; }
+  .module-title { font-size: 1.65rem; }
+  .module-subtitle { font-size: .9rem; line-height: 1.45; }
+  .module-header .btn-add { width: 100%; justify-content: center; }
+  .filters-card { border: 1px solid $color-milky; box-shadow: none; padding: .75rem; }
+  .filters-card .gap-2 { display: grid !important; grid-template-columns: minmax(0, 1fr) 7.5rem; width: 100%; }
+  .filter-input { min-width: unset; width: 100%; }
+  .filter-select { width: 100%; }
+  .installment-summary, .installment-mobile-list, .mobile-pagination { display: grid; }
+  .installment-mobile-list { gap: .75rem; }
+  .mobile-pagination { place-items: center;
+    ::ng-deep .pagination { margin-bottom: 0; }
+  }
+  .table-footer { flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem;
+    ::ng-deep ngb-pagination .pagination { margin-bottom: 0; }
+  }
+}

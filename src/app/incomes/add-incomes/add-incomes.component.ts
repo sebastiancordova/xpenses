@@ -27,7 +27,12 @@ export class AddIncomesComponent {
 
   }
 
-  submit() {
+  submit(): void {
+    if (this.addIncomeForm.invalid || this.loading) {
+      this.addIncomeForm.markAllAsTouched();
+      return;
+    }
+
     this.loading = true;
     const newExpense: Income = this.addIncomeForm.value;
     this.newIncome$.emit(newExpense)

@@ -1,113 +1,174 @@
 <div class="dashboard-wrapper">
 
-  <!-- Header -->
-  <div class="dashboard-header">
-    <div class="dashboard-header__inner d-flex align-items-center justify-content-between flex-wrap">
-      <div>
-        <h1 class="dashboard-title mb-0">Dashboard</h1>
-        <p class="dashboard-subtitle mb-0">Resumen del período de facturación</p>
+  <section class="dashboard-header" aria-labelledby="dashboard-title">
+    <div class="dashboard-header__inner">
+      <div class="dashboard-header__copy">
+        <span class="dashboard-eyebrow">Resumen financiero</span>
+        <h1 id="dashboard-title" class="dashboard-title">Dashboard</h1>
+        <p class="dashboard-subtitle">Período {{ periodRangeLabel }}</p>
       </div>
-      <div class="month-nav d-flex align-items-center">
-        <button class="month-nav__btn" type="button" (click)="goToPreviousMonth()">
-          <i class="fa-solid fa-chevron-left"></i>
+
+      <div class="dashboard-header__actions" aria-label="Acciones del dashboard">
+        <a class="quick-action quick-action--secondary" routerLink="/ingresos">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          <span>Ingreso</span>
+        </a>
+        <a class="quick-action" routerLink="/gastos">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          <span>Gasto</span>
+        </a>
+      </div>
+
+      <div class="month-nav" aria-label="Selector de período">
+        <button class="month-nav__btn" type="button" (click)="goToPreviousMonth()" aria-label="Ver período anterior">
+          <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
         </button>
-        <span class="month-nav__label">{{ displayMonthName }} {{ displayYear }}</span>
-        <button class="month-nav__btn" type="button" (click)="goToNextMonth()" [disabled]="isCurrentMonth">
-          <i class="fa-solid fa-chevron-right"></i>
+        <span class="month-nav__label" aria-live="polite">{{ displayMonthName }} {{ displayYear }}</span>
+        <button
+          class="month-nav__btn"
+          type="button"
+          (click)="goToNextMonth()"
+          [disabled]="isCurrentMonth"
+          aria-label="Ver período siguiente">
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
         </button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Loading -->
-  <div *ngIf="isLoading" class="loading-state d-flex justify-content-center align-items-center py-5">
-    <div class="spinner-border loading-state__spinner" role="status">
-      <span class="sr-only">Cargando...</span>
-    </div>
-  </div>
-
-  <ng-container *ngIf="!isLoading">
-
-    <!-- ROW 1: Hero metric cards -->
+  <div *ngIf="isLoading" class="skeleton-wrapper" role="status" aria-live="polite" aria-label="Cargando dashboard">
     <div class="row stats-row">
+      <div class="col-6 col-xl-3 mb-3" *ngFor="let n of [1,2,3,4]">
+        <div class="skeleton-card">
+          <div class="skeleton skeleton--icon mb-3"></div>
+          <div class="skeleton skeleton--label mb-2"></div>
+          <div class="skeleton skeleton--value mb-2"></div>
+          <div class="skeleton skeleton--sub"></div>
+        </div>
+      </div>
+    </div>
+    <div class="skeleton-card mb-3">
+      <div class="skeleton-row mb-3">
+        <div class="skeleton skeleton--label skeleton--wide"></div>
+        <div class="skeleton skeleton--label skeleton--medium"></div>
+      </div>
+      <div class="skeleton skeleton--bar"></div>
+    </div>
+  </div>
 
-      <!-- Net Balance — primary hero card -->
-      <div class="col-6 col-lg-3 mb-3">
-        <div class="stat-card stat-card--gradient">
+  <section *ngIf="loadError" class="alert alert-warning d-flex flex-wrap align-items-center mb-3" role="alert" aria-labelledby="dashboard-load-error-title">
+    <i class="fa-solid fa-cloud-exclamation" aria-hidden="true"></i>
+    <div>
+      <h2 id="dashboard-load-error-title">No pudimos cargar este período</h2>
+      <p>Revisa tu conexión e inténtalo nuevamente. Tus registros no se modificaron.</p>
+    </div>
+    <button type="button" class="quick-action ml-auto mt-2 mt-sm-0" (click)="retryLoadData()">
+      <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+      <span>Reintentar</span>
+    </button>
+  </section>
+
+  <ng-container *ngIf="!isLoading && !loadError">
+
+    <section class="dashboard-summary mb-3" *ngIf="insights" [ngClass]="dashboardToneClass" aria-label="Insight principal">
+      <div class="dashboard-summary__content">
+        <span class="dashboard-summary__label">Lectura rápida</span>
+        <p class="dashboard-summary__text">{{ primaryInsightText }}</p>
+      </div>
+      <div class="dashboard-summary__metric">
+        <span class="dashboard-summary__metric-label">Meta de ahorro</span>
+        <strong>{{ insights.savingsTarget | currency: 'CLP':'$':'1.0-0' }}</strong>
+      </div>
+    </section>
+
+    <section class="row stats-row" aria-label="Métricas principales">
+      <div class="col-6 col-xl-3 mb-3">
+        <article class="stat-card stat-card--gradient">
+          <i class="fas fa-wallet stat-card__watermark" aria-hidden="true"></i>
           <p class="stat-card__label">Balance neto</p>
           <p class="stat-card__value" [ngClass]="netBalanceClass">
             {{ (insights?.netBalance ?? 0) | currency: 'CLP':'$':'1.0-0' }}
           </p>
-          <p class="stat-card__sub">{{ displayMonthName }} {{ displayYear }}</p>
-        </div>
+          <p class="stat-card__sub">Ingresos menos gastos del período</p>
+        </article>
       </div>
 
-      <!-- Income -->
-      <div class="col-6 col-lg-3 mb-3">
-        <div class="stat-card">
-          <p class="stat-card__label">
-            <i class="fas fa-arrow-down stat-card__icon stat-card__icon--income mr-1"></i>
-            Ingresos del período
-          </p>
+      <div class="col-6 col-xl-3 mb-3">
+        <article class="stat-card stat-card--income">
+          <div class="stat-card__topline">
+            <div class="stat-card__icon-badge stat-card__icon-badge--income">
+              <i class="fas fa-arrow-down" aria-hidden="true"></i>
+            </div>
+            <span class="stat-card__chip" *ngIf="totalIncome > 0">Registrado</span>
+          </div>
+          <p class="stat-card__label">Ingresos</p>
           <p class="stat-card__value stat-card__value--dark">
             {{ totalIncome | currency: 'CLP':'$':'1.0-0' }}
           </p>
-          <p class="stat-card__sub" *ngIf="totalIncome > 0">Registrado en el período</p>
+          <p class="stat-card__sub" *ngIf="totalIncome > 0">Base para presupuesto y ahorro</p>
           <p class="stat-card__sub" *ngIf="totalIncome === 0">Sin ingresos registrados</p>
-        </div>
+        </article>
       </div>
 
-      <!-- Total expenses -->
-      <div class="col-6 col-lg-3 mb-3">
-        <div class="stat-card">
-          <p class="stat-card__label">
-            <i class="fas fa-arrow-up stat-card__icon stat-card__icon--expense mr-1"></i>
-            Total gastos
-          </p>
+      <div class="col-6 col-xl-3 mb-3">
+        <article class="stat-card stat-card--expense">
+          <div class="stat-card__topline">
+            <div class="stat-card__icon-badge stat-card__icon-badge--expense">
+              <i class="fas fa-arrow-up" aria-hidden="true"></i>
+            </div>
+            <span class="stat-card__chip">{{ variableExpensesCount }} variables</span>
+          </div>
+          <p class="stat-card__label">Total gastos</p>
           <p class="stat-card__value stat-card__value--dark">{{ total | currency: 'CLP':'$':'1.0-0' }}</p>
-          <p class="stat-card__sub">{{ variableExpensesCount }} gastos variables + recurrentes</p>
-        </div>
+          <p class="stat-card__sub">
+            {{ totalFixedAndSubs | currency: 'CLP':'$':'1.0-0' }} recurrentes
+          </p>
+        </article>
       </div>
 
-      <!-- Safe to spend -->
-      <div class="col-6 col-lg-3 mb-3">
-        <div class="stat-card" [ngClass]="{ 'stat-card--warning': (insights?.safeToSpend ?? 0) === 0 }">
-          <p class="stat-card__label">Disponible para gastar</p>
+      <div class="col-6 col-xl-3 mb-3">
+        <article class="stat-card stat-card--available" [ngClass]="{ 'stat-card--warning': (insights?.safeToSpend ?? 0) === 0 }">
+          <div class="stat-card__topline">
+            <div class="stat-card__icon-badge stat-card__icon-badge--available">
+              <i class="fas fa-coins" aria-hidden="true"></i>
+            </div>
+            <span class="stat-card__chip">{{ safeToSpendProgress | number: '1.0-0' }}% usado</span>
+          </div>
+          <p class="stat-card__label">Disponible variable</p>
           <p class="stat-card__value stat-card__value--dark">
             {{ (insights?.safeToSpend ?? 0) | currency: 'CLP':'$':'1.0-0' }}
           </p>
           <p class="stat-card__sub">
             <ng-container *ngIf="(insights?.daysRemaining ?? 0) > 0">
-              ~{{ (insights?.dailySafeToSpend ?? 0) | currency: 'CLP':'$':'1.0-0' }}/día · {{ insights?.daysRemaining }} días restantes
+              {{ (insights?.dailySafeToSpend ?? 0) | currency: 'CLP':'$':'1.0-0' }}/día - {{ insights?.daysRemaining }} días
             </ng-container>
             <ng-container *ngIf="(insights?.daysRemaining ?? 0) === 0">Período completado</ng-container>
           </p>
-        </div>
+        </article>
       </div>
-    </div>
+    </section>
 
-    <!-- ROW 2: Budget health bar + quick stats -->
-    <div class="budget-health-card mb-3" *ngIf="insights">
+    <section class="budget-health-card mb-3" *ngIf="insights" aria-label="Salud del presupuesto">
       <div class="budget-health-card__top">
         <div class="budget-health-card__left">
           <span class="budget-health-card__label">Consumo del presupuesto</span>
-          <span class="budget-health-card__pct" [ngClass]="budgetBarClass.replace('fill','pct')">
+          <span class="budget-health-card__pct" [ngClass]="budgetPctClass">
             {{ insights.budgetPct | number: '1.0-1' }}%
           </span>
         </div>
         <div class="budget-health-card__kpis">
           <span class="kpi">
-            <span class="kpi__label">Tasa de ahorro</span>
-            <span class="kpi__value" [ngClass]="insights.savingsRate >= (prefs.savingsRate) ? 'kpi__value--good' : 'kpi__value--bad'">
+            <span class="kpi__label">Ahorro</span>
+            <span class="kpi__value" [ngClass]="insights.savingsRate >= prefs.savingsRate ? 'kpi__value--good' : 'kpi__value--bad'">
               {{ insights.savingsRate | number: '1.0-1' }}%
             </span>
           </span>
-          <span class="kpi kpi--divider"></span>
+          <span class="kpi kpi--divider" aria-hidden="true"></span>
           <span class="kpi">
             <span class="kpi__label">Gasto diario</span>
             <span class="kpi__value">{{ insights.burnRate | currency: 'CLP':'$':'1.0-0' }}/día</span>
           </span>
-          <span class="kpi kpi--divider"></span>
+          <span class="kpi kpi--divider" aria-hidden="true"></span>
           <span class="kpi">
             <span class="kpi__label">Proyección</span>
             <span class="kpi__value" [ngClass]="insights.projectedExpenses > totalIncome && totalIncome > 0 ? 'kpi__value--bad' : ''">
@@ -116,20 +177,65 @@
           </span>
         </div>
       </div>
-      <div class="budget-bar">
+      <div class="budget-bar" role="progressbar" aria-label="Porcentaje de ingresos consumidos" [attr.aria-valuenow]="insights.budgetPct | number:'1.0-0'" aria-valuemin="0" aria-valuemax="100">
         <div class="budget-bar__fill" [ngClass]="budgetBarClass" [style.width.%]="insights.budgetPct > 100 ? 100 : insights.budgetPct"></div>
       </div>
-    </div>
+    </section>
 
-    <!-- ROW 3: Alert strip -->
+    <section class="expense-composition mb-3" *ngIf="total > 0" aria-label="Composición del gasto">
+      <div class="expense-composition__item">
+        <span class="expense-composition__label">Variables</span>
+        <strong>{{ totalVariable | currency: 'CLP':'$':'1.0-0' }}</strong>
+        <span>{{ variableExpensePct | number: '1.0-1' }}%</span>
+      </div>
+      <div class="expense-composition__track" aria-hidden="true">
+        <span class="expense-composition__fill expense-composition__fill--variable" [style.width.%]="variableExpensePct"></span>
+        <span class="expense-composition__fill expense-composition__fill--recurring" [style.width.%]="recurringExpensePct"></span>
+      </div>
+      <div class="expense-composition__item expense-composition__item--right">
+        <span class="expense-composition__label">Recurrentes y cuotas</span>
+        <strong>{{ totalFixedAndSubs | currency: 'CLP':'$':'1.0-0' }}</strong>
+        <span>{{ recurringExpensePct | number: '1.0-1' }}%</span>
+      </div>
+    </section>
+
+    <section class="dashboard-card installment-card mb-3" *ngIf="activeInstallments.length > 0" aria-labelledby="installments-title">
+      <div class="dashboard-card__header dashboard-card__header--split">
+        <span id="installments-title">
+          <i class="fas fa-credit-card mr-2" aria-hidden="true"></i>
+          Compras en cuotas
+        </span>
+        <strong>{{ totalInstallmentsAmount | currency: 'CLP':'$':'1.0-0' }} del período</strong>
+      </div>
+      <div class="installment-list">
+        <div class="installment-item" *ngFor="let p of activeInstallments">
+          <div class="installment-item__info">
+            <span class="installment-item__title">{{ p.title }}</span>
+            <span class="installment-item__sub">
+              <ng-container *ngIf="isCurrentMonth; else pastInstallment">
+                Próximo cobro: cuota {{ getInstallmentNumber(p) }} de {{ p.totalInstallments }}
+                · Por pagar: {{ getRemainingInstallments(p) }} cuota{{ getRemainingInstallments(p) !== 1 ? 's' : '' }}, incluida la próxima
+              </ng-container>
+              <ng-template #pastInstallment>
+                Cuota del período: {{ getInstallmentNumber(p) }} de {{ p.totalInstallments }}
+              </ng-template>
+            </span>
+          </div>
+          <span class="installment-item__amount">{{ p.installmentAmount | currency: 'CLP':'$':'1.0-0' }}</span>
+        </div>
+      </div>
+    </section>
+
     <div class="alert-strip mb-3"
-         *ngIf="insights?.alertMessage"
+         *ngIf="insights?.alertMessage && insights?.alertLevel !== 'ok'"
+         role="status"
          [ngClass]="{
            'alert-strip--ok': insights?.alertLevel === 'ok',
            'alert-strip--warn': insights?.alertLevel === 'warn',
            'alert-strip--danger': insights?.alertLevel === 'danger'
          }">
       <i class="fas mr-2"
+         aria-hidden="true"
          [ngClass]="{
            'fa-check-circle': insights?.alertLevel === 'ok',
            'fa-exclamation-triangle': insights?.alertLevel === 'warn',
@@ -138,48 +244,67 @@
       {{ insights?.alertMessage }}
     </div>
 
-    <!-- ROW 4: Chart + Breakdown -->
     <ng-container *ngIf="total > 0; else emptyState">
-      <div class="row">
+      <section class="row dashboard-grid" aria-label="Distribución de gastos">
         <div class="col-lg-5 mb-4">
-          <div class="dashboard-card h-100">
-            <p class="dashboard-card__header">Distribución por categoría</p>
+          <article class="dashboard-card h-100">
+            <div class="dashboard-card__header dashboard-card__header--stack">
+              <span>Distribución por categoría</span>
+              <small *ngIf="topCategory">Mayor gasto: {{ topCategory.category }}</small>
+            </div>
             <div class="chart-container">
               <canvas baseChart
                 [data]="doughnutChartData"
                 [legend]="false"
                 [type]="doughnutChartType"
-                [options]="chartOptions">
+                [options]="chartOptions"
+                aria-label="Gráfico de distribución de gastos por categoría">
               </canvas>
+              <div class="chart-center" aria-hidden="true">
+                <span>Total</span>
+                <strong>{{ total | currency: 'CLP':'$':'1.0-0' }}</strong>
+              </div>
             </div>
-          </div>
+          </article>
         </div>
         <div class="col-lg-7 mb-4">
-          <div class="dashboard-card h-100">
-            <p class="dashboard-card__header">Detalle por categoría</p>
+          <article class="dashboard-card h-100">
+            <div class="dashboard-card__header dashboard-card__header--stack">
+              <span>Detalle por categoría</span>
+              <small>{{ categoryBreakdown.length }} categorías con movimiento</small>
+            </div>
             <div class="category-list">
               <div class="category-item" *ngFor="let item of categoryBreakdown">
-                <div class="category-item__info">
-                  <span class="category-item__dot" [style.background-color]="item.color"></span>
-                  <span class="category-item__name">{{ item.category }}</span>
+                <div class="category-item__row">
+                  <div class="category-item__info">
+                    <span class="category-item__dot" [style.background-color]="item.color" aria-hidden="true"></span>
+                    <span class="category-item__name">{{ item.category }}</span>
+                  </div>
+                  <div class="category-item__right">
+                    <span class="category-item__amount">{{ item.amount | currency: 'CLP':'$':'1.0-0' }}</span>
+                    <span class="category-item__pct">{{ item.percentage | number: '1.0-1' }}%</span>
+                  </div>
                 </div>
-                <div class="category-item__right">
-                  <span class="category-item__amount">{{ item.amount | currency: 'CLP':'$':'1.0-0' }}</span>
-                  <span class="category-item__pct">{{ item.percentage | number: '1.0-1' }}%</span>
+                <div class="category-item__bar" aria-hidden="true">
+                  <div class="category-item__bar-fill" [style.background-color]="item.color" [style.width.%]="item.percentage"></div>
                 </div>
               </div>
             </div>
-          </div>
+          </article>
         </div>
-      </div>
+      </section>
     </ng-container>
 
     <ng-template #emptyState>
-      <div class="empty-state text-center py-5">
-        <i class="fa-regular fa-chart-pie empty-state__icon mb-3"></i>
+      <section class="empty-state text-center py-5" aria-label="Sin gastos registrados">
+        <i class="fa-regular fa-chart-pie empty-state__icon mb-3" aria-hidden="true"></i>
         <p class="empty-state__title">Sin gastos registrados</p>
         <p class="empty-state__sub">No hay gastos para {{ displayMonthName }} {{ displayYear }}.</p>
-      </div>
+        <a class="quick-action mt-3" routerLink="/gastos">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          <span>Registrar gasto</span>
+        </a>
+      </section>
     </ng-template>
 
   </ng-container>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Xpenses</title>
+  <rect width="512" height="512" fill="#876656"/>
+  <rect x="62" y="92" width="310" height="328" rx="68" fill="#fff"/>
+  <path d="M78 177h294c42 0 76 34 76 76v35c0 42-34 76-76 76H78V177Z" fill="#f7f1ee"/>
+  <path d="M151 231l74 55 74-55M151 341l74-55 74 55" fill="none" stroke="#876656" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+  <circle cx="393" cy="286" r="18" fill="#bd9988"/>
+</svg>

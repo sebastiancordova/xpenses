@@ -7,7 +7,8 @@
     [footerTemplate]="footerTemplate" />
 
   <!-- Trigger pill -->
-  <button type="button" class="date-trigger" (click)="datepicker.toggle()">
+  <div class="date-trigger">
+    <button type="button" class="date-trigger__open" (click)="datepicker.toggle()" aria-label="Seleccionar período de fechas">
     <i class="fas fa-calendar-alt date-trigger__icon"></i>
     <span class="date-trigger__label" *ngIf="!showCleanFilter">{{ currentPeriod }}</span>
     <ng-container *ngIf="showCleanFilter">
@@ -15,10 +16,11 @@
       <i class="fas fa-arrow-right date-trigger__arrow"></i>
       <span class="date-trigger__to">{{ toDateValue }}</span>
     </ng-container>
-    <button *ngIf="showCleanFilter" type="button" class="date-trigger__clear" (click)="$event.stopPropagation(); goToCurrentPeriod()">
+    </button>
+    <button *ngIf="showCleanFilter" type="button" class="date-trigger__clear" (click)="goToCurrentPeriod()" aria-label="Restablecer al período actual">
       <i class="fas fa-times"></i>
     </button>
-  </button>
+  </div>
 
   <!-- Day cell template -->
   <ng-template #t let-date let-focused="focused">

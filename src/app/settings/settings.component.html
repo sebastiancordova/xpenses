@@ -1,77 +1,124 @@
-<div class="settings-wrapper">
+<main class="settings-wrapper" aria-labelledby="settings-title">
+  <header class="settings-header">
+    <p class="settings-eyebrow"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Preferencias</p>
+    <h1 id="settings-title" class="settings-title">Configura tu presupuesto</h1>
+    <p class="settings-subtitle">Define tu período de seguimiento y cómo quieres distribuir cada ingreso.</p>
+  </header>
 
-  <div class="settings-header">
-    <h1 class="settings-title mb-0">Configuración</h1>
-    <p class="settings-subtitle mb-0">Personaliza el comportamiento de tu dashboard</p>
-  </div>
-
-  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-
-    <!-- Billing cycle -->
-    <div class="settings-card">
-      <p class="settings-card__title"><i class="fas fa-calendar-alt mr-2"></i>Ciclo de facturación</p>
-      <p class="settings-card__desc">Día del mes en que comienza tu ciclo (ej: día en que recibes tu sueldo o se cierra tu tarjeta).</p>
-      <div class="form-group settings-field">
-        <label class="field-label" for="billingCycleDay">Día de inicio del ciclo</label>
-        <input
-          type="number" id="billingCycleDay" min="1" max="28"
-          class="form-control field-input field-input--short"
-          formControlName="billingCycleDay"
-          placeholder="19">
-        <small class="field-hint">Entre 1 y 28. Actualmente el ciclo va del día {{ billingCycleDay?.value }} al {{ billingCycleDay?.value - 1 }} del mes siguiente.</small>
-        <small class="field-error" *ngIf="billingCycleDay?.invalid && billingCycleDay?.touched">Debe ser un número entre 1 y 28.</small>
-      </div>
+  <section *ngIf="loadError" class="settings-notice settings-notice--error" role="alert">
+    <i class="fa-solid fa-cloud-exclamation" aria-hidden="true"></i>
+    <div>
+      <strong>No pudimos cargar tu configuración.</strong>
+      <span>Revisa tu conexión. Tus valores guardados no se modificaron.</span>
     </div>
+    <button type="button" class="notice-action" (click)="retryLoad()">Reintentar</button>
+  </section>
 
-    <!-- Budget allocation -->
-    <div class="settings-card">
-      <p class="settings-card__title"><i class="fas fa-sliders-h mr-2"></i>Distribución del presupuesto</p>
-      <p class="settings-card__desc">Define cómo quieres distribuir tu ingreso mensual. El porcentaje restante ({{ 100 - totalAllocated }}%) corresponde a gastos fijos y suscripciones.</p>
+  <ng-container *ngIf="!preferencesLoading && !loadError; else settingsPending">
+    <section class="settings-context" aria-label="Cómo se aplican estos ajustes">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+      <p>Estos ajustes actualizan los cálculos del Dashboard. El día de facturación también se aplica a todas tus compras en cuotas.</p>
+    </section>
 
-      <div class="form-group settings-field">
-        <label class="field-label" for="savingsRate">Meta de ahorro (%)</label>
-        <div class="range-input-wrapper">
-          <input type="range" id="savingsRate" min="0" max="70" step="5"
-            class="range-input" formControlName="savingsRate">
-          <span class="range-value">{{ savingsRate?.value }}%</span>
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <section class="settings-card" aria-labelledby="cycle-title">
+        <div class="settings-card__heading">
+          <span class="settings-card__icon settings-card__icon--cycle"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>
+          <div>
+            <h2 id="cycle-title" class="settings-card__title">Ciclo de facturación</h2>
+            <p class="settings-card__desc">Indica el día en que se renueva el período que ves en tu Dashboard.</p>
+          </div>
         </div>
-      </div>
 
-      <div class="form-group settings-field">
-        <label class="field-label" for="variableRate">Gastos variables (%)</label>
-        <div class="range-input-wrapper">
-          <input type="range" id="variableRate" min="0" max="80" step="5"
-            class="range-input" formControlName="variableRate">
-          <span class="range-value">{{ variableRate?.value }}%</span>
+        <div class="cycle-control">
+          <label class="field-label" for="billingCycleDay">Día de facturación</label>
+          <div class="cycle-control__input">
+            <span aria-hidden="true">Día</span>
+            <input
+              type="number" id="billingCycleDay" min="1" max="28" step="1" inputmode="numeric"
+              class="form-control field-input" formControlName="billingCycleDay"
+              aria-describedby="billingCycleHint billingCycleError">
+          </div>
+          <p id="billingCycleHint" class="field-hint">{{ billingCycleDescription }}</p>
+          <p id="billingCycleError" class="field-error" role="alert" *ngIf="billingCycleDay?.invalid && billingCycleDay?.touched">Ingresa un número entre 1 y 28.</p>
         </div>
-      </div>
+      </section>
 
-      <div class="allocation-summary" [ngClass]="{ 'allocation-summary--warning': allocationWarning }">
-        <span class="allocation-bar">
-          <span class="allocation-bar__savings" [style.width.%]="savingsRate?.value"></span>
-          <span class="allocation-bar__variable" [style.width.%]="variableRate?.value"></span>
-        </span>
-        <div class="allocation-legend">
-          <span class="legend-dot legend-dot--savings"></span> Ahorro {{ savingsRate?.value }}%
-          <span class="legend-dot legend-dot--variable ml-3"></span> Variables {{ variableRate?.value }}%
-          <span class="legend-dot legend-dot--fixed ml-3"></span> Fijos/Subs {{ 100 - totalAllocated }}%
+      <section class="settings-card" aria-labelledby="allocation-title">
+        <div class="settings-card__heading">
+          <span class="settings-card__icon settings-card__icon--budget"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i></span>
+          <div>
+            <h2 id="allocation-title" class="settings-card__title">Distribución del presupuesto</h2>
+            <p class="settings-card__desc">Reserva una parte de tus ingresos para ahorro y gastos del día a día. El resto queda para gastos fijos y suscripciones.</p>
+          </div>
         </div>
-        <small class="field-error" *ngIf="allocationWarning">
-          La suma de ahorro + variables supera el 100%. Ajusta los valores.
-        </small>
-      </div>
-    </div>
 
-    <!-- Actions -->
-    <div class="settings-actions">
-      <div *ngIf="saved" class="save-feedback">
-        <i class="fas fa-check-circle mr-1"></i> Configuración guardada
-      </div>
-      <button type="submit" class="btn-save" [disabled]="form.invalid || loading || allocationWarning">
-        <span *ngIf="!loading">Guardar cambios</span>
-        <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1"></i>Guardando...</span>
-      </button>
-    </div>
+        <fieldset class="budget-controls">
+          <legend class="sr-only">Porcentajes de distribución</legend>
+          <div class="budget-control">
+            <div class="budget-control__header">
+              <label for="savingsRate">Meta de ahorro</label>
+              <output class="budget-control__value" aria-live="polite">{{ savingsRate?.value }}%</output>
+            </div>
+            <div class="budget-control__adjuster">
+              <button type="button" class="step-button" (click)="changeRate('savingsRate', -5)" [disabled]="savingsRate?.value <= 0" aria-label="Reducir ahorro en 5 puntos porcentuales"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+              <input type="range" id="savingsRate" min="0" max="100" step="1" class="range-input" formControlName="savingsRate" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="savingsRate?.value" [attr.aria-valuetext]="savingsRate?.value + '% de ahorro'">
+              <button type="button" class="step-button" (click)="changeRate('savingsRate', 5)" [disabled]="savingsRate?.value >= 100" aria-label="Aumentar ahorro en 5 puntos porcentuales"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+            </div>
+          </div>
 
-  </form>
-</div>
+          <div class="budget-control">
+            <div class="budget-control__header">
+              <label for="variableRate">Gastos variables</label>
+              <output class="budget-control__value" aria-live="polite">{{ variableRate?.value }}%</output>
+            </div>
+            <div class="budget-control__adjuster">
+              <button type="button" class="step-button" (click)="changeRate('variableRate', -5)" [disabled]="variableRate?.value <= 0" aria-label="Reducir gastos variables en 5 puntos porcentuales"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+              <input type="range" id="variableRate" min="0" max="100" step="1" class="range-input" formControlName="variableRate" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="variableRate?.value" [attr.aria-valuetext]="variableRate?.value + '% de gastos variables'">
+              <button type="button" class="step-button" (click)="changeRate('variableRate', 5)" [disabled]="variableRate?.value >= 100" aria-label="Aumentar gastos variables en 5 puntos porcentuales"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </fieldset>
+
+        <section class="allocation-summary" [class.allocation-summary--warning]="allocationWarning" aria-labelledby="allocation-summary-title">
+          <div class="allocation-summary__heading">
+            <h3 id="allocation-summary-title">Así se distribuye cada ingreso</h3>
+            <button type="button" class="recommendation-button" (click)="useRecommendedAllocation()">Usar recomendación</button>
+          </div>
+          <div class="allocation-bar" role="img" [attr.aria-label]="'Ahorro ' + savingsRate?.value + ' por ciento, gastos variables ' + variableRate?.value + ' por ciento, gastos fijos y suscripciones ' + fixedRate + ' por ciento'">
+            <span class="allocation-bar__savings" [style.width.%]="savingsRate?.value"></span>
+            <span class="allocation-bar__variable" [style.width.%]="variableRate?.value"></span>
+            <span class="allocation-bar__fixed" [style.width.%]="fixedRate"></span>
+          </div>
+          <ul class="allocation-list" aria-label="Detalle de distribución">
+            <li><span class="legend-dot legend-dot--savings"></span><span>Ahorro</span><strong>{{ savingsRate?.value }}%</strong></li>
+            <li><span class="legend-dot legend-dot--variable"></span><span>Variables</span><strong>{{ variableRate?.value }}%</strong></li>
+            <li><span class="legend-dot legend-dot--fixed"></span><span>Fijos y subs.</span><strong>{{ fixedRate }}%</strong></li>
+          </ul>
+          <p class="allocation-message" *ngIf="!allocationWarning">La recomendación inicial es 20% ahorro, 50% gastos variables y 30% gastos fijos.</p>
+          <p class="field-error allocation-error" role="alert" *ngIf="allocationWarning"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Ahorro y gastos variables no pueden superar el 100%. Reduce uno de los dos valores.</p>
+        </section>
+      </section>
+
+      <div class="settings-actions" [class.settings-actions--changed]="hasUnsavedChanges">
+        <div class="save-feedback" aria-live="polite">
+          <span *ngIf="hasUnsavedChanges && !loading && !saved && !saveError"><i class="fa-solid fa-circle" aria-hidden="true"></i> Tienes cambios sin guardar</span>
+          <span *ngIf="saved"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Configuración guardada</span>
+          <span *ngIf="saveError" class="save-feedback__error"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> No se pudo guardar. Inténtalo de nuevo.</span>
+        </div>
+        <button type="submit" class="btn-save" [disabled]="form.invalid || loading || allocationWarning || !hasUnsavedChanges">
+          <span *ngIf="!loading">Guardar cambios</span>
+          <span *ngIf="loading"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Guardando...</span>
+        </button>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-template #settingsPending>
+    <section *ngIf="preferencesLoading" class="settings-loading" role="status" aria-live="polite" aria-label="Cargando configuración">
+      <div class="settings-skeleton settings-skeleton--heading"></div>
+      <div class="settings-skeleton settings-skeleton--field"></div>
+      <div class="settings-skeleton settings-skeleton--card"></div>
+    </section>
+  </ng-template>
+</main>

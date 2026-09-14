@@ -1,0 +1,149 @@
+<div class="module-wrapper">
+
+  <!-- Header -->
+  <div class="module-header d-flex align-items-center justify-content-between flex-wrap">
+    <div>
+      <h1 class="module-title mb-0">Compras en cuotas</h1>
+      <p class="module-subtitle mb-0">Seguimiento de pagos en cuotas</p>
+    </div>
+    <button type="button" class="btn-add" (click)="openCreateModal()">
+      <i class="fas fa-plus mr-2"></i>Nueva compra
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <form [formGroup]="filtersForm">
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <div class="filter-input-wrapper">
+          <i class="fas fa-search filter-icon"></i>
+          <label class="sr-only" for="installment-search">Buscar compras en cuotas</label>
+          <input id="installment-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar compra" />
+        </div>
+        <label class="sr-only" for="installment-status">Filtrar por estado</label>
+        <select id="installment-status" formControlName="status" class="form-control filter-select">
+          <option value="all">Todas</option>
+          <option value="active">Activas</option>
+          <option value="completed">Finalizadas</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loadingPage" class="loading-state d-flex justify-content-center align-items-center py-5">
+    <div class="spinner-border loading-state__spinner" role="status">
+      <span class="sr-only">Cargando...</span>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!loadingPage">
+
+    <ng-container *ngIf="fireInstallmentPurchases.length > 0; else emptyState">
+      <section class="installment-summary" aria-label="Resumen de cuotas activas">
+        <span class="installment-summary__label">Compromiso mensual activo</span>
+        <strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong>
+        <span>{{ collectionSize }} compra{{ collectionSize !== 1 ? 's' : '' }} en esta vista</span>
+      </section>
+
+      <div class="installment-mobile-list d-md-none" aria-label="Compras en cuotas">
+        <button type="button" *ngFor="let p of installmentPurchases" (click)="openEditModal(p)" class="installment-mobile-card"
+          [class.installment-mobile-card--completed]="p.status === 'completed'"
+          [attr.aria-label]="'Editar compra en cuotas ' + p.title + '. Próximo cobro, cuota ' + getUpcomingInstallment(p) + ' de ' + p.totalInstallments">
+          <span class="installment-mobile-card__topline">
+            <span class="installment-mobile-card__title">{{ p.title }}</span>
+            <span class="status-badge" [class.status-badge--active]="p.status === 'active'" [class.status-badge--completed]="p.status === 'completed'">
+              {{ p.status === 'active' ? 'Activa' : 'Finalizada' }}
+            </span>
+          </span>
+          <span class="installment-mobile-card__amount">{{ p.installmentAmount | currency: 'CLP':'$':'1.0-0' }}<small>/mes</small></span>
+          <span class="installment-mobile-card__meta" *ngIf="p.status === 'active'">
+            <span class="installment-mobile-card__period">Próximo cobro: cuota {{ getUpcomingInstallment(p) }} de {{ p.totalInstallments }}</span>
+            <span *ngIf="isLastInstallment(p)" class="installment-mobile-card__last">Última cuota</span>
+            <span *ngIf="!isLastInstallment(p)">Por pagar: {{ getRemaining(p) }} cuotas, incluida la próxima</span>
+            <span class="installment-mobile-card__ending">Última cuota en {{ getEndingDate(p) }}</span>
+          </span>
+          <span class="installment-mobile-card__meta" *ngIf="p.status === 'completed'">{{ p.totalInstallments }} cuotas completadas</span>
+        </button>
+      </div>
+
+      <div class="table-card d-none d-md-block">
+        <div class="table-responsive">
+          <table class="table module-table mb-0">
+            <caption class="sr-only">Lista de compras en cuotas</caption>
+            <thead>
+              <tr>
+                <th scope="col">Compra</th>
+                <th scope="col" class="text-center d-none d-md-table-cell">Estado</th>
+                <th scope="col" class="text-right">Cuota mensual</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of installmentPurchases" (click)="openEditModal(p)" class="item-row"
+                  [class.item-row--completed]="p.status === 'completed'">
+                <td>
+                  <div class="item-title">{{ p.title }}</div>
+                  <div class="item-meta" *ngIf="p.status === 'active'">
+                    Próximo cobro: cuota {{ getUpcomingInstallment(p) }} de {{ p.totalInstallments }}
+                    &nbsp;·&nbsp;
+                    <ng-container *ngIf="isLastInstallment(p); else remainingInstallments">Última cuota</ng-container>
+                    <ng-template #remainingInstallments>Por pagar: {{ getRemaining(p) }} cuotas, incluida la próxima</ng-template>
+                  </div>
+                  <div class="item-meta" *ngIf="p.status === 'completed'">
+                    Finalizada — {{ p.totalInstallments }} cuotas completadas
+                  </div>
+                </td>
+                <td class="text-center d-none d-md-table-cell">
+                  <span class="status-badge" [class.status-badge--active]="p.status === 'active'"
+                        [class.status-badge--completed]="p.status === 'completed'">
+                    {{ p.status === 'active' ? 'Activa' : 'Finalizada' }}
+                  </span>
+                </td>
+                <td class="item-amount text-right">
+                  <span [class.item-amount--dimmed]="p.status === 'completed'">
+                    {{ p.installmentAmount | currency: 'CLP':'$':'1.0-0' }}
+                  </span>
+                  <div class="item-ending" *ngIf="p.status === 'active'">
+                    Finaliza en {{ getEndingDate(p) }}
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td class="font-weight-bold" colspan="2">Total cuotas activas / mes</td>
+                <td class="font-weight-bold text-right">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="table-footer d-flex justify-content-between align-items-center">
+          <small class="text-muted">{{ collectionSize }} compra{{ collectionSize !== 1 ? 's' : '' }}</small>
+          <ngb-pagination
+            [collectionSize]="collectionSize"
+            [maxSize]="5"
+            [(page)]="page"
+            (pageChange)="filter()"
+            [pageSize]="pageSize">
+          </ngb-pagination>
+        </div>
+      </div>
+      <div class="mobile-pagination d-md-none" *ngIf="collectionSize > pageSize">
+        <ngb-pagination [collectionSize]="collectionSize" [maxSize]="5" [(page)]="page" (pageChange)="filter()" [pageSize]="pageSize"></ngb-pagination>
+      </div>
+    </ng-container>
+
+    <ng-template #emptyState>
+      <div class="empty-state text-center py-5">
+        <i class="fas fa-credit-card empty-state__icon mb-3"></i>
+        <p class="empty-state__title">Sin compras en cuotas registradas</p>
+        <p class="empty-state__sub">Añade tus compras en cuotas para llevar un mejor control.</p>
+        <button type="button" class="btn-add" (click)="openCreateModal()">
+          <i class="fas fa-plus mr-2"></i>Agregar primera compra
+        </button>
+      </div>
+    </ng-template>
+
+  </ng-container>
+
+</div>

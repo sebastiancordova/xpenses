@@ -6,7 +6,7 @@
       <h1 class="module-title mb-0">Suscripciones</h1>
       <p class="module-subtitle mb-0">Servicios con cobro recurrente</p>
     </div>
-    <button class="btn-add" (click)="openCreateModal()">
+    <button type="button" class="btn-add" (click)="openCreateModal()">
       <i class="fas fa-plus mr-2"></i>Nueva suscripción
     </button>
   </div>
@@ -17,7 +17,8 @@
       <div class="d-flex flex-wrap align-items-center">
         <div class="filter-input-wrapper">
           <i class="fas fa-search filter-icon"></i>
-          <input type="text" formControlName="search" class="form-control filter-input" placeholder="Buscar..." />
+          <label class="sr-only" for="subscription-search">Buscar suscripciones</label>
+          <input id="subscription-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar suscripciones" />
         </div>
       </div>
     </form>
@@ -33,7 +34,28 @@
   <ng-container *ngIf="!loadingPage">
 
     <ng-container *ngIf="fireSubscriptions.length > 0; else emptyState">
-      <div class="table-card">
+      <section class="module-summary" aria-label="Resumen de suscripciones">
+        <span class="module-summary__label">Compromiso mensual</span>
+        <strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong>
+        <span class="module-summary__meta">{{ collectionSize }} suscripción{{ collectionSize !== 1 ? 'es' : '' }}</span>
+      </section>
+
+      <div class="module-mobile-list d-md-none" aria-label="Lista de suscripciones">
+        <button type="button" *ngFor="let subscription of subscriptions" class="module-mobile-card"
+          (click)="openEditModal(subscription)" [attr.aria-label]="'Editar suscripción ' + subscription.title">
+          <span class="module-mobile-card__content">
+            <span class="module-mobile-card__title">{{ subscription.title }}</span>
+            <span class="module-mobile-card__meta">Cobro recurrente</span>
+          </span>
+          <span class="module-mobile-card__amount">{{ subscription.amount | currency: 'CLP':'$':'1.0-0' }}<small>/mes</small></span>
+        </button>
+      </div>
+
+      <div class="mobile-pagination d-md-none">
+        <ngb-pagination [collectionSize]="collectionSize" [maxSize]="5" [(page)]="page" (pageChange)="filter()" [pageSize]="pageSize"></ngb-pagination>
+      </div>
+
+      <div class="table-card d-none d-md-block">
         <div class="table-responsive">
           <table class="table module-table mb-0">
             <caption class="sr-only">Lista de suscripciones</caption>
@@ -77,7 +99,7 @@
         <i class="fas fa-sync-alt empty-state__icon mb-3"></i>
         <p class="empty-state__title">Sin suscripciones registradas</p>
         <p class="empty-state__sub">Añade tus servicios recurrentes para llevar un mejor control.</p>
-        <button class="btn-add" (click)="openCreateModal()">
+        <button type="button" class="btn-add" (click)="openCreateModal()">
           <i class="fas fa-plus mr-2"></i>Agregar primera suscripción
         </button>
       </div>

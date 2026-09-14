@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, ViewChild, inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { IUser } from '@core/models/user';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -8,6 +8,7 @@ import { AddExpenseComponent } from './add-expense/add-expense.component';
 import { ExpensesService } from '@core/services/expenses.service';
 import { Expense, ExpenseCategory } from '@core/models/expense';
 import { EditExpenseComponent } from './edit-expense/edit-expense.component';
+import { RangeDateSelectorComponent } from '@shared/components/range-date-selector/range-date-selector.component';
 
 @Component({
   selector: 'app-expenses',
@@ -15,6 +16,7 @@ import { EditExpenseComponent } from './edit-expense/edit-expense.component';
   styleUrls: ['./expenses.component.scss']
 })
 export class ExpensesComponent implements OnDestroy {
+  @ViewChild(RangeDateSelectorComponent) private rangeDateSelector?: RangeDateSelectorComponent;
   public filtersForm: FormGroup;
   private unsubscribe$ = new Subject<boolean>();
   public loadingPage = true;
@@ -30,7 +32,9 @@ export class ExpensesComponent implements OnDestroy {
   private modalService: NgbModal = inject(NgbModal);
   public totalAmountFiltered = 0;
   public expenseCategory = ExpenseCategory;
-  private orderIndicator = false;
+  public sortColumn = '';
+  public sortAsc = false;
+  public hasCustomDateRange = false;
   private dateFilter$ = new BehaviorSubject<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
 
   constructor() {
@@ -44,6 +48,23 @@ export class ExpensesComponent implements OnDestroy {
     return 'category--' + category.toLowerCase().replace(/\s+/g, '-');
   }
 
+  get hasActiveFilters(): boolean {
+    const { search, category } = this.filtersForm.value;
+    return Boolean(search?.trim() || category || this.hasCustomDateRange);
+  }
+
+  get activeCategory(): string {
+    return this.filtersForm.get('category')?.value || '';
+  }
+
+  get amountSortLabel(): string {
+    return this.sortColumn === 'amount' && this.sortAsc ? 'Menor monto' : 'Mayor monto';
+  }
+
+  get amountSortIcon(): string {
+    return this.sortColumn === 'amount' && this.sortAsc ? 'fa-arrow-up' : 'fa-arrow-down';
+  }
+
   ngOnInit(): void {
     this.dateFilter$.pipe(
       takeUntil(this.unsubscribe$),
@@ -54,7 +75,10 @@ export class ExpensesComponent implements OnDestroy {
       this.filter();
     });
     this.filtersForm.valueChanges
-      .pipe(takeUntil(this.unsubscribe$), debounceTime(200), tap(() => this.filter()))
+      .pipe(takeUntil(this.unsubscribe$), debounceTime(200), tap(() => {
+        this.page = 1;
+        this.filter();
+      }))
       .subscribe();
   }
 
@@ -84,34 +108,54 @@ export class ExpensesComponent implements OnDestroy {
   }
 
   onOrderBy(type: string) {
+    if (this.sortColumn === type) {
+      this.sortAsc = !this.sortAsc;
+    } else {
+      this.sortColumn = type;
+      this.sortAsc = false;
+    }
     switch (type) {
       case 'amount':
-        if (this.orderIndicator) {
-          this.fireExpenses.sort((a, b) => +b.amount - +a.amount)
-        } else {
-          this.fireExpenses.sort((a, b) => +a.amount - +b.amount)
-        }
-        this.filter();
-        this.orderIndicator = !this.orderIndicator;
+        this.fireExpenses.sort((a, b) => this.sortAsc ? +a.amount - +b.amount : +b.amount - +a.amount);
         break;
       case 'title':
-        if (this.orderIndicator) {
-          this.fireExpenses.sort((a, b) => a.title.localeCompare(b.title));
-        } else {
-          this.fireExpenses.sort((a, b) => b.title.localeCompare(a.title));
-        }
-        this.filter();
-        this.orderIndicator = !this.orderIndicator;
-        break;
-
-      default:
+        this.fireExpenses.sort((a, b) => this.sortAsc ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title));
         break;
     }
+    this.filter();
+  }
+
+  getSortIcon(col: string): string {
+    if (this.sortColumn !== col) return 'fa-sort';
+    return this.sortAsc ? 'fa-sort-up' : 'fa-sort-down';
+  }
+
+  toggleAmountSort(): void {
+    this.onOrderBy('amount');
   }
 
   filterByDate(date: { from: Date | undefined; to: Date | undefined }) {
     this.page = 1;
+    this.hasCustomDateRange = Boolean(date.from && date.to);
     this.dateFilter$.next(date);
+  }
+
+  selectCategory(category: string): void {
+    this.filtersForm.patchValue({ category });
+  }
+
+  clearSearch(): void {
+    this.filtersForm.patchValue({ search: '' });
+  }
+
+  clearFilters(): void {
+    this.filtersForm.reset({ search: '', category: '' });
+    this.hasCustomDateRange = false;
+    if (this.rangeDateSelector) {
+      this.rangeDateSelector.goToCurrentPeriod();
+      return;
+    }
+    this.filterByDate({ from: undefined, to: undefined });
   }
 
   openCreateModal() {

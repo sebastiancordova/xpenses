@@ -12,55 +12,138 @@
   </div>
 
   <!-- Filters -->
-  <div class="filters-card">
-    <form [formGroup]="filtersForm">
-      <div class="d-flex flex-wrap align-items-center">
-        <div class="filter-input-wrapper mr-2 mb-2">
+  <section class="filters-card" aria-label="Filtros de gastos">
+    <form [formGroup]="filtersForm" class="filters-form">
+      <div class="filters-heading">
+        <div>
+          <span class="filters-heading__eyebrow">Explora tus gastos</span>
+          <h2 class="filters-heading__title">Filtrar y encontrar</h2>
+        </div>
+        <button *ngIf="hasActiveFilters" type="button" class="filters-clear" (click)="clearFilters()">
+          Limpiar <span class="sr-only">todos los filtros</span>
+        </button>
+      </div>
+
+      <div class="filter-input-wrapper filter-search">
           <i class="fas fa-search filter-icon"></i>
-          <input type="text" formControlName="search" class="form-control filter-input" placeholder="Buscar..." />
+          <label class="sr-only" for="expense-search">Buscar gastos</label>
+          <input id="expense-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar gastos" />
+          <button *ngIf="filtersForm.get('search')?.value" type="button" class="filter-search__clear" (click)="clearSearch()" aria-label="Borrar búsqueda">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+      </div>
+
+      <div class="filter-section" aria-label="Filtrar por categoría">
+        <span class="filter-section__label">Categoría</span>
+        <div class="category-chips" role="group" aria-label="Seleccionar categoría">
+          <button type="button" class="category-chip" [class.category-chip--active]="!activeCategory" (click)="selectCategory('')">Todas</button>
+          <button type="button" *ngFor="let enum of expenseCategory | keyvalue" class="category-chip"
+            [class.category-chip--active]="activeCategory === enum.key" (click)="selectCategory(enum.key)">
+            {{ enum.value }}
+          </button>
         </div>
-        <div class="filter-input-wrapper mb-2">
-          <select formControlName="category" class="form-control filter-input">
-            <option value="">Todas las categorías</option>
-            <option *ngFor="let enum of expenseCategory | keyvalue" [value]="enum.key">{{ enum.value }}</option>
-          </select>
-        </div>
-        <div class="filter-date ml-auto mb-2">
+      </div>
+
+      <div class="filter-period">
+        <span class="filter-section__label">Período</span>
+        <div class="filter-period__control">
           <app-range-date-selector (rangeSelected)="filterByDate($event)"></app-range-date-selector>
         </div>
       </div>
-    </form>
-  </div>
 
-  <!-- Loading -->
-  <div *ngIf="loadingPage" class="loading-state d-flex justify-content-center align-items-center py-5">
-    <div class="spinner-border loading-state__spinner" role="status">
-      <span class="sr-only">Cargando...</span>
+      <div class="filters-feedback" *ngIf="!loadingPage" aria-live="polite">
+        <span>{{ collectionSize }} gasto{{ collectionSize !== 1 ? 's' : '' }} encontrado{{ collectionSize !== 1 ? 's' : '' }}</span>
+        <strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong>
+      </div>
+    </form>
+  </section>
+
+  <!-- Loading Skeleton -->
+  <div *ngIf="loadingPage" class="skeleton-table-card">
+    <div class="skeleton-header-row">
+      <div class="skeleton skeleton--th" style="width:35%"></div>
+      <div class="skeleton skeleton--th d-none d-md-block" style="width:12%"></div>
+      <div class="skeleton skeleton--th d-none d-md-block" style="width:10%"></div>
+      <div class="skeleton skeleton--th ml-auto" style="width:10%"></div>
+    </div>
+    <div class="skeleton-body-row" *ngFor="let n of [1,2,3,4,5,6]">
+      <div>
+        <div class="skeleton skeleton--row-title mb-1"></div>
+        <div class="skeleton skeleton--row-sub"></div>
+      </div>
+      <div class="skeleton skeleton--badge d-none d-md-block"></div>
+      <div class="skeleton skeleton--date d-none d-md-block"></div>
+      <div class="skeleton skeleton--amount ml-auto"></div>
     </div>
   </div>
 
   <ng-container *ngIf="!loadingPage">
 
+    <!-- Results strip -->
+    <div class="results-strip d-none d-md-flex" *ngIf="fireExpenses.length > 0">
+      <span class="results-strip__count">{{ collectionSize }} gasto{{ collectionSize !== 1 ? 's' : '' }}</span>
+      <span class="results-strip__total">Total: <strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong></span>
+    </div>
+
     <ng-container *ngIf="fireExpenses.length > 0; else emptyState">
-      <div class="table-card">
+      <div class="expenses-list-toolbar d-md-none">
+        <span class="expenses-list-toolbar__label">Ordenar gastos</span>
+        <button type="button" class="expense-sort" (click)="toggleAmountSort()"
+          [attr.aria-label]="'Ordenar por ' + amountSortLabel.toLowerCase()">
+          <i class="fas" [ngClass]="amountSortIcon" aria-hidden="true"></i>
+          {{ amountSortLabel }}
+        </button>
+      </div>
+
+      <div class="expense-mobile-list d-md-none" aria-label="Lista de gastos">
+        <button type="button" *ngFor="let expense of expenses" class="expense-mobile-card"
+          [ngClass]="getCategoryClass(expense.category)" (click)="openEditModal(expense)"
+          [attr.aria-label]="'Editar gasto ' + expense.title">
+          <span class="expense-mobile-card__topline">
+            <span class="expense-mobile-card__content">
+              <span class="expense-mobile-card__title">{{ expense.title }}</span>
+              <span class="expense-mobile-card__comment" *ngIf="expense.comment">{{ expense.comment }}</span>
+            </span>
+            <span class="expense-mobile-card__amount">{{ expense.amount | currency: 'CLP':'$':'1.0-0' }}</span>
+          </span>
+          <span class="expense-mobile-card__meta">
+            <span class="category-badge" [ngClass]="getCategoryClass(expense.category)">{{ expense.category }}</span>
+            <span>{{ expense.createdAt.toDate() | date: 'dd MMM yyyy' }}</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="mobile-pagination d-md-none">
+        <ngb-pagination [collectionSize]="collectionSize" [maxSize]="5" [(page)]="page" (pageChange)="filter()" [pageSize]="pageSize"></ngb-pagination>
+      </div>
+
+      <div class="table-card d-none d-md-block">
         <div class="table-responsive">
           <table class="table expenses-table mb-0">
             <caption class="sr-only">Lista de gastos</caption>
             <thead>
               <tr>
-                <th scope="col" (click)="onOrderBy('title')" class="sortable">
-                  Nombre <i class="fas fa-sort fa-xs"></i>
+                <th scope="col" [attr.aria-sort]="sortColumn === 'title' ? (sortAsc ? 'ascending' : 'descending') : 'none'">
+                  <button type="button" (click)="onOrderBy('title')" class="sortable"
+                    [class.sort-active]="sortColumn === 'title'">
+                    Nombre <i class="fas fa-xs" aria-hidden="true" [ngClass]="getSortIcon('title')"></i>
+                  </button>
                 </th>
                 <th scope="col" class="d-none d-md-table-cell">Categoría</th>
                 <th scope="col" class="d-none d-md-table-cell">Fecha</th>
-                <th scope="col" (click)="onOrderBy('amount')" class="sortable text-right">
-                  Monto <i class="fas fa-sort fa-xs"></i>
+                <th scope="col" class="text-right" [attr.aria-sort]="sortColumn === 'amount' ? (sortAsc ? 'ascending' : 'descending') : 'none'">
+                  <button type="button" (click)="onOrderBy('amount')" class="sortable"
+                    [class.sort-active]="sortColumn === 'amount'">
+                    Monto <i class="fas fa-xs" aria-hidden="true" [ngClass]="getSortIcon('amount')"></i>
+                  </button>
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let expense of expenses" (click)="openEditModal(expense)"
-                  class="expense-row" [ngClass]="getCategoryClass(expense.category)">
+              <tr *ngFor="let expense of expenses; let i = index" (click)="openEditModal(expense)"
+                  class="expense-row" [class.expense-row--even]="i % 2 === 0" [ngClass]="getCategoryClass(expense.category)"
+                  [style.animation-delay]="i * 35 + 'ms'" role="button" tabindex="0"
+                  (keydown.enter)="openEditModal(expense)" (keydown.space)="openEditModal(expense)">
                 <td>
                   <div class="expense-title">{{ expense.title }}</div>
                   <div class="expense-comment" *ngIf="expense.comment">{{ expense.comment }}</div>
@@ -77,18 +160,9 @@
                 <td class="expense-amount text-right">{{ expense.amount | currency: 'CLP':'$':'1.0-0' }}</td>
               </tr>
             </tbody>
-            <tfoot>
-              <tr class="total-row">
-                <td class="font-weight-bold">Total<span class="d-none d-md-inline"> del período</span></td>
-                <td class="d-none d-md-table-cell"></td>
-                <td class="d-none d-md-table-cell"></td>
-                <td class="font-weight-bold text-right">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
-              </tr>
-            </tfoot>
           </table>
         </div>
-        <div class="table-footer d-flex justify-content-between align-items-center">
-          <small class="text-muted">{{ collectionSize }} gasto{{ collectionSize !== 1 ? 's' : '' }}</small>
+        <div class="table-footer d-flex justify-content-end align-items-center">
           <ngb-pagination
             [collectionSize]="collectionSize"
             [maxSize]="5"

@@ -1,0 +1,111 @@
+<div class="modal-header-bar">
+  <div class="modal-header-bar__left">
+    <h2 class="modal-header-bar__title">Editar compra en cuotas</h2>
+    <span class="modal-header-bar__meta" *ngIf="startDateDisplay">
+      Inicio: {{ startDateDisplay }}
+      <ng-container *ngIf="purchase.status === 'active'">
+        &nbsp;·&nbsp; Próximo cobro: cuota {{ upcomingInstallmentDisplay }} de {{ totalInstallments?.value }}
+        &nbsp;·&nbsp; Por pagar: {{ remainingInstallmentsDisplay }}, incluida la próxima
+      </ng-container>
+    </span>
+  </div>
+  <button type="button" class="modal-header-bar__close" (click)="activeModal.dismiss()" aria-label="Cerrar formulario de compra en cuotas">
+    <i class="fas fa-times" aria-hidden="true"></i>
+  </button>
+</div>
+
+<div class="modal-body-content">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate [attr.aria-busy]="loading">
+
+    <div class="form-group">
+      <label class="field-label" for="eip-title">Título</label>
+      <input autocomplete="off" type="text" class="form-control field-input" id="eip-title"
+        formControlName="title" ngbAutofocus aria-describedby="eip-title-error" [attr.aria-invalid]="title?.invalid && title?.touched"
+        [class.field-input--valid]="title?.valid && title?.touched">
+      <small id="eip-title-error" class="field-error" role="alert" *ngIf="title?.invalid && title?.touched">
+        El título es obligatorio
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label" for="eip-amount">Monto por cuota</label>
+      <div class="amount-input-wrapper">
+        <span class="amount-prefix">$</span>
+        <input autocomplete="off" type="text" pattern="[0-9]*" inputmode="numeric"
+          class="form-control field-input field-input--amount" id="eip-amount"
+          formControlName="installmentAmount" aria-describedby="eip-amount-error" [attr.aria-invalid]="installmentAmount?.invalid && installmentAmount?.touched"
+          [class.field-input--valid]="installmentAmount?.valid && installmentAmount?.touched">
+      </div>
+      <small id="eip-amount-error" class="field-error" role="alert" *ngIf="installmentAmount?.invalid && installmentAmount?.touched">
+        El monto es obligatorio
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label" for="eip-total">Nº de cuotas</label>
+      <input type="number" class="form-control field-input" id="eip-total"
+        formControlName="totalInstallments" min="2" max="120" inputmode="numeric" aria-describedby="eip-total-error"
+        [class.field-input--valid]="totalInstallments?.valid && totalInstallments?.touched">
+      <small id="eip-total-error" class="field-error" role="alert" *ngIf="totalInstallments?.invalid && totalInstallments?.touched">
+        Mínimo 2, máximo 120
+      </small>
+    </div>
+
+    <aside class="billing-cycle-note" role="status">
+      <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+      <span>El día de facturación se administra desde Configuración: <strong>{{ purchase.paymentDay }}</strong>.</span>
+    </aside>
+
+    <div class="form-group">
+      <label class="field-label" for="eip-start">Fecha de inicio</label>
+      <input type="date" class="form-control field-input" id="eip-start" formControlName="startDate"
+        aria-describedby="eip-start-help eip-start-error" [attr.aria-invalid]="startDate?.invalid && startDate?.touched"
+        [class.field-input--valid]="startDate?.valid && startDate?.touched">
+      <small id="eip-start-help" class="field-help">Al cambiarla, se recalcula la cuota vigente y la fecha de término.</small>
+      <small id="eip-start-error" class="field-error" role="alert" *ngIf="startDate?.invalid && startDate?.touched">
+        La fecha de inicio es obligatoria
+      </small>
+    </div>
+
+    <fieldset class="form-group category-fieldset" aria-describedby="eip-category-error">
+      <legend class="field-label">Categoría</legend>
+      <div class="category-grid">
+        <button type="button" class="category-pill"
+                *ngFor="let cat of expenseCategory | keyvalue"
+                [ngClass]="[getCategoryClass(cat.key), category?.value === cat.key ? 'category-pill--active' : '']"
+                (click)="selectCategory(cat.key)" [attr.aria-pressed]="category?.value === cat.key">
+          <i class="fas" [ngClass]="categoryIcons[cat.key] || 'fa-tag'" aria-hidden="true"></i>
+          <span>{{ cat.value }}</span>
+        </button>
+      </div>
+      <small id="eip-category-error" class="field-error" role="alert" *ngIf="category?.invalid && category?.touched">
+        La categoría es obligatoria
+      </small>
+    </fieldset>
+
+    <div class="modal-actions">
+      <div class="delete-zone">
+        <button type="button" class="btn-modal btn-modal--danger"
+                [class.btn-modal--danger-confirm]="confirmingDelete"
+                (click)="delete()">
+          <i class="fas mr-1" [ngClass]="confirmingDelete ? 'fa-triangle-exclamation' : 'fa-trash'"></i>
+          {{ confirmingDelete ? '¿Confirmar?' : 'Eliminar' }}
+        </button>
+        <button *ngIf="confirmingDelete" type="button" class="btn-modal btn-modal--ghost"
+                (click)="confirmingDelete = false">No</button>
+      </div>
+      <div class="right-actions">
+        <button type="button" class="btn-modal btn-modal--secondary"
+                (click)="toggleStatus()" [title]="purchase.status === 'active' ? 'Marcar como finalizada' : 'Reactivar'">
+          <i class="fas mr-1" [ngClass]="purchase.status === 'active' ? 'fa-check-circle' : 'fa-rotate-left'"></i>
+          {{ purchase.status === 'active' ? 'Finalizar' : 'Reactivar' }}
+        </button>
+        <button type="submit" class="btn-modal btn-modal--primary" [disabled]="form.invalid || loading">
+          <span *ngIf="!loading">Guardar</span>
+          <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1"></i>Guardando...</span>
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>

@@ -37,6 +37,7 @@
   display: inline-flex;
   align-items: center;
   padding: 0.45rem 1.1rem;
+  min-height: 44px;
   border: none;
   border-radius: 8px;
   background-color: $color-brand-primary;
@@ -44,10 +45,16 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.18s;
+  transition: background-color 0.18s, transform 0.18s, box-shadow 0.18s;
 
   &:hover {
     background-color: darken(#876656, 8%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(135, 102, 86, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 
   &:focus {
@@ -59,10 +66,37 @@
 // ─── Filters card ────────────────────────────────────────────────────────────
 .filters-card {
   background-color: white;
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
+  border: 1px solid $color-milky;
+  border-radius: 16px;
+  padding: 1.15rem 1.25rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   margin-bottom: 1.25rem;
+}
+
+.filters-form { display: grid; gap: 1rem; }
+
+.filters-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  &__eyebrow { display: block; color: $color-grey-light; font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+  &__title { margin: .15rem 0 0; color: $color-grey-darker; font-size: 1rem; font-weight: 700; }
+}
+
+.filters-clear {
+  min-height: 36px;
+  padding: 0 .55rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: $color-brand-primary;
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:focus-visible { outline: 3px solid rgba(135, 102, 86, .35); outline-offset: 2px; }
 }
 
 .filter-input-wrapper {
@@ -79,8 +113,10 @@
   }
 }
 
+.filter-search { width: min(100%, 27rem); }
+
 .filter-input {
-  height: 36px;
+  min-height: 44px;
   font-size: 0.82rem;
   background-color: $color-milkier;
   border: 1px solid transparent;
@@ -97,13 +133,95 @@
     background-color: white;
   }
 
-  &[type="text"] {
-    padding-left: 2rem;
-  }
 }
 
-select.filter-input {
-  padding-left: 0.75rem;
+.filter-search__clear {
+  position: absolute;
+  top: 50%;
+  right: .45rem;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  place-items: center;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: $color-grey-light;
+  cursor: pointer;
+
+  &:focus-visible { outline: 3px solid rgba(135, 102, 86, .35); outline-offset: 1px; }
+}
+
+.filter-section,
+.filter-period { display: grid; gap: .55rem; }
+
+.filter-section__label {
+  color: $color-grey-light;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+
+.category-chips {
+  display: flex;
+  gap: .5rem;
+  overflow-x: auto;
+  padding: .1rem .05rem .35rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.category-chip {
+  min-height: 38px;
+  padding: 0 .8rem;
+  flex: 0 0 auto;
+  border: 1px solid $color-milky;
+  border-radius: 999px;
+  background: white;
+  color: $color-grey;
+  font-size: .78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  &:focus-visible { outline: 3px solid rgba(135, 102, 86, .35); outline-offset: 2px; }
+  &--active { border-color: $color-brand-primary; background: $color-brand-primary; color: white; }
+}
+
+.filter-period__control {
+  width: min(100%, 20rem);
+
+  ::ng-deep app-range-date-selector { display: block; }
+  ::ng-deep .date-trigger { width: 100%; justify-content: space-between; }
+  ::ng-deep .date-trigger__open { flex: 1; }
+}
+
+.filters-feedback {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: .85rem;
+  border-top: 1px solid $color-milkier;
+  color: $color-grey-light;
+  font-size: .78rem;
+
+  strong { color: $color-grey-darker; font-size: .9rem; font-variant-numeric: tabular-nums; }
+}
+
+.sortable {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: .3rem;
+
+  &:focus-visible { outline: 3px solid $color-brand-primary; outline-offset: 2px; border-radius: 4px; }
 }
 
 // ─── Table card ───────────────────────────────────────────────────────────────
@@ -130,14 +248,20 @@ select.filter-input {
     &.sortable {
       cursor: pointer;
       user-select: none;
+      transition: color 0.15s;
 
-      &:hover {
+      &:hover, &.sort-active {
         color: $color-brand-primary;
       }
 
       .fas {
         opacity: 0.4;
         margin-left: 0.2rem;
+        transition: opacity 0.15s;
+      }
+
+      &.sort-active .fas {
+        opacity: 1;
       }
     }
   }
@@ -155,9 +279,15 @@ select.filter-input {
   cursor: pointer;
   transition: background-color 0.14s;
   border-left: 3px solid transparent;
+  animation: rowSlideIn 0.25s ease both;
 
   &:hover {
     background-color: $color-milkiest;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $color-brand-secondary;
+    outline-offset: -3px;
   }
 
   // Category accent colors (left border)
@@ -198,6 +328,7 @@ select.filter-input {
   font-weight: 600;
   color: $color-grey-darker;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 // ─── Category badges ─────────────────────────────────────────────────────────
@@ -221,15 +352,6 @@ select.filter-input {
   &.category--auto-cuidado     { background-color: #e8eaf6; color: #283593; }
   &.category--gasto-fijo       { background-color: #fbe9e7; color: #bf360c; }
   &.category--otros            { background-color: #f5f5f5; color: #424242; }
-}
-
-// ─── Total row ────────────────────────────────────────────────────────────────
-.total-row td {
-  padding: 0.85rem 1rem;
-  border-top: 2px solid $color-milky;
-  font-size: 0.875rem;
-  color: $color-grey-darker;
-  background-color: $color-milkiest;
 }
 
 // ─── Table footer ─────────────────────────────────────────────────────────────
@@ -295,6 +417,156 @@ select.filter-input {
   }
 }
 
+// ─── Skeleton loading ────────────────────────────────────────────────────────
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+.skeleton-table-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.skeleton-header-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid $color-milkier;
+  background: $color-milkiest;
+}
+
+.skeleton-body-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid $color-milkier;
+
+  &:last-child { border-bottom: none; }
+
+  > div:first-child { flex: 1; min-width: 0; }
+}
+
+.skeleton {
+  background: $color-milkier;
+  border-radius: 6px;
+  flex-shrink: 0;
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+
+  &--th        { height: 0.6rem; }
+  &--row-title { height: 0.875rem; width: 55%; }
+  &--row-sub   { height: 0.6rem;  width: 35%; }
+  &--badge     { height: 1.4rem;  width: 6rem; border-radius: 20px; }
+  &--date      { height: 0.75rem; width: 5rem; }
+  &--amount    { height: 0.875rem; width: 4.5rem; }
+}
+
+// ─── Row entrance animation ───────────────────────────────────────────────────
+@keyframes rowSlideIn {
+  from { opacity: 0; transform: translateX(-5px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expense-row  { animation: none; }
+  .skeleton     { animation: none; }
+}
+
+// ─── Results strip ───────────────────────────────────────────────────────────
+.results-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.25rem;
+  margin-bottom: 0.65rem;
+
+  &__count {
+    font-size: 0.8rem;
+    color: $color-grey-lighter;
+  }
+
+  &__total {
+    font-size: 0.8rem;
+    color: $color-grey-light;
+
+    strong {
+      color: $color-grey-darker;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+// ─── Mobile-first list controls and cards ──────────────────────────────────
+.expenses-list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin: 0 0 .75rem;
+
+  &__label { color: $color-grey-light; font-size: .78rem; font-weight: 700; }
+}
+
+.expense-sort {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  min-height: 44px;
+  padding: 0 .8rem;
+  border: 1px solid rgba(135, 102, 86, .28);
+  border-radius: 8px;
+  background: white;
+  color: $color-brand-primary;
+  font-size: .8rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:focus-visible { outline: 3px solid rgba(135, 102, 86, .35); outline-offset: 2px; }
+  &:active { background: $color-milkiest; }
+}
+
+.expense-mobile-list { display: grid; gap: 0.75rem; }
+
+.expense-mobile-card {
+  width: 100%; min-height: 102px; padding: 0.9rem 1rem; display: grid; gap: 0.7rem;
+  text-align: left; border: 1px solid $color-milky; border-left: 4px solid $color-grey-lightest; border-radius: 12px;
+  background: white; color: $color-grey-darker; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  cursor: pointer; touch-action: manipulation; transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+
+  &:active { transform: scale(0.985); background: $color-milkiest; }
+  &:focus-visible { outline: 3px solid rgba(135, 102, 86, 0.4); outline-offset: 2px; }
+  &.category--supermercado   { border-left-color: #2e7d32; }
+  &.category--transporte      { border-left-color: #1565c0; }
+  &.category--casa            { border-left-color: #e65100; }
+  &.category--cuentas         { border-left-color: #c62828; }
+  &.category--entretenimiento { border-left-color: #6a1b9a; }
+  &.category--subscripciones  { border-left-color: #00838f; }
+  &.category--ropa            { border-left-color: #ad1457; }
+  &.category--auto-cuidado    { border-left-color: #283593; }
+  &.category--gasto-fijo      { border-left-color: #bf360c; }
+  &.category--otros           { border-left-color: #9e9e9e; }
+
+  &__topline { min-width: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  &__content { min-width: 0; display: grid; gap: 0.2rem; }
+  &__title { font-size: 0.98rem; font-weight: 650; overflow-wrap: anywhere; }
+  &__comment { font-size: 0.8rem; line-height: 1.35; color: $color-grey-light; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  &__amount { flex: 0 0 auto; text-align: right; font-size: 1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  &__meta { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 0.78rem; color: $color-grey-light; }
+}
+
+.mobile-pagination {
+  display: grid;
+  place-items: center;
+  margin-top: 1rem;
+  ::ng-deep .pagination { margin-bottom: 0; }
+}
+
 // ─── Mobile row meta ─────────────────────────────────────────────────────────
 .expense-date-mobile {
   font-size: 0.72rem;
@@ -306,13 +578,19 @@ select.filter-input {
 @media (max-width: $break-sm) {
   // Header: button full-width when it wraps
   .expenses-header {
-    row-gap: 0.75rem;
+    align-items: stretch !important;
+    row-gap: 1rem;
+    margin-bottom: 1rem;
 
     .btn-add {
       width: 100%;
       justify-content: center;
     }
   }
+
+  .expenses-title { font-size: 1.65rem; }
+  .expenses-subtitle { font-size: 0.9rem; }
+  .filters-card { padding: 1rem; margin-bottom: 1rem; box-shadow: none; }
 
   // Filters: all inputs stack full-width
   .filter-input-wrapper {
@@ -325,10 +603,10 @@ select.filter-input {
     width: 100%;
   }
 
-  .filter-date {
-    margin-left: 0 !important;
-    width: 100%;
-  }
+  .filter-search,
+  .filter-period__control { width: 100%; }
+
+  .filters-feedback { padding-top: .8rem; }
 
   // Comment: release fixed max-width
   .expense-comment {
