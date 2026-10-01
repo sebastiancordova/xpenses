@@ -40,6 +40,47 @@
   box-shadow: 0 2px 10px rgba(0,0,0,0.06);
   margin-bottom: 1.25rem;
 }
+.filters-layout {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.income-period-picker { display: grid; gap: 0.35rem; }
+.income-period-picker__label {
+  color: $color-grey-light;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.income-period-picker__controls { display: flex; align-items: center; gap: 0.35rem; }
+.period-input {
+  min-height: 44px;
+  width: 10.5rem;
+  border: 1px solid $color-milky;
+  border-radius: 8px;
+  color: $color-grey-darker;
+  font-size: 0.88rem;
+  font-weight: 600;
+  &:focus { border-color: $color-brand-secondary; box-shadow: 0 0 0 3px rgba(189,153,136,0.2); }
+}
+.period-nav-button {
+  align-items: center;
+  background: $color-milkier;
+  border: 1px solid $color-milky;
+  border-radius: 8px;
+  color: $color-grey;
+  cursor: pointer;
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+  &:hover:not(:disabled) { background: $color-milky; color: $color-grey-darker; }
+  &:disabled { cursor: not-allowed; opacity: 0.45; }
+  &:focus-visible { outline: 3px solid rgba(135, 102, 86, 0.4); outline-offset: 2px; }
+}
 .filter-input-wrapper { position: relative;
   .filter-icon { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); color: $color-grey-lighter; font-size: 0.75rem; pointer-events: none; }
 }
@@ -98,6 +139,17 @@
 }
 .item-title { font-weight: 500; color: $color-grey-darker; }
 .item-amount { font-weight: 600; color: $color-grey-darker; white-space: nowrap; }
+.income-type-badge {
+  background: $color-milkier;
+  border-radius: 999px;
+  color: $color-grey;
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.28rem 0.55rem;
+  white-space: nowrap;
+  &--variable { background: #edf6f3; color: #277567; }
+}
 
 // ─── Total row ────────────────────────────────────────────────────────────
 .total-row td { padding: 0.85rem 1rem; border-top: 2px solid $color-milky; font-size: 0.875rem; color: $color-grey-darker; background-color: $color-milkiest; }
@@ -131,6 +183,11 @@
   .module-subtitle { font-size: 0.9rem; }
   .module-header .btn-add { width: 100%; justify-content: center; }
   .filters-card { padding: 0.75rem; margin-bottom: 1rem; box-shadow: none; border: 1px solid $color-milky; }
+  .filters-layout { align-items: stretch; }
+  .income-period-picker { width: 100%; }
+  .income-period-picker__controls { width: 100%; }
+  .period-input { flex: 1; width: auto; }
+  .filter-input-wrapper { width: 100%; }
   .filter-input { min-width: unset; width: 100%; }
   .module-summary, .module-mobile-list, .mobile-pagination { display: grid; }
   .module-mobile-list { gap: 0.75rem; }

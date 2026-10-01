@@ -8,17 +8,40 @@
 <div class="modal-body-content">
   <form [formGroup]="addIncomeForm" (ngSubmit)="submit()" novalidate [attr.aria-busy]="loading">
 
+    <div class="form-row">
+      <div class="form-group col-12 col-sm-6">
+        <label class="field-label" for="period">Mes del ingreso</label>
+        <input id="period" type="month" class="form-control field-input" formControlName="period">
+      </div>
+
+      <div class="form-group col-12 col-sm-6">
+        <span class="field-label" id="income-type-label">Tipo de ingreso</span>
+        <div class="income-type-toggle" role="group" aria-labelledby="income-type-label">
+          <button type="button" class="income-type-toggle__option"
+            [class.income-type-toggle__option--active]="addIncomeForm.get('type')?.value === 'fixed'"
+            [attr.aria-pressed]="addIncomeForm.get('type')?.value === 'fixed'" (click)="selectType('fixed')">
+            Sueldo fijo
+          </button>
+          <button type="button" class="income-type-toggle__option"
+            [class.income-type-toggle__option--active]="addIncomeForm.get('type')?.value === 'variable'"
+            [attr.aria-pressed]="addIncomeForm.get('type')?.value === 'variable'" (click)="selectType('variable')">
+            Variable
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="form-group">
       <label class="field-label" for="title">Título</label>
       <input autocomplete="off" type="text" class="form-control field-input" id="title" formControlName="title"
-        placeholder="Ej: Salario mensual" ngbAutofocus aria-describedby="income-title-error" [attr.aria-invalid]="title?.invalid && title?.touched">
+        placeholder="Ej: Sueldo base u horas extra" ngbAutofocus aria-describedby="income-title-error" [attr.aria-invalid]="title?.invalid && title?.touched">
       <small id="income-title-error" class="field-error" role="alert" *ngIf="title?.invalid && title?.touched && title?.hasError('required')">
         El título es obligatorio
       </small>
     </div>
 
     <div class="form-group">
-      <label class="field-label" for="amount">Monto mensual</label>
+      <label class="field-label" for="amount">Monto del mes</label>
       <div class="amount-input-wrapper">
         <span class="amount-prefix">$</span>
         <input autocomplete="off" type="text" pattern="[0-9]*" inputmode="numeric"

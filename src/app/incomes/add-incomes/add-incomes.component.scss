@@ -84,6 +84,26 @@
     margin-top: 0.25rem;
   }
 
+  .income-type-toggle {
+    display: grid;
+    gap: 0.35rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .income-type-toggle__option {
+    background: $color-milkier;
+    border: 1px solid $color-milky;
+    border-radius: 8px;
+    color: $color-grey;
+    cursor: pointer;
+    font-size: 0.76rem;
+    font-weight: 600;
+    min-height: 44px;
+    padding: 0.35rem;
+    &:focus-visible { outline: 3px solid rgba(135, 102, 86, 0.4); outline-offset: 2px; }
+    &--active { background: rgba(135, 102, 86, 0.12); border-color: $color-brand-primary; color: $color-brand-primary; }
+  }
+
   .modal-actions {
     display: flex;
     justify-content: space-between;

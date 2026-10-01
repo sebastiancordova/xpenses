@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Income } from '@core/models/income';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -22,7 +21,9 @@ export class EditIncomeComponent {
   constructor() {
     this.editIncomeForm = this.fb.group({
       title: ['', Validators.required],
-      amount: ['', Validators.required]
+      amount: ['', Validators.required],
+      period: ['', Validators.required],
+      type: ['fixed', Validators.required]
     })
 
   }
@@ -30,9 +31,16 @@ export class EditIncomeComponent {
   ngOnInit(): void {
     this.title?.setValue(this.income.title);
     this.amount?.setValue(this.income.amount);
+    this.editIncomeForm.get('period')?.setValue(this.income.period || this.periodFromCreatedAt());
+    this.editIncomeForm.get('type')?.setValue(this.income.type || 'fixed');
   }
 
   submit() {
+    if (this.editIncomeForm.invalid || this.loading) {
+      this.editIncomeForm.markAllAsTouched();
+      return;
+    }
+
     this.loading = true;
     const editIncome: Income = { ...this.income, ...this.editIncomeForm.value };
     this.editIncome$.emit(editIncome)
@@ -50,5 +58,14 @@ export class EditIncomeComponent {
   }
   get amount() {
     return this.editIncomeForm.get('amount');
+  }
+
+  selectType(type: 'fixed' | 'variable'): void {
+    this.editIncomeForm.get('type')?.setValue(type);
+  }
+
+  private periodFromCreatedAt(): string {
+    const date = this.income.createdAt?.toDate?.() || new Date();
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   }
 }

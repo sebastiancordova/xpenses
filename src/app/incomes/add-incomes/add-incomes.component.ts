@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Income } from '@core/models/income';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -13,18 +13,21 @@ export class AddIncomesComponent {
   public addIncomeForm!: FormGroup;
   public loading = false
   public activeModal: NgbActiveModal = inject(NgbActiveModal);
+  @Input() period = this.currentPeriod();
   @Output() newIncome$ = new EventEmitter<Income>();
   private fb: FormBuilder = inject(FormBuilder);
   constructor() {
     this.addIncomeForm = this.fb.group({
       title: ['', Validators.required],
-      amount: ['', Validators.required]
+      amount: ['', Validators.required],
+      period: [this.currentPeriod(), Validators.required],
+      type: ['fixed', Validators.required]
     })
 
   }
 
   ngOnInit(): void {
-
+    this.addIncomeForm.get('period')?.setValue(this.period || this.currentPeriod());
   }
 
   submit(): void {
@@ -34,8 +37,8 @@ export class AddIncomesComponent {
     }
 
     this.loading = true;
-    const newExpense: Income = this.addIncomeForm.value;
-    this.newIncome$.emit(newExpense)
+    const newIncome: Income = this.addIncomeForm.value;
+    this.newIncome$.emit(newIncome)
     this.activeModal.close();
   }
 
@@ -44,5 +47,14 @@ export class AddIncomesComponent {
   }
   get amount() {
     return this.addIncomeForm.get('amount');
+  }
+
+  selectType(type: 'fixed' | 'variable'): void {
+    this.addIncomeForm.get('type')?.setValue(type);
+  }
+
+  private currentPeriod(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   }
 }

@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { IUser } from '@core/models/user';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Subject, debounceTime, take, takeUntil, tap } from 'rxjs';
@@ -28,10 +27,15 @@ export class IncomesComponent {
   public fireIncomes: Income[] = [];
   public incomes: Income[] = [];
   public totalAmountFiltered = 0;
+  private readonly monthNames = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
 
   constructor() {
     this.filtersForm = this.fb.group({
-      search: ''
+      search: '',
+      period: this.currentPeriod()
     });
   }
 
@@ -41,7 +45,10 @@ export class IncomesComponent {
       this.filter();
     });
     this.filtersForm.valueChanges
-      .pipe(takeUntil(this.unsubscribe$), debounceTime(200), tap(() => this.filter()))
+      .pipe(takeUntil(this.unsubscribe$), debounceTime(200), tap(() => {
+        this.page = 1;
+        this.filter();
+      }))
       .subscribe();
 
   }
@@ -49,7 +56,9 @@ export class IncomesComponent {
   filter() {
     let incomes = this.fireIncomes;
     // filters
-    const { search } = this.filtersForm.value;
+    const { search, period } = this.filtersForm.value;
+
+    incomes = incomes.filter(income => this.incomesService.getIncomePeriod(income) === period);
 
     if (search !== '') {
       incomes = incomes.filter(expense => expense.title.toLowerCase().includes(search.toLowerCase()) || expense.amount.toLowerCase().includes(search.toLowerCase()));
@@ -69,6 +78,7 @@ export class IncomesComponent {
       centered: true,
       windowClass: 'add-income-modal',
     })
+    modalRef.componentInstance.period = this.selectedPeriod;
     modalRef.componentInstance.newIncome$.pipe(take(1)).subscribe((income: Income) => {
       this.incomesService.save(income).then(() => {
         this.toastr.success('Ingreso añadido');
@@ -107,6 +117,45 @@ export class IncomesComponent {
 
   get search() {
     return this.filtersForm.get('search');
+  }
+
+  get selectedPeriod(): string {
+    return this.filtersForm.get('period')?.value || this.currentPeriod();
+  }
+
+  get selectedPeriodLabel(): string {
+    const [year, month] = this.selectedPeriod.split('-').map(Number);
+    return `${this.monthNames[month - 1]} ${year}`;
+  }
+
+  get isCurrentMonth(): boolean {
+    return this.selectedPeriod === this.currentPeriod();
+  }
+
+  getIncomeTypeLabel(income: Income): string {
+    return income.type === 'variable' ? 'Ingreso variable' : 'Sueldo fijo';
+  }
+
+  previousMonth(): void {
+    this.changeMonth(-1);
+  }
+
+  nextMonth(): void {
+    if (!this.isCurrentMonth) {
+      this.changeMonth(1);
+    }
+  }
+
+  private changeMonth(offset: number): void {
+    const [year, month] = this.selectedPeriod.split('-').map(Number);
+    const nextDate = new Date(year, month - 1 + offset, 1);
+    const period = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}`;
+    this.filtersForm.get('period')?.setValue(period);
+  }
+
+  private currentPeriod(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   }
 
   ngOnDestroy() {

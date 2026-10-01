@@ -4,7 +4,7 @@
   <div class="module-header d-flex align-items-center justify-content-between flex-wrap">
     <div>
       <h1 class="module-title mb-0">Ingresos</h1>
-      <p class="module-subtitle mb-0">Período de facturación actual</p>
+      <p class="module-subtitle mb-0">Registra cada mes sin perder tu historial.</p>
     </div>
     <button type="button" class="btn-add" (click)="openCreateModal()">
       <i class="fas fa-plus mr-2"></i>Nuevo ingreso
@@ -14,7 +14,20 @@
   <!-- Filters -->
   <div class="filters-card">
     <form [formGroup]="filtersForm">
-      <div class="d-flex flex-wrap align-items-center">
+      <div class="filters-layout">
+        <div class="income-period-picker">
+          <span class="income-period-picker__label">Mes de ingresos</span>
+          <div class="income-period-picker__controls">
+            <button type="button" class="period-nav-button" (click)="previousMonth()" aria-label="Ver mes anterior">
+              <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            </button>
+            <label class="sr-only" for="income-period">Mes de ingresos</label>
+            <input id="income-period" type="month" formControlName="period" class="form-control period-input" />
+            <button type="button" class="period-nav-button" (click)="nextMonth()" [disabled]="isCurrentMonth" aria-label="Ver mes siguiente">
+              <i class="fas fa-chevron-right" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
         <div class="filter-input-wrapper">
           <i class="fas fa-search filter-icon"></i>
           <label class="sr-only" for="income-search">Buscar ingresos</label>
@@ -33,9 +46,9 @@
 
   <ng-container *ngIf="!loadingPage">
 
-    <ng-container *ngIf="fireIncomes.length > 0; else emptyState">
+    <ng-container *ngIf="collectionSize > 0; else emptyState">
       <section class="module-summary" aria-label="Resumen de ingresos">
-        <span class="module-summary__label">Ingresos del período</span>
+        <span class="module-summary__label">Ingresos de {{ selectedPeriodLabel }}</span>
         <strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong>
         <span class="module-summary__meta">{{ collectionSize }} ingreso{{ collectionSize !== 1 ? 's' : '' }}</span>
       </section>
@@ -45,7 +58,7 @@
           (click)="openEditModal(income)" [attr.aria-label]="'Editar ingreso ' + income.title">
           <span class="module-mobile-card__content">
             <span class="module-mobile-card__title">{{ income.title }}</span>
-            <span class="module-mobile-card__meta">Ingreso registrado</span>
+            <span class="module-mobile-card__meta">{{ getIncomeTypeLabel(income) }}</span>
           </span>
           <span class="module-mobile-card__amount">{{ income.amount | currency: 'CLP':'$':'1.0-0' }}</span>
         </button>
@@ -62,6 +75,7 @@
             <thead>
               <tr>
                 <th scope="col">Nombre</th>
+                <th scope="col">Tipo</th>
                 <th scope="col" class="text-right">Monto</th>
               </tr>
             </thead>
@@ -70,12 +84,13 @@
                 <td>
                   <div class="item-title">{{ income.title }}</div>
                 </td>
+                <td><span class="income-type-badge" [class.income-type-badge--variable]="income.type === 'variable'">{{ getIncomeTypeLabel(income) }}</span></td>
                 <td class="item-amount text-right">{{ income.amount | currency: 'CLP':'$':'1.0-0' }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr class="total-row">
-                <td class="font-weight-bold">Total</td>
+                <td class="font-weight-bold" colspan="2">Total</td>
                 <td class="font-weight-bold text-right">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
               </tr>
             </tfoot>
@@ -98,7 +113,7 @@
       <div class="empty-state text-center py-5">
         <i class="fas fa-coins empty-state__icon mb-3"></i>
         <p class="empty-state__title">Sin ingresos registrados</p>
-        <p class="empty-state__sub">No hay ingresos para este período.</p>
+        <p class="empty-state__sub">No hay ingresos en {{ selectedPeriodLabel }}. Puedes agregar sueldo fijo, horas extra o bonos.</p>
         <button type="button" class="btn-add" (click)="openCreateModal()">
           <i class="fas fa-plus mr-2"></i>Agregar primer ingreso
         </button>
