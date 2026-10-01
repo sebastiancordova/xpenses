@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { CollectionReference, Firestore, collection, collectionData, orderBy, query, Timestamp, addDoc, deleteDoc, doc, updateDoc } from '@angular/fire/firestore';
 import { FixedExpense } from '@core/models/expense';
 import { UserService } from './user.service';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, map, of, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,13 +12,17 @@ export class FixedExpensesService {
   private userService = inject(UserService);
   private firestore: Firestore = inject(Firestore);
 
-  getAll(): Observable<FixedExpense[]> {
+  getAll(paymentMethodId?: string, legacyPaymentMethodId?: string): Observable<FixedExpense[]> {
     return this.userService.currentUser.pipe(
       switchMap(user => {
         if (user) {
           const colRef = collection(this.firestore, `users/${user.uid}/fixed-expenses`) as CollectionReference<FixedExpense>;
           const queryRef = query(colRef, orderBy('createdAt', 'desc'));
-          return collectionData(queryRef, { idField: 'uid' });
+          return (collectionData(queryRef, { idField: 'uid' }) as Observable<FixedExpense[]>).pipe(
+            map(expenses => paymentMethodId
+              ? expenses.filter(expense => (expense.paymentMethodId ?? legacyPaymentMethodId) === paymentMethodId)
+              : expenses)
+          );
         }
         return of([]);
       })

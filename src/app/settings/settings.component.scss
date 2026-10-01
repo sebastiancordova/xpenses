@@ -105,7 +105,43 @@
 
   &--cycle { background: #f4ede9; color: $color-brand-primary; }
   &--budget { background: #ebf5ef; color: #26784a; }
+  &--payment { background: #eef2fb; color: #31499c; }
 }
+
+.payment-method-list { display: grid; gap: .65rem; margin-top: 1.2rem; }
+.payment-method {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: .65rem;
+  padding: .7rem;
+  border: 1px solid #e7e8ed;
+  border-radius: 12px;
+  background: #fff;
+
+  &--inactive { opacity: .58; }
+  &__icon { display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border-radius: 9px; background: #f4ede9; color: $color-brand-primary; }
+  &__content { display: grid; min-width: 0; gap: .12rem; }
+  &__content strong { overflow: hidden; color: $color-grey-darker; font-size: .9rem; text-overflow: ellipsis; white-space: nowrap; }
+  &__content span { color: $color-grey; font-size: .76rem; line-height: 1.35; }
+  &__default { padding: .25rem .45rem; border-radius: 999px; background: #e9f6ef; color: #26784a; font-size: .68rem; font-weight: 800; }
+  &__edit { display: inline-grid; width: 44px; height: 44px; place-items: center; border: 0; border-radius: 9px; background: transparent; color: $color-brand-primary; cursor: pointer; }
+  &__edit:focus-visible, &__toggle:focus-visible { outline: 3px solid rgba(135, 102, 86, .35); outline-offset: 2px; }
+  &__toggle { min-height: 32px; border: 0; border-radius: 999px; padding: 0 .5rem; background: #f4ede9; color: $color-brand-primary; font-size: .7rem; font-weight: 800; cursor: pointer; }
+}
+.payment-method-loading { margin-top: 1rem; color: $color-grey; font-size: .85rem; }
+.payment-method-add, .payment-method-save, .payment-method-cancel {
+  min-height: 44px; border-radius: 10px; font-size: .84rem; font-weight: 800; cursor: pointer;
+}
+.payment-method-add { width: 100%; margin-top: 1rem; border: 1px dashed #cfc4bd; background: #fffaf7; color: $color-brand-primary; }
+.payment-method-form { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #edf0f3; }
+.payment-method-form h3 { margin: 0 0 1rem; color: $color-grey-darker; font-size: .95rem; font-weight: 800; }
+.payment-field { min-height: 48px; border: 1px solid #dfe1e7; border-radius: 10px; color: $color-grey-darker; font-size: 1rem; }
+.payment-field--day { max-width: 9rem; }
+.payment-method-form__actions { display: flex; justify-content: flex-end; gap: .65rem; margin-top: 1rem; }
+.payment-method-cancel { border: 0; padding: 0 .85rem; background: transparent; color: $color-grey; }
+.payment-method-save { border: 0; padding: 0 1rem; background: $color-brand-primary; color: #fff; }
+.payment-method-save:disabled { opacity: .55; cursor: not-allowed; }
 
 .settings-card__title {
   margin: .05rem 0 .2rem;

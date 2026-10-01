@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { CollectionReference, Firestore, collection, collectionData, Timestamp, addDoc, doc, orderBy, query, deleteDoc, updateDoc, where } from '@angular/fire/firestore';
 import { Expense } from '@core/models/expense';
-import { Observable, of } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -13,7 +13,7 @@ export class ExpensesService {
   private expensesCollection!: CollectionReference<Expense>;
   constructor() { }
 
-  getAll(startDate?: Date, endDate?: Date): Observable<Expense[]> {
+  getAll(startDate?: Date, endDate?: Date, paymentMethodId?: string, legacyPaymentMethodId?: string): Observable<Expense[]> {
     const userId = this.userService.currentUserValue.uid;
     if(!userId){
       return of([]);
@@ -42,7 +42,11 @@ export class ExpensesService {
 
     const colRef = collection(this.firestore, `users/${userId}/expenses`) as CollectionReference<Expense>;
     const queryRef = query(colRef, orderBy('createdAt', 'desc'), where('createdAt', '>=', finalStartDate), where('createdAt', '<=', finalEndDate));
-    return collectionData(queryRef, { idField: 'uid' }) as Observable<Expense[]>;
+    return (collectionData(queryRef, { idField: 'uid' }) as Observable<Expense[]>).pipe(
+      map(expenses => paymentMethodId
+        ? expenses.filter(expense => (expense.paymentMethodId ?? legacyPaymentMethodId) === paymentMethodId)
+        : expenses)
+    );
   }
 
   save(expense: Expense) {

@@ -8,7 +8,9 @@ export interface InstallmentPurchase extends Base {
   totalInstallments: number;
   currentInstallment: number; // cuotas ya facturadas/pagadas estimadas
   startDate: Timestamp;
-  paymentDay: number; // mirrored from the account-wide billingCycleDay preference
-  category: ExpenseCategory;
+  paymentDay: number; // copied from the selected credit card's statement closing day
+  paymentMethodId?: string;
+  category: ExpenseCategory | string;
+  subcategory?: string;
   status: 'active' | 'completed';
 }

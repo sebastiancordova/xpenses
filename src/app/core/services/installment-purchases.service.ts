@@ -17,12 +17,15 @@ import { map, tap } from 'rxjs/operators';
 import { InstallmentPurchase } from '@core/models/installment-purchase';
 import { UserService } from './user.service';
 import { UserPreferencesService } from './user-preferences.service';
+import { PaymentMethodsService } from './payment-methods.service';
+import { PaymentMethod } from '@core/models/payment-method';
 
 @Injectable({ providedIn: 'root' })
 export class InstallmentPurchasesService {
   private firestore = inject(Firestore);
   private userService = inject(UserService);
   private preferencesService = inject(UserPreferencesService);
+  private paymentMethodsService = inject(PaymentMethodsService);
 
   private colPath(): string {
     return `users/${this.userService.currentUserValue.uid}/installment-purchases`;
@@ -34,9 +37,9 @@ export class InstallmentPurchasesService {
     const colRef = collection(this.firestore, this.colPath()) as CollectionReference<InstallmentPurchase>;
     const q = query(colRef, orderBy('createdAt', 'desc'));
     const purchases$ = collectionData(q, { idField: 'uid' }) as Observable<InstallmentPurchase[]>;
-    return combineLatest([purchases$, this.preferencesService.getPreferences()]).pipe(
-      tap(([purchases, preferences]) => this.syncCalculatedStatuses(purchases, preferences.billingCycleDay)),
-      map(([purchases, preferences]) => this.applyConfiguredPaymentDay(purchases, preferences.billingCycleDay))
+    return combineLatest([purchases$, this.preferencesService.getPreferences(), this.paymentMethodsService.getAll()]).pipe(
+      map(([purchases, preferences, methods]) => this.applyPaymentMethods(purchases, methods, preferences.billingCycleDay)),
+      tap(purchases => this.syncCalculatedStatuses(purchases))
     );
   }
 
@@ -45,18 +48,18 @@ export class InstallmentPurchasesService {
    * Completed purchases are intentionally included so historical dashboards
    * show the installment that belonged to that past statement.
    */
-  getInstallmentsForCycle(start: Date, end: Date): Observable<InstallmentPurchase[]> {
+  getInstallmentsForCycle(start: Date, end: Date, paymentMethodId?: string, legacyPaymentMethodId?: string): Observable<InstallmentPurchase[]> {
     const uid = this.userService.currentUserValue.uid;
     if (!uid) return of([]);
     const colRef = collection(this.firestore, this.colPath()) as CollectionReference<InstallmentPurchase>;
     const q = query(colRef, orderBy('createdAt', 'desc'));
     const purchases$ = collectionData(q, { idField: 'uid' }) as Observable<InstallmentPurchase[]>;
-    return combineLatest([purchases$, this.preferencesService.getPreferences()]).pipe(
-      // Keep records in sync even when the dashboard is the first screen visited.
-      tap(([purchases, preferences]) => this.syncCalculatedStatuses(purchases, preferences.billingCycleDay)),
-      map(([purchases, preferences]) => this.applyConfiguredPaymentDay(purchases, preferences.billingCycleDay)),
+    return combineLatest([purchases$, this.preferencesService.getPreferences(), this.paymentMethodsService.getAll()]).pipe(
+      map(([purchases, preferences, methods]) => this.applyPaymentMethods(purchases, methods, preferences.billingCycleDay)),
+      tap(purchases => this.syncCalculatedStatuses(purchases)),
       map(purchases => purchases.filter(p =>
         p.startDate &&
+        (!paymentMethodId || (p.paymentMethodId ?? legacyPaymentMethodId) === paymentMethodId) &&
         this.hasPaymentInCycle(p, start, end)
       ))
     );
@@ -65,11 +68,11 @@ export class InstallmentPurchasesService {
   async save(purchase: InstallmentPurchase): Promise<any> {
     const uid = this.userService.currentUserValue.uid;
     const colRef = collection(this.firestore, `users/${uid}/installment-purchases`) as CollectionReference<InstallmentPurchase>;
-    const { billingCycleDay } = await firstValueFrom(this.preferencesService.getPreferences());
+    const paymentDay = await this.resolvePaymentDay(purchase);
     const startDate = purchase.startDate.toDate();
-    purchase.paymentDay = billingCycleDay;
-    purchase.currentInstallment = this.getPaidInstallments(startDate, billingCycleDay, purchase.totalInstallments);
-    purchase.status = this.isCompleted(startDate, billingCycleDay, purchase.totalInstallments) ? 'completed' : 'active';
+    purchase.paymentDay = paymentDay;
+    purchase.currentInstallment = this.getPaidInstallments(startDate, paymentDay, purchase.totalInstallments);
+    purchase.status = this.isCompleted(startDate, paymentDay, purchase.totalInstallments) ? 'completed' : 'active';
     purchase.createdAt = Timestamp.now();
     purchase.updatedAt = Timestamp.now();
     return addDoc(colRef, purchase);
@@ -78,11 +81,11 @@ export class InstallmentPurchasesService {
   async update(purchase: InstallmentPurchase): Promise<void> {
     const uid = this.userService.currentUserValue.uid;
     const docRef = doc(this.firestore, `users/${uid}/installment-purchases/${purchase.uid}`);
-    const { billingCycleDay } = await firstValueFrom(this.preferencesService.getPreferences());
+    const paymentDay = await this.resolvePaymentDay(purchase);
     const startDate = purchase.startDate.toDate();
-    purchase.paymentDay = billingCycleDay;
-    purchase.currentInstallment = this.getPaidInstallments(startDate, billingCycleDay, purchase.totalInstallments);
-    purchase.status = this.isCompleted(startDate, billingCycleDay, purchase.totalInstallments) ? 'completed' : 'active';
+    purchase.paymentDay = paymentDay;
+    purchase.currentInstallment = this.getPaidInstallments(startDate, paymentDay, purchase.totalInstallments);
+    purchase.status = this.isCompleted(startDate, paymentDay, purchase.totalInstallments) ? 'completed' : 'active';
     purchase.updatedAt = Timestamp.now();
     return updateDoc(docRef, { ...purchase });
   }
@@ -153,12 +156,12 @@ export class InstallmentPurchasesService {
     return null;
   }
 
-  private syncCalculatedStatuses(purchases: InstallmentPurchase[], billingCycleDay: number): void {
+  private syncCalculatedStatuses(purchases: InstallmentPurchase[]): void {
     const uid = this.userService.currentUserValue.uid;
     if (!uid) return;
     purchases.forEach(p => {
       if (p.uid && p.startDate) {
-        const paymentDay = billingCycleDay;
+        const paymentDay = p.paymentDay;
         const paidInstallments = this.getPaidInstallments(p.startDate.toDate(), paymentDay, p.totalInstallments);
         const status = paidInstallments >= p.totalInstallments ? 'completed' : 'active';
         if (p.status !== status || p.currentInstallment !== paidInstallments || p.paymentDay !== paymentDay) {
@@ -169,11 +172,27 @@ export class InstallmentPurchasesService {
     });
   }
 
-  /** Keeps persisted purchases aligned with the account-wide billing day. */
-  private applyConfiguredPaymentDay(purchases: InstallmentPurchase[], billingCycleDay: number): InstallmentPurchase[] {
+  /** Applies each credit card's current billing day without losing legacy purchases. */
+  private applyPaymentMethods(purchases: InstallmentPurchase[], methods: PaymentMethod[], legacyBillingDay: number): InstallmentPurchase[] {
+    const defaultMethod = methods.find(method => method.isDefault) || methods[0];
     return purchases.map(purchase => {
-      return purchase.paymentDay === billingCycleDay ? purchase : { ...purchase, paymentDay: billingCycleDay };
+      const method = methods.find(item => item.uid === purchase.paymentMethodId) || (!purchase.paymentMethodId ? defaultMethod : undefined);
+      const paymentDay = method?.type === 'credit' && method.billingCycleDay ? method.billingCycleDay : (purchase.paymentDay || legacyBillingDay);
+      return purchase.paymentDay === paymentDay ? purchase : { ...purchase, paymentDay };
     });
+  }
+
+  private async resolvePaymentDay(purchase: InstallmentPurchase): Promise<number> {
+    if (purchase.paymentMethodId) {
+      const methods = await firstValueFrom(this.paymentMethodsService.getAll());
+      const method = methods.find(item => item.uid === purchase.paymentMethodId);
+      if (!method || method.type !== 'credit' || !method.billingCycleDay) {
+        throw new Error('Selecciona una tarjeta de crédito activa para esta compra en cuotas');
+      }
+      return method.billingCycleDay;
+    }
+    const { billingCycleDay } = await firstValueFrom(this.preferencesService.getPreferences());
+    return billingCycleDay;
   }
 
   private startOfDay(date: Date): Date {

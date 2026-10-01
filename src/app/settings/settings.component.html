@@ -2,7 +2,7 @@
   <header class="settings-header">
     <p class="settings-eyebrow"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Preferencias</p>
     <h1 id="settings-title" class="settings-title">Configura tu presupuesto</h1>
-    <p class="settings-subtitle">Define tu período de seguimiento y cómo quieres distribuir cada ingreso.</p>
+    <p class="settings-subtitle">Administra cómo pagas y cómo quieres distribuir cada ingreso.</p>
   </header>
 
   <section *ngIf="loadError" class="settings-notice settings-notice--error" role="alert">
@@ -17,33 +17,72 @@
   <ng-container *ngIf="!preferencesLoading && !loadError; else settingsPending">
     <section class="settings-context" aria-label="Cómo se aplican estos ajustes">
       <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-      <p>Estos ajustes actualizan los cálculos del Dashboard. El día de facturación también se aplica a todas tus compras en cuotas.</p>
+      <p>El Dashboard usa el método de pago que selecciones. Cada tarjeta de crédito mantiene su propio ciclo de facturación.</p>
+    </section>
+
+    <section class="settings-card payment-methods-card" aria-labelledby="payment-methods-title">
+      <div class="settings-card__heading">
+        <span class="settings-card__icon settings-card__icon--payment"><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span>
+        <div>
+          <h2 id="payment-methods-title" class="settings-card__title">Métodos de pago</h2>
+          <p class="settings-card__desc">Agrega tus tarjetas, débito o efectivo. Las cuotas solo se pueden asociar a una tarjeta de crédito.</p>
+        </div>
+      </div>
+
+      <div class="payment-method-list" *ngIf="!paymentMethodsLoading; else methodsPending">
+        <article class="payment-method" *ngFor="let method of paymentMethods" [class.payment-method--inactive]="!method.isActive">
+          <span class="payment-method__icon" aria-hidden="true">
+            <i class="fa-solid" [ngClass]="method.type === 'cash' ? 'fa-money-bill-wave' : method.type === 'debit' ? 'fa-building-columns' : 'fa-credit-card'"></i>
+          </span>
+          <div class="payment-method__content">
+            <strong>{{ method.name }}</strong>
+            <span>{{ paymentMethodTypeLabels[method.type] }}<ng-container *ngIf="method.type === 'credit'"> · Cierre día {{ method.billingCycleDay }}</ng-container></span>
+          </div>
+          <span class="payment-method__default" *ngIf="method.isDefault">Principal</span>
+          <button type="button" class="payment-method__edit" (click)="editPaymentMethod(method)" [attr.aria-label]="'Editar ' + method.name">
+            <i class="fa-solid fa-pen" aria-hidden="true"></i><span class="sr-only">Editar</span>
+          </button>
+          <button *ngIf="!method.isDefault" type="button" class="payment-method__toggle" (click)="togglePaymentMethod(method)" [attr.aria-label]="(method.isActive ? 'Desactivar ' : 'Activar ') + method.name">
+            {{ method.isActive ? 'Activo' : 'Inactivo' }}
+          </button>
+        </article>
+      </div>
+      <ng-template #methodsPending><div class="payment-method-loading" role="status">Cargando métodos de pago…</div></ng-template>
+
+      <form *ngIf="showPaymentMethodForm" [formGroup]="paymentMethodForm" (ngSubmit)="savePaymentMethod()" class="payment-method-form" novalidate>
+        <h3>{{ editingPaymentMethod ? 'Editar método' : 'Nuevo método' }}</h3>
+        <div class="form-group">
+          <label class="field-label" for="payment-method-name">Nombre</label>
+          <input id="payment-method-name" type="text" class="form-control payment-field" formControlName="name" placeholder="Ej: Visa Banco Norte" autocomplete="off">
+          <small class="field-error" *ngIf="paymentMethodName?.invalid && paymentMethodName?.touched">Ingresa un nombre para identificarlo.</small>
+        </div>
+        <div class="form-group">
+          <label class="field-label" for="payment-method-type">Tipo</label>
+          <select id="payment-method-type" class="form-control payment-field" formControlName="type">
+            <option value="credit">Tarjeta de crédito</option>
+            <option value="debit">Débito</option>
+            <option value="cash">Efectivo</option>
+          </select>
+        </div>
+        <div class="form-group" *ngIf="isCreditPaymentMethod">
+          <label class="field-label" for="payment-method-billing-day">Día de facturación</label>
+          <input id="payment-method-billing-day" type="number" min="1" max="28" inputmode="numeric" class="form-control payment-field payment-field--day" formControlName="billingCycleDay">
+          <small class="field-hint">Las compras y cuotas de esta tarjeta usarán este ciclo en el Dashboard.</small>
+        </div>
+        <p class="field-error" role="alert" *ngIf="paymentMethodError">{{ paymentMethodError }}</p>
+        <div class="payment-method-form__actions">
+          <button type="button" class="payment-method-cancel" (click)="cancelPaymentMethod()">Cancelar</button>
+          <button type="submit" class="payment-method-save" [disabled]="paymentMethodSaving">
+            {{ paymentMethodSaving ? 'Guardando…' : (editingPaymentMethod ? 'Guardar' : 'Agregar método') }}
+          </button>
+        </div>
+      </form>
+      <button *ngIf="!showPaymentMethodForm" type="button" class="payment-method-add" (click)="startPaymentMethod()">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar método de pago
+      </button>
     </section>
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <section class="settings-card" aria-labelledby="cycle-title">
-        <div class="settings-card__heading">
-          <span class="settings-card__icon settings-card__icon--cycle"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>
-          <div>
-            <h2 id="cycle-title" class="settings-card__title">Ciclo de facturación</h2>
-            <p class="settings-card__desc">Indica el día en que se renueva el período que ves en tu Dashboard.</p>
-          </div>
-        </div>
-
-        <div class="cycle-control">
-          <label class="field-label" for="billingCycleDay">Día de facturación</label>
-          <div class="cycle-control__input">
-            <span aria-hidden="true">Día</span>
-            <input
-              type="number" id="billingCycleDay" min="1" max="28" step="1" inputmode="numeric"
-              class="form-control field-input" formControlName="billingCycleDay"
-              aria-describedby="billingCycleHint billingCycleError">
-          </div>
-          <p id="billingCycleHint" class="field-hint">{{ billingCycleDescription }}</p>
-          <p id="billingCycleError" class="field-error" role="alert" *ngIf="billingCycleDay?.invalid && billingCycleDay?.touched">Ingresa un número entre 1 y 28.</p>
-        </div>
-      </section>
-
       <section class="settings-card" aria-labelledby="allocation-title">
         <div class="settings-card__heading">
           <span class="settings-card__icon settings-card__icon--budget"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i></span>

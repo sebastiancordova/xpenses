@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { UserService } from './user.service';
 import { CollectionReference, Firestore, Timestamp, addDoc, collection, collectionData, deleteDoc, doc, orderBy, query, updateDoc } from '@angular/fire/firestore';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, map, of, switchMap } from 'rxjs';
 import { Subscription } from '@core/models/subscriptions';
 
 @Injectable({
@@ -12,13 +12,17 @@ export class SubscriptionsService {
   private userService = inject(UserService);
   private firestore: Firestore = inject(Firestore);
 
-  getAll(): Observable<Subscription[]> {
+  getAll(paymentMethodId?: string, legacyPaymentMethodId?: string): Observable<Subscription[]> {
     return this.userService.currentUser.pipe(
       switchMap(user => {
         if (user) {
           const colRef = collection(this.firestore, `users/${user.uid}/subscriptions`) as CollectionReference<Subscription>;
           const queryRef = query(colRef, orderBy('createdAt', 'desc'));
-          return collectionData(queryRef, { idField: 'uid' });
+          return (collectionData(queryRef, { idField: 'uid' }) as Observable<Subscription[]>).pipe(
+            map(subscriptions => paymentMethodId
+              ? subscriptions.filter(subscription => (subscription.paymentMethodId ?? legacyPaymentMethodId) === paymentMethodId)
+              : subscriptions)
+          );
         }
         return of([]);
       })
