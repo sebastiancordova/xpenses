@@ -1,0 +1,25 @@
+<section class="savings-summary" aria-labelledby="savings-summary-title" [attr.aria-busy]="isLoading">
+  <header>
+    <h2 id="savings-summary-title"><i class="fa-solid fa-bullseye" aria-hidden="true"></i> Mis metas</h2>
+    <a routerLink="/metas">Ver metas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+  </header>
+  <p *ngIf="isLoading" role="status">Cargando tus ahorros…</p>
+  <div *ngIf="loadError" role="alert" class="savings-summary__error">
+    <p>No pudimos cargar tus metas.</p>
+    <button type="button" (click)="retry()">Reintentar</button>
+  </div>
+  <ng-container *ngIf="!isLoading && !loadError">
+    <div *ngIf="!goals.length; else savingsMetrics" class="savings-summary__empty">
+      <p>Dale un destino a tu ahorro. Crea una meta y registra lo que apartas para ella.</p>
+      <a routerLink="/metas">Crear mi primera meta</a>
+    </div>
+    <ng-template #savingsMetrics>
+      <div class="savings-summary__metrics">
+        <div><span>Ahorrado hoy</span><strong>{{ balance | currency:'CLP':'$':'1.0-0' }}</strong></div>
+        <div><span>Aportes netos de {{ monthLabel }}</span><strong>{{ netContributions | currency:'CLP':'$':'1.0-0' }}</strong></div>
+        <div><span>Plan mensual vigente</span><strong>{{ suggested | currency:'CLP':'$':'1.0-0' }}</strong></div>
+      </div>
+      <p class="savings-summary__note">Global, independiente de tu método de pago. Aportes netos = aportes menos retiros del mes calendario. El plan actual se calcula con los ingresos de {{ monthLabel }}; no reconstruye planes anteriores ni cuenta como dinero ahorrado.</p>
+    </ng-template>
+  </ng-container>
+</section>

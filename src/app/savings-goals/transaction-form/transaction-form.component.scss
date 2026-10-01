@@ -1,0 +1,6 @@
+@import "../savings-modal";
+
+.transaction-goal-name { color: #493b35; font-size: .95rem; font-weight: 800; margin: 0; }
+.transaction-balance { align-items: center; border-bottom: 1px solid #eee9e6; color: #77706c; display: flex; font-size: .78rem; justify-content: space-between; margin: .5rem 0 .85rem; padding-bottom: .7rem; }
+.transaction-balance strong { color: #493b35; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.transaction-manual-note { background: #f5f0ed; border-radius: 8px; color: #604b3f; font-size: .78rem; line-height: 1.45; margin: 0 0 1rem; padding: .7rem .75rem; }

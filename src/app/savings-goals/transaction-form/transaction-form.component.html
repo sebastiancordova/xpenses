@@ -1,0 +1,58 @@
+<div class="savings-modal-header">
+  <div>
+    <p class="savings-modal-eyebrow">{{ type === 'contribution' ? 'SUMAR A TU META' : 'USAR PARTE DEL SALDO' }}</p>
+    <h2 id="savings-modal-title">{{ title }}</h2>
+  </div>
+  <button type="button" class="savings-modal-close" (click)="activeModal.dismiss()" [disabled]="loading" aria-label="Cerrar formulario">
+    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+  </button>
+</div>
+
+<div class="savings-modal-body" *ngIf="goal as currentGoal">
+  <p class="transaction-goal-name">{{ currentGoal.name }}</p>
+  <p class="transaction-balance">Saldo disponible <strong>{{ formatMoney(currentGoal.balance) }}</strong></p>
+  <p class="transaction-manual-note" *ngIf="type === 'contribution'">
+    Registrar un aporte no mueve dinero entre cuentas. Este movimiento solo actualiza el saldo de la meta.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate [attr.aria-busy]="loading">
+    <fieldset class="savings-form-fields" [disabled]="loading">
+    <div class="savings-field">
+      <label for="transaction-amount">Monto <span aria-hidden="true">*</span></label>
+      <div class="savings-amount-wrap"><span aria-hidden="true">$</span>
+        <input #transactionAmount id="transaction-amount" class="form-control savings-input savings-input--amount" type="text" inputmode="numeric"
+          autocomplete="off" formControlName="amount" placeholder="0" aria-describedby="transaction-amount-hint transaction-amount-error"
+          [attr.aria-invalid]="!!amountError">
+      </div>
+      <small id="transaction-amount-hint" class="savings-hint">
+        {{ type === 'withdrawal' ? 'Máximo ' + formatMoney(currentGoal.balance) + '.' : 'Pesos chilenos, sin decimales.' }}
+      </small>
+      <small id="transaction-amount-error" class="savings-error" role="alert" *ngIf="amountError">{{ amountError }}</small>
+    </div>
+
+    <div class="savings-field">
+      <label for="transaction-date">Fecha del movimiento <span aria-hidden="true">*</span></label>
+      <input id="transaction-date" class="form-control savings-input" type="date" formControlName="date" [max]="today"
+        aria-describedby="transaction-date-error" [attr.aria-invalid]="form.get('date')?.invalid && form.get('date')?.touched">
+      <small id="transaction-date-error" class="savings-error" role="alert" *ngIf="form.get('date')?.invalid && form.get('date')?.touched">
+        Selecciona una fecha de hoy o anterior.
+      </small>
+    </div>
+
+    <div class="savings-field">
+      <label for="transaction-note">Nota <span class="savings-optional">(opcional)</span></label>
+      <input id="transaction-note" class="form-control savings-input" type="text" maxlength="120" formControlName="note"
+        placeholder="Ej: Ahorro de octubre">
+    </div>
+    </fieldset>
+
+    <p class="savings-form-error" role="alert" *ngIf="error">{{ error }}</p>
+    <div class="savings-modal-actions">
+      <button type="button" class="savings-button savings-button--secondary" (click)="activeModal.dismiss()" [disabled]="loading">Cancelar</button>
+      <button type="submit" class="savings-button savings-button--primary" [disabled]="form.invalid || loading">
+        <span *ngIf="!loading">{{ type === 'contribution' ? 'Registrar aporte' : 'Registrar retiro' }}</span>
+        <span *ngIf="loading"><i class="fa-solid fa-spinner fa-spin mr-1" aria-hidden="true"></i>Guardando…</span>
+      </button>
+    </div>
+  </form>
+</div>

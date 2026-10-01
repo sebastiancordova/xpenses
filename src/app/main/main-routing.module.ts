@@ -27,6 +27,10 @@ const routes: Routes = [
         loadChildren: () => import('../incomes/incomes.module').then(m => m.IncomesModule),
       },
       {
+        path: 'metas',
+        loadChildren: () => import('../savings-goals/savings-goals.module').then(m => m.SavingsGoalsModule),
+      },
+      {
         path: 'gastos',
         loadChildren: () => import('../expenses/expenses.module').then(m => m.ExpensesModule)
       },

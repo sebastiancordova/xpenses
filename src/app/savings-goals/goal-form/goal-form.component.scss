@@ -1,0 +1,11 @@
+@import "src/assets/sass/variables";
+@import "../savings-modal";
+
+.allocation-option:focus-within { outline: 3px solid rgba(135, 102, 86, .4); outline-offset: 2px; }
+.savings-allocation { border: 0; padding: 0; }
+.savings-allocation legend { margin-bottom: .15rem; }
+.savings-allocation > .savings-hint { margin: 0 0 .55rem; }
+.allocation-options { display: grid; gap: .55rem; grid-template-columns: 1fr 1fr; margin-bottom: .6rem; }
+.allocation-option { align-items: center; background: #fbfaf9; border: 1px solid $color-milky; border-radius: 8px; color: $color-grey; cursor: pointer; display: flex !important; gap: .45rem; margin: 0 !important; min-height: 44px; padding: .45rem .65rem; }
+.allocation-option--selected { background: #f3eeeb; border-color: $color-brand-primary; color: #513a2e; }
+.allocation-option input { accent-color: $color-brand-primary; height: 1rem; margin: 0; width: 1rem; }

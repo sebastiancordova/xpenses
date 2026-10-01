@@ -1,0 +1,20 @@
+<div class="savings-modal-header">
+  <div>
+    <p class="savings-modal-eyebrow">CONFIRMACIÓN</p>
+    <h2 id="savings-modal-title">{{ title }}</h2>
+  </div>
+  <button type="button" class="savings-modal-close" (click)="activeModal.dismiss()" [disabled]="loading" aria-label="Cerrar confirmación">
+    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+  </button>
+</div>
+<div class="savings-modal-body">
+  <p class="confirm-action-message">{{ message }}</p>
+  <p class="savings-form-error" role="alert" *ngIf="error">{{ error }}</p>
+  <div class="savings-modal-actions">
+    <button type="button" class="savings-button savings-button--secondary" (click)="activeModal.dismiss()" [disabled]="loading">Cancelar</button>
+    <button type="button" class="savings-button savings-button--danger" (click)="confirmed.emit()" [disabled]="loading">
+      <span *ngIf="!loading">{{ confirmLabel }}</span>
+      <span *ngIf="loading"><i class="fa-solid fa-spinner fa-spin mr-1" aria-hidden="true"></i>Guardando…</span>
+    </button>
+  </div>
+</div>

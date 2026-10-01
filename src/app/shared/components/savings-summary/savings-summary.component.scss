@@ -1,0 +1,27 @@
+@import "src/assets/sass/variables";
+
+:host { display: block; margin-bottom: 1rem; }
+.savings-summary {
+  background: #fff;
+  border: 1px solid $color-milky;
+  border-radius: 14px;
+  padding: 1rem;
+  color: $color-grey-darker;
+  header { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+  h2 { margin: 0; font-size: 1.1rem; font-weight: 800; }
+  h2 i { color: $color-brand-primary; margin-right: .4rem; }
+  a, button { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 44px; color: #765444; font-weight: 700; }
+  a:focus-visible, button:focus-visible { outline: 3px solid $color-brand-secondary; outline-offset: 3px; border-radius: 4px; }
+  button { background: #fff; border: 1px solid $color-milky; border-radius: 8px; padding: .5rem 1rem; }
+  p { margin: .75rem 0 0; }
+  &__metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; margin-top: .75rem; }
+  &__metrics div { display: flex; flex-direction: column; gap: .25rem; }
+  &__metrics span, &__note { font-size: .85rem; color: #66727d; }
+  &__metrics strong { font-size: 1.25rem; overflow-wrap: anywhere; }
+  &__note { line-height: 1.5; }
+  &__error { color: #b42318; }
+}
+@media (max-width: 575px) {
+  .savings-summary__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .savings-summary__metrics div:first-child { grid-column: 1 / -1; padding-bottom: .5rem; border-bottom: 1px solid $color-milky; }
+}

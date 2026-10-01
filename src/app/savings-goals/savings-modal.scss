@@ -1,0 +1,47 @@
+@import "src/assets/sass/variables";
+
+.savings-goal-modal {
+  z-index: 9999;
+  .modal-dialog { max-width: 34rem; }
+  .modal-content { border: 0; border-radius: 14px; overflow: hidden; }
+}
+
+.savings-modal-header { align-items: center; background: #fff; border-bottom: 1px solid $color-milkier; display: flex; justify-content: space-between; padding: 1rem 1.25rem; }
+.savings-modal-header h2 { color: $color-grey-darker; font-size: 1.08rem; font-weight: 800; margin: 0; }
+.savings-modal-eyebrow { color: $color-brand-primary; font-size: .66rem; font-weight: 800; letter-spacing: .12em; margin: 0 0 .15rem; }
+.savings-modal-close { align-items: center; background: $color-milkier; border: 0; border-radius: 50%; color: $color-grey; cursor: pointer; display: inline-flex; height: 44px; justify-content: center; width: 44px; }
+.savings-modal-close:disabled { cursor: not-allowed; opacity: .5; }
+.savings-modal-close:focus-visible, .savings-button:focus-visible { outline: 3px solid rgba(135, 102, 86, .4); outline-offset: 2px; }
+.savings-modal-body { max-height: min(78vh, 46rem); overflow-y: auto; padding: 1.25rem; }
+.savings-field { margin: 0 0 1rem; min-width: 0; }
+.savings-form-fields { border: 0; margin: 0; min-width: 0; padding: 0; }
+.savings-field > label, .savings-field legend { color: $color-grey; display: block; font-size: .8rem; font-weight: 700; margin: 0 0 .38rem; }
+.savings-field label > span[aria-hidden="true"], .savings-field legend > span[aria-hidden="true"] { color: #8d3f35; }
+.savings-optional { color: $color-grey-light; font-weight: 400; }
+.savings-input { background: #fbfaf9; border: 1px solid $color-milky; border-radius: 8px; color: $color-grey-darker; font-size: 1rem; min-height: 46px; padding: .55rem .75rem; }
+.savings-input:focus { background: #fff; border-color: $color-brand-primary; box-shadow: 0 0 0 3px rgba(135, 102, 86, .18); }
+.savings-amount-wrap { position: relative; }
+.savings-amount-wrap > span { color: $color-grey-light; left: .8rem; pointer-events: none; position: absolute; top: 50%; transform: translateY(-50%); }
+.savings-amount-wrap .savings-input--amount { padding-left: 1.8rem; }
+.savings-amount-wrap--percent > span { left: auto; right: .85rem; }
+.savings-amount-wrap--percent input { padding-right: 2rem; }
+.savings-hint { color: #625a56; display: block; font-size: .75rem; line-height: 1.4; margin-top: .3rem; }
+.savings-error { color: #9b332b; display: block; font-size: .75rem; line-height: 1.4; margin-top: .3rem; }
+.savings-form-error { background: #fff2f0; border-radius: 8px; color: #84332d; font-size: .8rem; line-height: 1.45; margin: 0 0 .8rem; padding: .65rem .75rem; }
+.savings-modal-actions { border-top: 1px solid $color-milkier; display: flex; gap: .65rem; justify-content: flex-end; margin-top: 1.15rem; padding-top: .9rem; }
+.savings-button { align-items: center; border: 0; border-radius: 8px; cursor: pointer; display: inline-flex; font-size: .86rem; font-weight: 700; justify-content: center; min-height: 44px; padding: .55rem .95rem; transition: background-color .18s, opacity .18s; }
+.savings-button:disabled { cursor: not-allowed; opacity: .55; }
+.savings-button--primary { background: $color-brand-primary; color: #fff; min-width: 7rem; }
+.savings-button--primary:hover:not(:disabled) { background: darken(#876656, 8%); }
+.savings-button--secondary { background: #f2efed; color: $color-grey; }
+.savings-button--secondary:hover:not(:disabled) { background: #eae4e0; }
+
+@media (max-width: 575.98px) {
+  .savings-goal-modal .modal-dialog { margin: .5rem; }
+  .savings-modal-body { max-height: calc(100dvh - 6rem); padding: 1rem; }
+  .savings-goal-modal .savings-input { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .savings-goal-modal *, .savings-goal-modal *::before, .savings-goal-modal *::after { transition-duration: .01ms !important; }
+}

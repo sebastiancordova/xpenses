@@ -1,0 +1,86 @@
+<div class="savings-modal-header">
+  <div>
+    <p class="savings-modal-eyebrow">MIS METAS</p>
+    <h2 id="savings-modal-title">{{ goal ? 'Editar meta' : 'Nueva meta' }}</h2>
+  </div>
+  <button type="button" class="savings-modal-close" (click)="activeModal.dismiss()" [disabled]="loading" aria-label="Cerrar formulario">
+    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+  </button>
+</div>
+
+<div class="savings-modal-body">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate [attr.aria-busy]="loading">
+    <fieldset class="savings-form-fields" [disabled]="loading">
+    <div class="savings-field">
+      <label for="goal-name">Nombre de la meta <span aria-hidden="true">*</span></label>
+      <input id="goal-name" class="form-control savings-input" type="text" maxlength="60" autocomplete="off"
+        formControlName="name" placeholder="Ej: Viaje al sur" ngbAutofocus aria-describedby="goal-name-error"
+        [attr.aria-invalid]="!!fieldErrors['name']">
+      <small id="goal-name-error" class="savings-error" role="alert" *ngIf="fieldErrors['name']">{{ fieldErrors['name'] }}</small>
+    </div>
+
+    <div class="savings-field">
+      <label for="goal-target">Monto objetivo <span aria-hidden="true">*</span></label>
+      <div class="savings-amount-wrap"><span aria-hidden="true">$</span>
+        <input id="goal-target" class="form-control savings-input savings-input--amount" type="text" inputmode="numeric"
+          autocomplete="off" formControlName="targetAmount" placeholder="0" aria-describedby="goal-target-hint goal-target-error"
+          [attr.aria-invalid]="!!fieldErrors['targetAmount']">
+      </div>
+      <small id="goal-target-hint" class="savings-hint">Pesos chilenos, sin decimales.</small>
+      <small id="goal-target-error" class="savings-error" role="alert" *ngIf="fieldErrors['targetAmount']">{{ fieldErrors['targetAmount'] }}</small>
+    </div>
+
+    <div class="savings-field">
+      <label for="goal-date">Fecha objetivo <span class="savings-optional">(opcional)</span></label>
+      <input id="goal-date" class="form-control savings-input" type="date" formControlName="targetDate">
+      <small class="savings-error" role="alert" *ngIf="form.get('targetDate')?.invalid && form.get('targetDate')?.touched">
+        Revisa la fecha objetivo.
+      </small>
+    </div>
+
+    <fieldset class="savings-field savings-allocation">
+      <legend>Plan mensual <span aria-hidden="true">*</span></legend>
+      <p class="savings-hint">Define cuánto te gustaría destinar al mes. Es una guía; no se moverá dinero automáticamente.</p>
+      <div class="allocation-options" role="radiogroup" aria-label="Tipo de plan mensual">
+        <label class="allocation-option" [class.allocation-option--selected]="allocationType === 'percentage'">
+          <input type="radio" formControlName="allocationType" value="percentage" (change)="updateAllocationValidators()">
+          <span>Porcentaje</span>
+        </label>
+        <label class="allocation-option" [class.allocation-option--selected]="allocationType === 'fixed'">
+          <input type="radio" formControlName="allocationType" value="fixed" (change)="updateAllocationValidators()">
+          <span>Monto fijo</span>
+        </label>
+      </div>
+      <div class="savings-amount-wrap" *ngIf="allocationType === 'fixed'">
+        <span aria-hidden="true">$</span>
+        <input id="allocation-value" class="form-control savings-input savings-input--amount" type="text" inputmode="numeric"
+          formControlName="allocationValue" placeholder="0" aria-label="Monto fijo mensual en pesos">
+      </div>
+      <div class="savings-amount-wrap savings-amount-wrap--percent" *ngIf="allocationType === 'percentage'">
+        <input id="allocation-value" class="form-control savings-input" type="number" inputmode="decimal" min="0.01" max="100" step="0.01"
+          formControlName="allocationValue" placeholder="10" aria-label="Porcentaje mensual de ingresos">
+        <span aria-hidden="true">%</span>
+      </div>
+      <small class="savings-error" role="alert" *ngIf="fieldErrors['allocationValue']">{{ fieldErrors['allocationValue'] }}</small>
+    </fieldset>
+
+    <div class="savings-field" *ngIf="goal">
+      <label for="goal-status">Estado</label>
+      <select id="goal-status" class="form-control savings-input" formControlName="status" (change)="updateStatusValidators()">
+        <option value="active">Activa</option>
+        <option value="paused">En pausa</option>
+        <option value="completed">Completada</option>
+      </select>
+    </div>
+    </fieldset>
+
+    <p class="savings-form-error" role="alert" *ngIf="error">{{ error }}</p>
+    <div class="savings-modal-actions">
+      <button type="button" class="savings-button savings-button--secondary" (click)="activeModal.dismiss()" [disabled]="loading">Cancelar</button>
+      <button type="submit" class="savings-button savings-button--primary" [disabled]="form.invalid || loading">
+        <span *ngIf="!loading">{{ goal ? 'Guardar cambios' : 'Crear meta' }}</span>
+        <span *ngIf="loading"><i class="fa-solid fa-spinner fa-spin mr-1" aria-hidden="true"></i>Guardando…</span>
+      </button>
+    </div>
+  </form>
+</div>

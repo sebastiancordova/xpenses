@@ -1,0 +1,195 @@
+<section class="savings-page" aria-labelledby="savings-title">
+  <div class="savings-page__header">
+    <div>
+      <p class="eyebrow">PLANIFICA A TU RITMO</p>
+      <h1 id="savings-title">Mis metas</h1>
+      <p class="savings-page__intro">Organiza tus objetivos y registra cómo avanzas, paso a paso.</p>
+    </div>
+    <button type="button" class="primary-action" (click)="openCreateGoal()" [disabled]="loading || loadError">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      <span>Nueva meta</span>
+    </button>
+  </div>
+
+  <div *ngIf="notice" class="savings-notice" role="status" aria-live="polite">
+    <span><i class="fa-solid fa-circle-info" aria-hidden="true"></i>{{ notice }}</span>
+    <button type="button" (click)="notice = ''" aria-label="Cerrar mensaje">Cerrar</button>
+  </div>
+
+  <div *ngIf="loading" class="loading-state" role="status" aria-live="polite">
+    <span class="loading-state__spinner" aria-hidden="true"></span>
+    <span>Cargando tus metas…</span>
+  </div>
+
+  <div *ngIf="!loading && loadError" class="state-card state-card--error" role="alert">
+    <div class="state-card__icon" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <h2>No pudimos cargar tus metas</h2>
+    <p>Revisa tu conexión e inténtalo otra vez.</p>
+    <button type="button" class="secondary-action" (click)="loadData()">Reintentar</button>
+  </div>
+
+  <ng-container *ngIf="!loading && !loadError">
+    <section class="overview" aria-label="Resumen de ahorro">
+      <article class="overview__balance">
+        <div class="overview__balance-copy">
+          <span class="overview__label">Saldo en tus metas</span>
+          <strong>{{ formatMoney(overview.balance) }}</strong>
+          <span class="overview__support">{{ overview.activeCount }} {{ overview.activeCount === 1 ? 'meta activa' : 'metas activas' }}</span>
+        </div>
+        <div class="overview__mark" aria-hidden="true"><i class="fa-solid fa-piggy-bank"></i></div>
+      </article>
+
+      <article class="overview__plan">
+        <div class="overview__plan-heading">
+          <div>
+            <span class="overview__label">Plan mensual</span>
+            <strong>{{ formatMoney(monthlyPlanned) }}</strong>
+          </div>
+          <span class="plan-caption">Planes porcentuales: {{ formatPercentage(overview.allocatedPercentage) }}% · {{ currentPeriodLabel }}</span>
+        </div>
+        <div class="plan-track" role="img" [attr.aria-label]="'Plan mensual: ' + formatMoney(monthlyPlanned) + ' de ' + formatMoney(monthlyIncome) + ' de ingresos'">
+          <span [style.width.%]="planPercent"
+            [class.plan-track__fill--over]="hasAllocationOverIncome"></span>
+        </div>
+        <div class="plan-legend">
+          <span>Ingreso del mes <strong>{{ formatMoney(monthlyIncome) }}</strong></span>
+          <span>Sin asignar <strong>{{ formatMoney(overview.unassignedIncome) }}</strong></span>
+        </div>
+        <p class="allocation-warning" *ngIf="hasAllocationOverIncome" role="alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+          Tu plan mensual supera tus ingresos. Ajusta los montos o porcentajes para dejar dinero disponible.
+        </p>
+        <p class="allocation-hint" *ngIf="!hasAllocationOverIncome">
+          Los porcentajes se calculan sobre los ingresos registrados este mes.
+        </p>
+      </article>
+    </section>
+
+    <div *ngIf="goals.length === 0" class="state-card state-card--empty">
+      <div class="state-card__icon" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></div>
+      <h2>Empieza con una meta que te importe</h2>
+      <p>Puede ser un viaje, un fondo de emergencia o cualquier objetivo que quieras alcanzar.</p>
+      <button type="button" class="primary-action" (click)="openCreateGoal()">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i><span>Crear mi primera meta</span>
+      </button>
+    </div>
+
+    <section *ngIf="goals.length > 0" class="goals-section" aria-labelledby="goals-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">TUS OBJETIVOS</p>
+          <h2 id="goals-heading">Metas de ahorro</h2>
+        </div>
+        <span class="goal-count">{{ goals.length }} {{ goals.length === 1 ? 'meta' : 'metas' }}</span>
+      </div>
+
+      <article class="goal-card" *ngFor="let goal of displayGoals">
+        <div class="goal-card__topline">
+          <div class="goal-card__title-wrap">
+            <span class="goal-mark" aria-hidden="true"><i class="fa-solid fa-flag"></i></span>
+            <div class="goal-card__title-copy">
+              <h3>{{ goal.name }}</h3>
+              <span class="status-pill" [ngClass]="'status-pill--' + goal.status">{{ statusLabel(goal.status) }}</span>
+            </div>
+          </div>
+          <button type="button" class="icon-action"
+            (click)="expandedGoalId = expandedGoalId === goal.uid ? null : (goal.uid || null)"
+            [attr.aria-expanded]="expandedGoalId === goal.uid"
+            [attr.aria-label]="expandedGoalId === goal.uid ? 'Ocultar historial de ' + goal.name : 'Ver historial y acciones de ' + goal.name">
+            <i class="fa-solid" [ngClass]="expandedGoalId === goal.uid ? 'fa-chevron-up' : 'fa-ellipsis'" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div class="goal-card__amounts">
+          <div><span>Ahorrado</span><strong>{{ formatMoney(goal.balance) }}</strong></div>
+          <div class="goal-card__target"><span>Meta</span><strong>{{ formatMoney(goal.targetAmount) }}</strong></div>
+        </div>
+        <div class="goal-progress" role="img" [attr.aria-label]="formatMoney(goal.balance) + ' de ' + formatMoney(goal.targetAmount) + ', ' + formatPercentage(progress(goal)) + ' por ciento'">
+          <span [style.width.%]="progress(goal)" [class.goal-progress__fill--complete]="progress(goal) >= 100"></span>
+        </div>
+        <div class="goal-card__progress-caption">
+          <span>{{ progress(goal) | number:'1.0-0' }}% completado</span>
+          <span *ngIf="goal.targetDate">Fecha objetivo: {{ formatDate(goal.targetDate) }}</span>
+        </div>
+
+        <div class="goal-card__plan" *ngIf="goal.status === 'active'">
+          <div>
+            <span>Plan al mes</span>
+            <strong>{{ formatMoney(suggestedContribution(goal)) }}</strong>
+            <small>{{ goal.allocationType === 'percentage' ? formatPercentage(goal.allocationValue) + '% de ingresos' : 'Monto fijo' }}</small>
+          </div>
+          <div class="projection-copy">
+            <span *ngIf="projection(goal).estimatedDate">Proyección: {{ formatDate(projection(goal).estimatedDate!) }}</span>
+            <span *ngIf="!projection(goal).estimatedDate && projection(goal).monthsRemaining === null">Proyección no disponible con el plan y los ingresos actuales</span>
+            <span *ngIf="projection(goal).monthsRemaining === 0">Objetivo alcanzado</span>
+            <small>Estimación, no una promesa</small>
+            <small class="projection-copy__late" *ngIf="hasLateProjection(goal)">Con este plan llegarías después de la fecha objetivo.</small>
+          </div>
+        </div>
+        <div class="goal-card__plan goal-card__plan--muted" *ngIf="goal.status !== 'active'">
+          <span *ngIf="goal.status === 'paused'">El plan mensual está pausado.</span>
+          <span *ngIf="goal.status === 'completed'">Marcada como completada.</span>
+          <span *ngIf="goal.status === 'archived'">Meta archivada; el saldo se conserva.</span>
+        </div>
+
+        <div class="goal-card__actions goal-card__actions--primary">
+          <button type="button" class="goal-action goal-action--primary" (click)="openTransaction(goal, 'contribution')"
+            [disabled]="goal.status !== 'active'" [attr.aria-label]="'Registrar aporte a ' + goal.name">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i><span>Aportar</span>
+          </button>
+          <button type="button" class="goal-action" (click)="openTransaction(goal, 'withdrawal')"
+            [disabled]="goal.balance <= 0" [attr.aria-label]="'Registrar retiro de ' + goal.name">
+            <i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i><span>Retirar</span>
+          </button>
+        </div>
+
+        <div class="goal-card__actions goal-card__actions--secondary" *ngIf="expandedGoalId === goal.uid && goal.status !== 'archived'">
+          <button type="button" class="goal-action" (click)="openEditGoal(goal)" [attr.aria-label]="'Editar ' + goal.name">
+            <i class="fa-solid fa-pen" aria-hidden="true"></i><span>Editar</span>
+          </button>
+          <button type="button" class="goal-action" *ngIf="goal.status === 'active' || goal.status === 'paused'" (click)="togglePause(goal)"
+            [disabled]="isUpdating(goal)"
+            [attr.aria-label]="goal.status === 'active' ? 'Pausar ' + goal.name : 'Reanudar ' + goal.name">
+            <i class="fa-solid" [ngClass]="isUpdating(goal) ? 'fa-spinner fa-spin' : (goal.status === 'active' ? 'fa-pause' : 'fa-play')" aria-hidden="true"></i>
+            <span>{{ isUpdating(goal) ? 'Guardando…' : (goal.status === 'active' ? 'Pausar' : 'Reanudar') }}</span>
+          </button>
+          <button type="button" class="goal-action goal-action--archive" (click)="archiveGoal(goal)" [attr.aria-label]="'Archivar ' + goal.name">
+            <i class="fa-solid fa-box-archive" aria-hidden="true"></i><span>Archivar</span>
+          </button>
+        </div>
+
+        <div class="goal-card__actions goal-card__actions--secondary" *ngIf="expandedGoalId === goal.uid && goal.status === 'archived'">
+          <button type="button" class="goal-action" (click)="togglePause(goal)" [disabled]="isUpdating(goal)"
+            [attr.aria-label]="'Reactivar ' + goal.name">
+            <i class="fa-solid" [ngClass]="isUpdating(goal) ? 'fa-spinner fa-spin' : 'fa-rotate-left'" aria-hidden="true"></i>
+            <span>{{ isUpdating(goal) ? 'Guardando…' : 'Reactivar meta' }}</span>
+          </button>
+        </div>
+
+        <div class="goal-history" *ngIf="expandedGoalId === goal.uid" [attr.aria-label]="'Historial de ' + goal.name">
+          <div class="goal-history__heading"><h4>Historial de movimientos</h4><span>{{ transactionsFor(goal).length }}</span></div>
+          <p class="goal-history__empty" *ngIf="transactionsFor(goal).length === 0">Todavía no hay movimientos. Tus aportes y retiros aparecerán aquí.</p>
+          <ul class="transaction-list" *ngIf="transactionsFor(goal).length > 0">
+            <li *ngFor="let transaction of transactionsFor(goal)">
+              <span class="transaction-list__icon" [class.transaction-list__icon--withdrawal]="transaction.type === 'withdrawal'" aria-hidden="true">
+                <i class="fa-solid" [ngClass]="transaction.type === 'contribution' ? 'fa-arrow-down' : 'fa-arrow-up' "></i>
+              </span>
+              <span class="transaction-list__copy">
+                <strong>{{ transaction.type === 'contribution' ? 'Aporte' : 'Retiro' }}<span *ngIf="transaction.note"> · {{ transaction.note }}</span></strong>
+                <small>{{ formatDate(transaction.date) }}</small>
+              </span>
+              <strong class="transaction-list__amount" [class.transaction-list__amount--withdrawal]="transaction.type === 'withdrawal'">
+                {{ transaction.type === 'contribution' ? '+' : '−' }}{{ formatMoney(transaction.amount) }}
+              </strong>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </section>
+
+    <p class="manual-record-note">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+      Registrar un aporte no mueve dinero entre cuentas. El saldo refleja los movimientos que anotas aquí.
+    </p>
+  </ng-container>
+</section>
