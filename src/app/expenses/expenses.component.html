@@ -37,9 +37,9 @@
         <span class="filter-section__label">Categoría</span>
         <div class="category-chips" role="group" aria-label="Seleccionar categoría">
           <button type="button" class="category-chip" [class.category-chip--active]="!activeCategory" (click)="selectCategory('')">Todas</button>
-          <button type="button" *ngFor="let enum of expenseCategory | keyvalue" class="category-chip"
-            [class.category-chip--active]="activeCategory === enum.key" (click)="selectCategory(enum.key)">
-            {{ enum.value }}
+          <button type="button" *ngFor="let option of categoryOptions" class="category-chip"
+            [class.category-chip--active]="activeCategory === option.category" (click)="selectCategory(option.category)">
+            {{ option.category }}
           </button>
         </div>
       </div>
@@ -107,7 +107,7 @@
             <span class="expense-mobile-card__amount">{{ expense.amount | currency: 'CLP':'$':'1.0-0' }}</span>
           </span>
           <span class="expense-mobile-card__meta">
-            <span class="category-badge" [ngClass]="getCategoryClass(expense.category)">{{ expense.category }}</span>
+            <span class="category-badge" [ngClass]="getCategoryClass(expense.category)">{{ expense.category }}<ng-container *ngIf="expense.subcategory"> · {{ expense.subcategory }}</ng-container></span>
             <span>{{ expense.createdAt.toDate() | date: 'dd MMM yyyy' }}</span>
           </span>
         </button>
@@ -153,7 +153,7 @@
                 </td>
                 <td class="d-none d-md-table-cell">
                   <span class="category-badge" [ngClass]="getCategoryClass(expense.category)">
-                    {{ expense.category }}
+                    {{ expense.category }}<ng-container *ngIf="expense.subcategory"> · {{ expense.subcategory }}</ng-container>
                   </span>
                 </td>
                 <td class="expense-date d-none d-md-table-cell">{{ expense.createdAt.toDate() | date: 'dd/MM/yyyy' }}</td>

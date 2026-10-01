@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject, Subject, debounceTime, filter, switchMap, take, takeUntil, tap } from 'rxjs';
 import { AddExpenseComponent } from './add-expense/add-expense.component';
 import { ExpensesService } from '@core/services/expenses.service';
-import { Expense, ExpenseCategory } from '@core/models/expense';
+import { Expense, EXPENSE_CATEGORY_OPTIONS } from '@core/models/expense';
 import { EditExpenseComponent } from './edit-expense/edit-expense.component';
 import { RangeDateSelectorComponent } from '@shared/components/range-date-selector/range-date-selector.component';
 
@@ -31,7 +31,7 @@ export class ExpensesComponent implements OnDestroy {
   private toastr: ToastrService = inject(ToastrService);
   private modalService: NgbModal = inject(NgbModal);
   public totalAmountFiltered = 0;
-  public expenseCategory = ExpenseCategory;
+  public categoryOptions = EXPENSE_CATEGORY_OPTIONS;
   public sortColumn = '';
   public sortAsc = false;
   public hasCustomDateRange = false;

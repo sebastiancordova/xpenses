@@ -3,8 +3,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Timestamp } from '@angular/fire/firestore';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { InstallmentPurchase } from '@core/models/installment-purchase';
-import { ExpenseCategory } from '@core/models/expense';
+import { EXPENSE_CATEGORY_OPTIONS } from '@core/models/expense';
 import { InstallmentPurchasesService } from '@core/services/installment-purchases.service';
+import { PaymentMethod } from '@core/models/payment-method';
+import { PaymentMethodsService } from '@core/services/payment-methods.service';
+import { UserPreferencesService } from '@core/services/user-preferences.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-edit-installment-purchase',
@@ -20,23 +24,14 @@ export class EditInstallmentPurchaseComponent implements OnInit {
   public form!: FormGroup;
   public loading = false;
   public confirmingDelete = false;
+  public paymentMethods: PaymentMethod[] = [];
   public activeModal = inject(NgbActiveModal);
-  public expenseCategory = ExpenseCategory;
+  public categoryOptions = EXPENSE_CATEGORY_OPTIONS;
   private fb = inject(FormBuilder);
   private service = inject(InstallmentPurchasesService);
+  private paymentMethodsService = inject(PaymentMethodsService);
+  private preferencesService = inject(UserPreferencesService);
 
-  readonly categoryIcons: Record<string, string> = {
-    'Supermercado':    'fa-cart-shopping',
-    'Subscripciones':  'fa-tv',
-    'Transporte':      'fa-car',
-    'Casa':            'fa-house',
-    'Cuentas':         'fa-receipt',
-    'Entretenimiento': 'fa-film',
-    'Otros':           'fa-tag',
-    'Ropa':            'fa-shirt',
-    'Auto cuidado':    'fa-heart',
-    'Gasto Fijo':      'fa-thumbtack',
-  };
 
   constructor() {
     this.form = this.fb.group({
@@ -44,18 +39,25 @@ export class EditInstallmentPurchaseComponent implements OnInit {
       installmentAmount: ['', Validators.required],
       totalInstallments: [12, [Validators.required, Validators.min(2), Validators.max(120)]],
       category: ['', Validators.required],
+      subcategory: [''],
       startDate: ['', Validators.required],
+      paymentMethodId: ['', Validators.required],
     });
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    const preferences = await firstValueFrom(this.preferencesService.getPreferences());
+    const defaultMethod = await this.paymentMethodsService.ensureDefault(preferences.billingCycleDay);
+    this.paymentMethods = (await firstValueFrom(this.paymentMethodsService.getAll())).filter(method => method.type === 'credit' && (method.isActive || method.uid === this.purchase.paymentMethodId));
     const startDate = this.purchase.startDate?.toDate();
     this.form.patchValue({
       title: this.purchase.title,
       installmentAmount: this.purchase.installmentAmount,
       totalInstallments: this.purchase.totalInstallments,
       category: this.purchase.category,
+      subcategory: this.purchase.subcategory || '',
       startDate: startDate ? this.formatDateForInput(startDate) : '',
+      paymentMethodId: this.purchase.paymentMethodId || defaultMethod.uid,
     });
   }
 
@@ -64,7 +66,7 @@ export class EditInstallmentPurchaseComponent implements OnInit {
   }
 
   selectCategory(key: string): void {
-    this.form.patchValue({ category: key });
+    this.form.patchValue({ category: key, subcategory: '' });
     this.category?.markAsTouched();
   }
 
@@ -104,7 +106,14 @@ export class EditInstallmentPurchaseComponent implements OnInit {
   get installmentAmount() { return this.form.get('installmentAmount'); }
   get totalInstallments() { return this.form.get('totalInstallments'); }
   get category() { return this.form.get('category'); }
+  get subcategory() { return this.form.get('subcategory'); }
+  get selectedCategory() { return this.categoryOptions.find(option => option.category === this.category?.value); }
   get startDate() { return this.form.get('startDate'); }
+  get paymentMethodId() { return this.form.get('paymentMethodId'); }
+
+  get selectedPaymentDay(): number {
+    return this.paymentMethods.find(method => method.uid === this.paymentMethodId?.value)?.billingCycleDay || this.purchase.paymentDay;
+  }
 
   get startDateDisplay(): string {
     const value = this.startDate?.value;
@@ -115,7 +124,7 @@ export class EditInstallmentPurchaseComponent implements OnInit {
     const value = this.startDate?.value;
     if (!value) return 0;
     return this.service.getUpcomingInstallment(
-      this.toLocalDate(value), this.purchase.paymentDay, +this.totalInstallments?.value
+      this.toLocalDate(value), this.selectedPaymentDay, +this.totalInstallments?.value
     );
   }
 
@@ -123,7 +132,7 @@ export class EditInstallmentPurchaseComponent implements OnInit {
     const value = this.startDate?.value;
     if (!value) return 0;
     return this.service.getRemainingInstallments(
-      this.toLocalDate(value), this.purchase.paymentDay, +this.totalInstallments?.value
+      this.toLocalDate(value), this.selectedPaymentDay, +this.totalInstallments?.value
     );
   }
 

@@ -1,7 +1,11 @@
 import { Component, EventEmitter, inject, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Expense, ExpenseCategory } from '@core/models/expense';
+import { Expense, EXPENSE_CATEGORY_OPTIONS } from '@core/models/expense';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { PaymentMethod } from '@core/models/payment-method';
+import { PaymentMethodsService } from '@core/services/payment-methods.service';
+import { UserPreferencesService } from '@core/services/user-preferences.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-add-expense',
@@ -13,34 +17,30 @@ export class AddExpenseComponent {
   public addExpenseForm!: FormGroup;
   public loading = false
   public activeModal: NgbActiveModal = inject(NgbActiveModal);
-  public expenseCategory = ExpenseCategory;
+  public categoryOptions = EXPENSE_CATEGORY_OPTIONS;
   public maxCommentLength = 120;
-  readonly categoryIcons: Record<string, string> = {
-    'Supermercado':    'fa-cart-shopping',
-    'Subscripciones':  'fa-tv',
-    'Transporte':      'fa-car',
-    'Casa':            'fa-house',
-    'Cuentas':         'fa-receipt',
-    'Entretenimiento': 'fa-film',
-    'Otros':           'fa-tag',
-    'Ropa':            'fa-shirt',
-    'Auto cuidado':    'fa-heart',
-    'Gasto Fijo':      'fa-thumbtack',
-  };
+  public paymentMethods: PaymentMethod[] = [];
   @Output() newExpense$ = new EventEmitter<Expense>();
   private fb: FormBuilder = inject(FormBuilder);
+  private paymentMethodsService = inject(PaymentMethodsService);
+  private preferencesService = inject(UserPreferencesService);
   constructor() {
     this.addExpenseForm = this.fb.group({
       title: ['', Validators.required],
       amount: ['', Validators.required],
       category: ['', Validators.required],
-      comment: ['', Validators.maxLength(120)]
+      subcategory: [''],
+      comment: ['', Validators.maxLength(120)],
+      paymentMethodId: ['', Validators.required]
     })
 
   }
 
-  ngOnInit(): void {
-
+  async ngOnInit(): Promise<void> {
+    const preferences = await firstValueFrom(this.preferencesService.getPreferences());
+    const defaultMethod = await this.paymentMethodsService.ensureDefault(preferences.billingCycleDay);
+    this.paymentMethods = (await firstValueFrom(this.paymentMethodsService.getAll())).filter(method => method.isActive);
+    this.addExpenseForm.patchValue({ paymentMethodId: defaultMethod.uid });
   }
 
   submit(): void {
@@ -60,7 +60,7 @@ export class AddExpenseComponent {
   }
 
   selectCategory(key: string): void {
-    this.addExpenseForm.patchValue({ category: key });
+    this.addExpenseForm.patchValue({ category: key, subcategory: '' });
     this.category?.markAsTouched();
   }
 
@@ -73,8 +73,11 @@ export class AddExpenseComponent {
   get category() {
     return this.addExpenseForm.get('category');
   }
+  get subcategory() { return this.addExpenseForm.get('subcategory'); }
+  get selectedCategory() { return this.categoryOptions.find(option => option.category === this.category?.value); }
   get comment() {
     return this.addExpenseForm.get('comment');
   }
+  get paymentMethodId() { return this.addExpenseForm.get('paymentMethodId'); }
 
 }

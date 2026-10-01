@@ -44,9 +44,18 @@
       </small>
     </div>
 
+    <div class="form-group">
+      <label class="field-label" for="ip-payment-method">Tarjeta de crédito</label>
+      <select id="ip-payment-method" class="form-control field-input" formControlName="paymentMethodId" (change)="updatePaymentMethod()">
+        <option value="" disabled>Selecciona una tarjeta</option>
+        <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }} · Cierre día {{ method.billingCycleDay }}</option>
+      </select>
+      <small class="field-error" role="alert" *ngIf="paymentMethodId?.invalid && paymentMethodId?.touched">Agrega o selecciona una tarjeta de crédito en Configuración.</small>
+    </div>
+
     <aside class="billing-cycle-note" role="status">
       <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
-      <span>Las cuotas se calculan con tu día de facturación: <strong>{{ billingCycleDay }}</strong>. Puedes cambiarlo en Configuración.</span>
+      <span>Las cuotas se calculan con el cierre de esta tarjeta: <strong>día {{ billingCycleDay }}</strong>.</span>
     </aside>
 
     <div class="form-group">
@@ -63,12 +72,20 @@
       <legend class="field-label">Categoría</legend>
       <div class="category-grid">
         <button type="button" class="category-pill"
-                *ngFor="let cat of expenseCategory | keyvalue"
-                [ngClass]="[getCategoryClass(cat.key), category?.value === cat.key ? 'category-pill--active' : '']"
-                (click)="selectCategory(cat.key)" [attr.aria-pressed]="category?.value === cat.key">
-          <i class="fas" [ngClass]="categoryIcons[cat.key] || 'fa-tag'" aria-hidden="true"></i>
-          <span>{{ cat.value }}</span>
+                *ngFor="let cat of categoryOptions"
+                [ngClass]="[getCategoryClass(cat.category), category?.value === cat.category ? 'category-pill--active' : '']"
+                (click)="selectCategory(cat.category)" [attr.aria-pressed]="category?.value === cat.category">
+          <i class="fas" [ngClass]="cat.icon" aria-hidden="true"></i>
+          <span>{{ cat.category }}</span>
         </button>
+      </div>
+      <div class="subcategory-picker" *ngIf="selectedCategory?.subcategories?.length">
+        <span class="subcategory-picker__label">¿En qué tipo de compra?</span>
+        <div class="subcategory-grid" role="group" aria-label="Subcategoría">
+          <button type="button" class="subcategory-pill" *ngFor="let item of selectedCategory?.subcategories"
+            [class.subcategory-pill--active]="subcategory?.value === item" (click)="subcategory?.setValue(item)"
+            [attr.aria-pressed]="subcategory?.value === item">{{ item }}</button>
+        </div>
       </div>
       <small id="ip-category-error" class="field-error" role="alert" *ngIf="category?.invalid && category?.touched">
         La categoría es obligatoria

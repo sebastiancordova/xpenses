@@ -30,6 +30,15 @@
       </small>
     </div>
 
+    <div class="form-group">
+      <label class="field-label" for="fixed-payment-method">Método de pago</label>
+      <select id="fixed-payment-method" class="form-control field-input" formControlName="paymentMethodId">
+        <option value="" disabled>Selecciona un método</option>
+        <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }}</option>
+      </select>
+      <small class="field-error" *ngIf="paymentMethodId?.invalid && paymentMethodId?.touched">Selecciona el método que cobra este gasto.</small>
+    </div>
+
     <div class="modal-actions">
       <button type="button" class="btn-modal btn-modal--secondary" (click)="activeModal.dismiss()">Cancelar</button>
       <button type="submit" class="btn-modal btn-modal--primary" [disabled]="addFixedExpenseForm.invalid || loading">

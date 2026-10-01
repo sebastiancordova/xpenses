@@ -1,6 +1,7 @@
 @import "src/assets/sass/variables";
 
-.add-subscription-modal {
+.add-subscription-modal,
+.edit-subscription-modal {
   z-index: 9999;
 
   .modal-dialog-centered.modal-sm { max-width: 32rem; }

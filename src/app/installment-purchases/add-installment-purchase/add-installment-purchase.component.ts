@@ -3,9 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Timestamp } from '@angular/fire/firestore';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { InstallmentPurchase } from '@core/models/installment-purchase';
-import { ExpenseCategory } from '@core/models/expense';
+import { EXPENSE_CATEGORY_OPTIONS } from '@core/models/expense';
 import { UserPreferencesService } from '@core/services/user-preferences.service';
-import { take } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
+import { PaymentMethod } from '@core/models/payment-method';
+import { PaymentMethodsService } from '@core/services/payment-methods.service';
 
 @Component({
   selector: 'app-add-installment-purchase',
@@ -17,24 +19,14 @@ export class AddInstallmentPurchaseComponent implements OnInit {
   public form!: FormGroup;
   public loading = false;
   public billingCycleDay = 19;
+  public paymentMethods: PaymentMethod[] = [];
   public activeModal = inject(NgbActiveModal);
-  public expenseCategory = ExpenseCategory;
+  public categoryOptions = EXPENSE_CATEGORY_OPTIONS;
   @Output() newInstallmentPurchase$ = new EventEmitter<InstallmentPurchase>();
   private fb = inject(FormBuilder);
   private preferences = inject(UserPreferencesService);
+  private paymentMethodsService = inject(PaymentMethodsService);
 
-  readonly categoryIcons: Record<string, string> = {
-    'Supermercado':    'fa-cart-shopping',
-    'Subscripciones':  'fa-tv',
-    'Transporte':      'fa-car',
-    'Casa':            'fa-house',
-    'Cuentas':         'fa-receipt',
-    'Entretenimiento': 'fa-film',
-    'Otros':           'fa-tag',
-    'Ropa':            'fa-shirt',
-    'Auto cuidado':    'fa-heart',
-    'Gasto Fijo':      'fa-thumbtack',
-  };
 
   constructor() {
     const today = new Date();
@@ -44,14 +36,21 @@ export class AddInstallmentPurchaseComponent implements OnInit {
       installmentAmount: ['', Validators.required],
       totalInstallments: [12, [Validators.required, Validators.min(2), Validators.max(120)]],
       category: ['', Validators.required],
+      subcategory: [''],
       startDate: [todayStr, Validators.required],
+      paymentMethodId: ['', Validators.required],
     });
   }
 
-  ngOnInit(): void {
-    this.preferences.getPreferences().pipe(take(1)).subscribe(preferences => {
-      this.billingCycleDay = preferences.billingCycleDay;
-    });
+  async ngOnInit(): Promise<void> {
+    const preferences = await firstValueFrom(this.preferences.getPreferences());
+    const defaultMethod = await this.paymentMethodsService.ensureDefault(preferences.billingCycleDay);
+    this.paymentMethods = (await firstValueFrom(this.paymentMethodsService.getAll())).filter(method => method.isActive && method.type === 'credit');
+    const selected = this.paymentMethods.find(method => method.uid === defaultMethod.uid) || this.paymentMethods[0];
+    if (selected) {
+      this.form.patchValue({ paymentMethodId: selected.uid });
+      this.billingCycleDay = selected.billingCycleDay || preferences.billingCycleDay;
+    }
   }
 
   getCategoryClass(key: string): string {
@@ -59,8 +58,13 @@ export class AddInstallmentPurchaseComponent implements OnInit {
   }
 
   selectCategory(key: string): void {
-    this.form.patchValue({ category: key });
+    this.form.patchValue({ category: key, subcategory: '' });
     this.category?.markAsTouched();
+  }
+
+  updatePaymentMethod(): void {
+    const selected = this.paymentMethods.find(method => method.uid === this.paymentMethodId?.value);
+    if (selected?.billingCycleDay) this.billingCycleDay = selected.billingCycleDay;
   }
 
   submit(): void {
@@ -78,7 +82,9 @@ export class AddInstallmentPurchaseComponent implements OnInit {
       currentInstallment: 1,
       startDate: Timestamp.fromDate(new Date(y, m - 1, d)),
       paymentDay: this.billingCycleDay,
-      category: val.category as ExpenseCategory,
+      paymentMethodId: val.paymentMethodId,
+      category: val.category,
+      subcategory: val.subcategory || undefined,
       status: 'active',
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
@@ -91,5 +97,8 @@ export class AddInstallmentPurchaseComponent implements OnInit {
   get installmentAmount() { return this.form.get('installmentAmount'); }
   get totalInstallments() { return this.form.get('totalInstallments'); }
   get category() { return this.form.get('category'); }
+  get subcategory() { return this.form.get('subcategory'); }
+  get selectedCategory() { return this.categoryOptions.find(option => option.category === this.category?.value); }
   get startDate() { return this.form.get('startDate'); }
+  get paymentMethodId() { return this.form.get('paymentMethodId'); }
 }

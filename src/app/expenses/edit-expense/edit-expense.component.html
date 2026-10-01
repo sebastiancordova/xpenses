@@ -1,59 +1,79 @@
 <div class="expense-modal-header">
-  <h5 class="expense-modal-header__title">Editar gasto</h5>
-  <button type="button" class="expense-modal-header__close" (click)="activeModal.dismiss()" aria-label="Cerrar">
-    <i class="fas fa-times"></i>
+  <h2 class="expense-modal-header__title">Editar gasto</h2>
+  <button type="button" class="expense-modal-header__close" (click)="activeModal.dismiss()" aria-label="Cerrar formulario de gasto">
+    <i class="fas fa-times" aria-hidden="true"></i>
   </button>
 </div>
 
 <div class="expense-modal-body">
-  <form [formGroup]="editExpenseForm" (ngSubmit)="submit()" novalidate>
-
+  <form [formGroup]="editExpenseForm" (ngSubmit)="submit()" novalidate [attr.aria-busy]="loading">
     <div class="form-group">
-      <label class="field-label" for="title">Título</label>
-      <input autocomplete="off" type="text" class="form-control field-input" id="title" formControlName="title"
-        [class.field-input--valid]="title?.valid && title?.touched" ngbAutofocus>
-      <small class="field-error" *ngIf="title?.invalid && title?.touched && title?.hasError('required')">
+      <label class="field-label" for="edit-expense-title">Título</label>
+      <input autocomplete="off" type="text" class="form-control field-input" id="edit-expense-title" formControlName="title"
+        placeholder="Ej: Compras del supermercado" ngbAutofocus aria-describedby="edit-expense-title-error"
+        [attr.aria-invalid]="title?.invalid && title?.touched"
+        [class.field-input--valid]="title?.valid && title?.touched">
+      <small id="edit-expense-title-error" class="field-error" role="alert" *ngIf="title?.invalid && title?.touched && title?.hasError('required')">
         El título es obligatorio
       </small>
     </div>
 
     <div class="form-group">
-      <label class="field-label" for="amount">Monto</label>
+      <label class="field-label" for="edit-expense-amount">Monto</label>
       <div class="amount-input-wrapper">
         <span class="amount-prefix">$</span>
-        <input autocomplete="off" type="text" pattern="-?[0-9]+" inputmode="decimal"
-          class="form-control field-input field-input--amount" id="amount" formControlName="amount"
+        <input autocomplete="off" type="text" pattern="[0-9]*" inputmode="numeric"
+          class="form-control field-input field-input--amount" id="edit-expense-amount" formControlName="amount"
+          placeholder="0" aria-describedby="edit-expense-amount-error" [attr.aria-invalid]="amount?.invalid && amount?.touched"
           [class.field-input--valid]="amount?.valid && amount?.touched">
       </div>
-      <small class="field-error" *ngIf="amount?.invalid && amount?.touched && amount?.hasError('required')">
+      <small id="edit-expense-amount-error" class="field-error" role="alert" *ngIf="amount?.invalid && amount?.touched && amount?.hasError('required')">
         El monto es obligatorio
       </small>
     </div>
 
     <div class="form-group">
-      <label class="field-label">Categoría</label>
+      <label class="field-label" for="edit-expense-payment-method">Método de pago</label>
+      <select id="edit-expense-payment-method" class="form-control field-input" formControlName="paymentMethodId"
+        [attr.aria-invalid]="paymentMethodId?.invalid && paymentMethodId?.touched">
+        <option value="" disabled>Selecciona un método</option>
+        <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }}</option>
+      </select>
+      <small class="field-error" role="alert" *ngIf="paymentMethodId?.invalid && paymentMethodId?.touched">Selecciona cómo pagaste este gasto.</small>
+    </div>
+
+    <fieldset class="form-group category-fieldset" aria-describedby="edit-expense-category-error">
+      <legend class="field-label">Categoría</legend>
       <div class="category-grid">
         <button type="button" class="category-pill"
-                *ngFor="let cat of expenseCategory | keyvalue"
-                [ngClass]="[getCategoryClass(cat.key), category?.value === cat.key ? 'category-pill--active' : '']"
-                (click)="selectCategory(cat.key)">
-          <i class="fas" [ngClass]="categoryIcons[cat.key] || 'fa-tag'"></i>
-          <span>{{ cat.value }}</span>
+                *ngFor="let cat of categoryOptions"
+                [ngClass]="[getCategoryClass(cat.category), category?.value === cat.category ? 'category-pill--active' : '']"
+                (click)="selectCategory(cat.category)" [attr.aria-pressed]="category?.value === cat.category">
+          <i class="fas" [ngClass]="cat.icon" aria-hidden="true"></i>
+          <span>{{ cat.category }}</span>
         </button>
       </div>
-      <small class="field-error" *ngIf="category?.invalid && category?.touched">
+      <div class="subcategory-picker" *ngIf="selectedCategory?.subcategories?.length">
+        <span class="subcategory-picker__label">¿En qué tipo de gasto?</span>
+        <div class="subcategory-grid" role="group" aria-label="Subcategoría">
+          <button type="button" class="subcategory-pill" *ngFor="let item of selectedCategory?.subcategories"
+            [class.subcategory-pill--active]="subcategory?.value === item" (click)="subcategory?.setValue(item)"
+            [attr.aria-pressed]="subcategory?.value === item">{{ item }}</button>
+        </div>
+      </div>
+      <small id="edit-expense-category-error" class="field-error" role="alert" *ngIf="category?.invalid && category?.touched">
         La categoría es obligatoria
       </small>
-    </div>
+    </fieldset>
 
     <div class="form-group">
       <div class="field-label-row">
-        <label class="field-label" for="comment">Comentario <span class="field-optional">(opcional)</span></label>
+        <label class="field-label" for="edit-expense-comment">Comentario <span class="field-optional">(opcional)</span></label>
         <span class="field-char-count" [class.field-char-count--near]="(comment?.value?.length || 0) > 90">
           {{ comment?.value?.length || 0 }}/{{ maxCommentLength }}
         </span>
       </div>
-      <textarea id="comment" rows="3" class="form-control field-input" formControlName="comment"
+      <textarea id="edit-expense-comment" rows="3" class="form-control field-input" formControlName="comment"
         placeholder="Añade una nota..." [maxlength]="maxCommentLength"></textarea>
     </div>
 
@@ -62,7 +82,7 @@
         <button type="button" class="btn-modal btn-modal--danger"
                 [class.btn-modal--danger-confirm]="confirmingDelete"
                 (click)="delete()">
-          <i class="fas mr-1" [ngClass]="confirmingDelete ? 'fa-triangle-exclamation' : 'fa-trash'"></i>
+          <i class="fas mr-1" [ngClass]="confirmingDelete ? 'fa-triangle-exclamation' : 'fa-trash'" aria-hidden="true"></i>
           {{ confirmingDelete ? '¿Confirmar?' : 'Eliminar' }}
         </button>
         <button *ngIf="confirmingDelete" type="button" class="btn-modal btn-modal--ghost"
@@ -72,9 +92,8 @@
       </div>
       <button type="submit" class="btn-modal btn-modal--primary" [disabled]="editExpenseForm.invalid || loading">
         <span *ngIf="!loading">Guardar</span>
-        <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1"></i>Guardando...</span>
+        <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>Guardando...</span>
       </button>
     </div>
-
   </form>
 </div>

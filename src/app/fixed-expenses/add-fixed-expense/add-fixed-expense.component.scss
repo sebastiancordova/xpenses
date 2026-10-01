@@ -1,6 +1,7 @@
 @import "src/assets/sass/variables";
 
-.add-fixed-expense-modal {
+.add-fixed-expense-modal,
+.edit-fixed-expense-modal {
   z-index: 9999;
 
   .modal-dialog-centered.modal-sm { max-width: 32rem; }

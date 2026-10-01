@@ -33,16 +33,33 @@
       </small>
     </div>
 
+    <div class="form-group">
+      <label class="field-label" for="expense-payment-method">Método de pago</label>
+      <select id="expense-payment-method" class="form-control field-input" formControlName="paymentMethodId" [attr.aria-invalid]="paymentMethodId?.invalid && paymentMethodId?.touched">
+        <option value="" disabled>Selecciona un método</option>
+        <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }}</option>
+      </select>
+      <small class="field-error" role="alert" *ngIf="paymentMethodId?.invalid && paymentMethodId?.touched">Selecciona cómo pagaste este gasto.</small>
+    </div>
+
     <fieldset class="form-group category-fieldset" aria-describedby="expense-category-error">
       <legend class="field-label">Categoría</legend>
       <div class="category-grid">
         <button type="button" class="category-pill"
-                *ngFor="let cat of expenseCategory | keyvalue"
-                [ngClass]="[getCategoryClass(cat.key), category?.value === cat.key ? 'category-pill--active' : '']"
-                (click)="selectCategory(cat.key)" [attr.aria-pressed]="category?.value === cat.key">
-          <i class="fas" [ngClass]="categoryIcons[cat.key] || 'fa-tag'" aria-hidden="true"></i>
-          <span>{{ cat.value }}</span>
+                *ngFor="let cat of categoryOptions"
+                [ngClass]="[getCategoryClass(cat.category), category?.value === cat.category ? 'category-pill--active' : '']"
+                (click)="selectCategory(cat.category)" [attr.aria-pressed]="category?.value === cat.category">
+          <i class="fas" [ngClass]="cat.icon" aria-hidden="true"></i>
+          <span>{{ cat.category }}</span>
         </button>
+      </div>
+      <div class="subcategory-picker" *ngIf="selectedCategory?.subcategories?.length">
+        <span class="subcategory-picker__label">¿En qué tipo de gasto?</span>
+        <div class="subcategory-grid" role="group" aria-label="Subcategoría">
+          <button type="button" class="subcategory-pill" *ngFor="let item of selectedCategory?.subcategories"
+            [class.subcategory-pill--active]="subcategory?.value === item" (click)="subcategory?.setValue(item)"
+            [attr.aria-pressed]="subcategory?.value === item">{{ item }}</button>
+        </div>
       </div>
       <small id="expense-category-error" class="field-error" role="alert" *ngIf="category?.invalid && category?.touched">
         La categoría es obligatoria
