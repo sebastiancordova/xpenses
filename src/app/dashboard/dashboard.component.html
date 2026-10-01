@@ -1,312 +1,138 @@
 <div class="dashboard-wrapper">
-
   <section class="dashboard-header" aria-labelledby="dashboard-title">
     <div class="dashboard-header__inner">
       <div class="dashboard-header__copy">
         <span class="dashboard-eyebrow">Resumen financiero</span>
         <h1 id="dashboard-title" class="dashboard-title">Dashboard</h1>
-        <p class="dashboard-subtitle">Período {{ periodRangeLabel }}</p>
+        <div class="payment-method-picker" *ngIf="selectedPaymentMethod">
+          <div class="payment-method-picker__field">
+            <span class="payment-method-picker__icon" aria-hidden="true"><i class="fa-solid" [ngClass]="paymentMethodIcon"></i></span>
+            <div class="payment-method-picker__content">
+              <label for="dashboard-payment-method">Método de pago</label>
+              <select id="dashboard-payment-method" [value]="selectedPaymentMethod.uid" (change)="onPaymentMethodChange($any($event.target).value)">
+                <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="dashboard-header__actions" aria-label="Acciones del dashboard">
-        <a class="quick-action quick-action--secondary" routerLink="/ingresos">
-          <i class="fa-solid fa-plus" aria-hidden="true"></i>
-          <span>Ingreso</span>
-        </a>
-        <a class="quick-action" routerLink="/gastos">
-          <i class="fa-solid fa-plus" aria-hidden="true"></i>
-          <span>Gasto</span>
-        </a>
+        <a class="quick-action quick-action--secondary" routerLink="/ingresos"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>Ingreso</span></a>
+        <a class="quick-action" routerLink="/gastos"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>Gasto</span></a>
       </div>
 
-      <div class="month-nav" aria-label="Selector de período">
-        <button class="month-nav__btn" type="button" (click)="goToPreviousMonth()" aria-label="Ver período anterior">
-          <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-        </button>
-        <span class="month-nav__label" aria-live="polite">{{ displayMonthName }} {{ displayYear }}</span>
-        <button
-          class="month-nav__btn"
-          type="button"
-          (click)="goToNextMonth()"
-          [disabled]="isCurrentMonth"
-          aria-label="Ver período siguiente">
-          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-        </button>
+      <div class="month-selector">
+        <div class="month-nav" aria-label="Selector de mes">
+          <button class="month-nav__btn" type="button" (click)="goToPreviousMonth()" aria-label="Ver período anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+          <span class="month-nav__label" aria-live="polite">{{ displayMonthName }} {{ displayYear }}</span>
+          <button class="month-nav__btn" type="button" (click)="goToNextMonth()" [disabled]="isCurrentMonth" aria-label="Ver período siguiente"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+        </div>
+        <p class="month-selector__range"><i class="fa-regular fa-calendar" aria-hidden="true"></i> Período de facturación: {{ periodRangeLabel }}</p>
       </div>
     </div>
   </section>
 
   <div *ngIf="isLoading" class="skeleton-wrapper" role="status" aria-live="polite" aria-label="Cargando dashboard">
-    <div class="row stats-row">
-      <div class="col-6 col-xl-3 mb-3" *ngFor="let n of [1,2,3,4]">
-        <div class="skeleton-card">
-          <div class="skeleton skeleton--icon mb-3"></div>
-          <div class="skeleton skeleton--label mb-2"></div>
-          <div class="skeleton skeleton--value mb-2"></div>
-          <div class="skeleton skeleton--sub"></div>
-        </div>
-      </div>
-    </div>
-    <div class="skeleton-card mb-3">
-      <div class="skeleton-row mb-3">
-        <div class="skeleton skeleton--label skeleton--wide"></div>
-        <div class="skeleton skeleton--label skeleton--medium"></div>
-      </div>
-      <div class="skeleton skeleton--bar"></div>
-    </div>
+    <div class="row stats-row"><div class="col-6 col-xl-3 mb-3" *ngFor="let n of [1,2,3,4]"><div class="skeleton-card"><div class="skeleton skeleton--icon mb-3"></div><div class="skeleton skeleton--label mb-2"></div><div class="skeleton skeleton--value mb-2"></div><div class="skeleton skeleton--sub"></div></div></div></div>
+    <div class="skeleton-card mb-3"><div class="skeleton-row mb-3"><div class="skeleton skeleton--label skeleton--wide"></div><div class="skeleton skeleton--label skeleton--medium"></div></div><div class="skeleton skeleton--bar"></div></div>
   </div>
 
   <section *ngIf="loadError" class="alert alert-warning d-flex flex-wrap align-items-center mb-3" role="alert" aria-labelledby="dashboard-load-error-title">
-    <i class="fa-solid fa-cloud-exclamation" aria-hidden="true"></i>
-    <div>
-      <h2 id="dashboard-load-error-title">No pudimos cargar este período</h2>
-      <p>Revisa tu conexión e inténtalo nuevamente. Tus registros no se modificaron.</p>
-    </div>
-    <button type="button" class="quick-action ml-auto mt-2 mt-sm-0" (click)="retryLoadData()">
-      <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
-      <span>Reintentar</span>
-    </button>
+    <i class="fa-solid fa-cloud-exclamation" aria-hidden="true"></i><div><h2 id="dashboard-load-error-title">No pudimos cargar este período</h2><p>Revisa tu conexión e inténtalo nuevamente. Tus registros no se modificaron.</p></div>
+    <button type="button" class="quick-action ml-auto mt-2 mt-sm-0" (click)="retryLoadData()"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i><span>Reintentar</span></button>
   </section>
 
   <ng-container *ngIf="!isLoading && !loadError">
-
-    <section class="dashboard-summary mb-3" *ngIf="insights" [ngClass]="dashboardToneClass" aria-label="Insight principal">
-      <div class="dashboard-summary__content">
-        <span class="dashboard-summary__label">Lectura rápida</span>
-        <p class="dashboard-summary__text">{{ primaryInsightText }}</p>
-      </div>
-      <div class="dashboard-summary__metric">
-        <span class="dashboard-summary__metric-label">Meta de ahorro</span>
-        <strong>{{ insights.savingsTarget | currency: 'CLP':'$':'1.0-0' }}</strong>
-      </div>
+    <section class="row stats-row" aria-label="Resumen del período">
+      <div class="col-6 col-xl-3 mb-3"><article class="stat-card stat-card--gradient"><i class="fas fa-wallet stat-card__watermark" aria-hidden="true"></i><p class="stat-card__label">Balance neto</p><p class="stat-card__value" [ngClass]="netBalanceClass">{{ (insights?.netBalance ?? 0) | currency: 'CLP':'$':'1.0-0' }}</p><p class="stat-card__sub">Ingresos menos gastos del período</p></article></div>
+      <div class="col-6 col-xl-3 mb-3"><article class="stat-card stat-card--income"><div class="stat-card__topline"><span class="stat-card__icon-badge stat-card__icon-badge--income"><i class="fas fa-arrow-down" aria-hidden="true"></i></span><span class="stat-card__chip" *ngIf="totalIncome > 0">Global</span></div><p class="stat-card__label">Ingresos del mes</p><p class="stat-card__value stat-card__value--dark">{{ totalIncome | currency: 'CLP':'$':'1.0-0' }}</p><p class="stat-card__sub">Compartidos entre tus métodos</p></article></div>
+      <div class="col-6 col-xl-3 mb-3"><article class="stat-card stat-card--expense"><div class="stat-card__topline"><span class="stat-card__icon-badge stat-card__icon-badge--expense"><i class="fas fa-arrow-up" aria-hidden="true"></i></span><span class="stat-card__chip">{{ variableExpensesCount }} variables</span></div><p class="stat-card__label">Gastos del período</p><p class="stat-card__value stat-card__value--dark">{{ total | currency: 'CLP':'$':'1.0-0' }}</p><p class="stat-card__sub">{{ totalFixedAndSubs | currency: 'CLP':'$':'1.0-0' }} recurrentes y cuotas</p></article></div>
+      <div class="col-6 col-xl-3 mb-3"><article class="stat-card stat-card--available" [ngClass]="{ 'stat-card--warning': (insights?.safeToSpend ?? 0) === 0 }"><div class="stat-card__topline"><span class="stat-card__icon-badge stat-card__icon-badge--available"><i class="fas fa-coins" aria-hidden="true"></i></span><span class="stat-card__chip">{{ safeToSpendProgress | number: '1.0-0' }}% usado</span></div><p class="stat-card__label">Disponible variable</p><p class="stat-card__value stat-card__value--dark">{{ (insights?.safeToSpend ?? 0) | currency: 'CLP':'$':'1.0-0' }}</p><p class="stat-card__sub"><ng-container *ngIf="(insights?.daysRemaining ?? 0) > 0">{{ (insights?.dailySafeToSpend ?? 0) | currency: 'CLP':'$':'1.0-0' }}/día · {{ insights?.daysRemaining }} días</ng-container><ng-container *ngIf="(insights?.daysRemaining ?? 0) === 0">Período completado</ng-container></p></article></div>
     </section>
 
-    <section class="row stats-row" aria-label="Métricas principales">
-      <div class="col-6 col-xl-3 mb-3">
-        <article class="stat-card stat-card--gradient">
-          <i class="fas fa-wallet stat-card__watermark" aria-hidden="true"></i>
-          <p class="stat-card__label">Balance neto</p>
-          <p class="stat-card__value" [ngClass]="netBalanceClass">
-            {{ (insights?.netBalance ?? 0) | currency: 'CLP':'$':'1.0-0' }}
-          </p>
-          <p class="stat-card__sub">Ingresos menos gastos del período</p>
-        </article>
-      </div>
-
-      <div class="col-6 col-xl-3 mb-3">
-        <article class="stat-card stat-card--income">
-          <div class="stat-card__topline">
-            <div class="stat-card__icon-badge stat-card__icon-badge--income">
-              <i class="fas fa-arrow-down" aria-hidden="true"></i>
-            </div>
-            <span class="stat-card__chip" *ngIf="totalIncome > 0">Registrado</span>
-          </div>
-          <p class="stat-card__label">Ingresos</p>
-          <p class="stat-card__value stat-card__value--dark">
-            {{ totalIncome | currency: 'CLP':'$':'1.0-0' }}
-          </p>
-          <p class="stat-card__sub" *ngIf="totalIncome > 0">Base para presupuesto y ahorro</p>
-          <p class="stat-card__sub" *ngIf="totalIncome === 0">Sin ingresos registrados</p>
-        </article>
-      </div>
-
-      <div class="col-6 col-xl-3 mb-3">
-        <article class="stat-card stat-card--expense">
-          <div class="stat-card__topline">
-            <div class="stat-card__icon-badge stat-card__icon-badge--expense">
-              <i class="fas fa-arrow-up" aria-hidden="true"></i>
-            </div>
-            <span class="stat-card__chip">{{ variableExpensesCount }} variables</span>
-          </div>
-          <p class="stat-card__label">Total gastos</p>
-          <p class="stat-card__value stat-card__value--dark">{{ total | currency: 'CLP':'$':'1.0-0' }}</p>
-          <p class="stat-card__sub">
-            {{ totalFixedAndSubs | currency: 'CLP':'$':'1.0-0' }} recurrentes
-          </p>
-        </article>
-      </div>
-
-      <div class="col-6 col-xl-3 mb-3">
-        <article class="stat-card stat-card--available" [ngClass]="{ 'stat-card--warning': (insights?.safeToSpend ?? 0) === 0 }">
-          <div class="stat-card__topline">
-            <div class="stat-card__icon-badge stat-card__icon-badge--available">
-              <i class="fas fa-coins" aria-hidden="true"></i>
-            </div>
-            <span class="stat-card__chip">{{ safeToSpendProgress | number: '1.0-0' }}% usado</span>
-          </div>
-          <p class="stat-card__label">Disponible variable</p>
-          <p class="stat-card__value stat-card__value--dark">
-            {{ (insights?.safeToSpend ?? 0) | currency: 'CLP':'$':'1.0-0' }}
-          </p>
-          <p class="stat-card__sub">
-            <ng-container *ngIf="(insights?.daysRemaining ?? 0) > 0">
-              {{ (insights?.dailySafeToSpend ?? 0) | currency: 'CLP':'$':'1.0-0' }}/día - {{ insights?.daysRemaining }} días
-            </ng-container>
-            <ng-container *ngIf="(insights?.daysRemaining ?? 0) === 0">Período completado</ng-container>
-          </p>
-        </article>
-      </div>
-    </section>
-
-    <section class="budget-health-card mb-3" *ngIf="insights" aria-label="Salud del presupuesto">
-      <div class="budget-health-card__top">
-        <div class="budget-health-card__left">
-          <span class="budget-health-card__label">Consumo del presupuesto</span>
-          <span class="budget-health-card__pct" [ngClass]="budgetPctClass">
-            {{ insights.budgetPct | number: '1.0-1' }}%
-          </span>
+    <ng-container *ngIf="hasExpenses; else emptyState">
+      <section class="dashboard-card category-overview mb-3" aria-labelledby="category-overview-title">
+        <div class="dashboard-card__header dashboard-card__header--stack">
+          <span id="category-overview-title">Tus gastos por categoría</span>
+          <small *ngIf="!hasExclusions">Toca una categoría para ver el detalle. Excluirla solo cambia este análisis.</small>
+          <small *ngIf="hasExclusions">Montos y porcentajes ajustados según lo que incluyas en este análisis; tus totales del período no cambian.</small>
         </div>
-        <div class="budget-health-card__kpis">
-          <span class="kpi">
-            <span class="kpi__label">Ahorro</span>
-            <span class="kpi__value" [ngClass]="insights.savingsRate >= prefs.savingsRate ? 'kpi__value--good' : 'kpi__value--bad'">
-              {{ insights.savingsRate | number: '1.0-1' }}%
-            </span>
-          </span>
-          <span class="kpi kpi--divider" aria-hidden="true"></span>
-          <span class="kpi">
-            <span class="kpi__label">Gasto diario</span>
-            <span class="kpi__value">{{ insights.burnRate | currency: 'CLP':'$':'1.0-0' }}/día</span>
-          </span>
-          <span class="kpi kpi--divider" aria-hidden="true"></span>
-          <span class="kpi">
-            <span class="kpi__label">Proyección</span>
-            <span class="kpi__value" [ngClass]="insights.projectedExpenses > totalIncome && totalIncome > 0 ? 'kpi__value--bad' : ''">
-              {{ insights.projectedExpenses | currency: 'CLP':'$':'1.0-0' }}
-            </span>
-          </span>
-        </div>
-      </div>
-      <div class="budget-bar" role="progressbar" aria-label="Porcentaje de ingresos consumidos" [attr.aria-valuenow]="insights.budgetPct | number:'1.0-0'" aria-valuemin="0" aria-valuemax="100">
-        <div class="budget-bar__fill" [ngClass]="budgetBarClass" [style.width.%]="insights.budgetPct > 100 ? 100 : insights.budgetPct"></div>
-      </div>
-    </section>
-
-    <section class="expense-composition mb-3" *ngIf="total > 0" aria-label="Composición del gasto">
-      <div class="expense-composition__item">
-        <span class="expense-composition__label">Variables</span>
-        <strong>{{ totalVariable | currency: 'CLP':'$':'1.0-0' }}</strong>
-        <span>{{ variableExpensePct | number: '1.0-1' }}%</span>
-      </div>
-      <div class="expense-composition__track" aria-hidden="true">
-        <span class="expense-composition__fill expense-composition__fill--variable" [style.width.%]="variableExpensePct"></span>
-        <span class="expense-composition__fill expense-composition__fill--recurring" [style.width.%]="recurringExpensePct"></span>
-      </div>
-      <div class="expense-composition__item expense-composition__item--right">
-        <span class="expense-composition__label">Recurrentes y cuotas</span>
-        <strong>{{ totalFixedAndSubs | currency: 'CLP':'$':'1.0-0' }}</strong>
-        <span>{{ recurringExpensePct | number: '1.0-1' }}%</span>
-      </div>
-    </section>
-
-    <section class="dashboard-card installment-card mb-3" *ngIf="activeInstallments.length > 0" aria-labelledby="installments-title">
-      <div class="dashboard-card__header dashboard-card__header--split">
-        <span id="installments-title">
-          <i class="fas fa-credit-card mr-2" aria-hidden="true"></i>
-          Compras en cuotas
-        </span>
-        <strong>{{ totalInstallmentsAmount | currency: 'CLP':'$':'1.0-0' }} del período</strong>
-      </div>
-      <div class="installment-list">
-        <div class="installment-item" *ngFor="let p of activeInstallments">
-          <div class="installment-item__info">
-            <span class="installment-item__title">{{ p.title }}</span>
-            <span class="installment-item__sub">
-              <ng-container *ngIf="isCurrentMonth; else pastInstallment">
-                Próximo cobro: cuota {{ getInstallmentNumber(p) }} de {{ p.totalInstallments }}
-                · Por pagar: {{ getRemainingInstallments(p) }} cuota{{ getRemainingInstallments(p) !== 1 ? 's' : '' }}, incluida la próxima
-              </ng-container>
-              <ng-template #pastInstallment>
-                Cuota del período: {{ getInstallmentNumber(p) }} de {{ p.totalInstallments }}
-              </ng-template>
-            </span>
-          </div>
-          <span class="installment-item__amount">{{ p.installmentAmount | currency: 'CLP':'$':'1.0-0' }}</span>
-        </div>
-      </div>
-    </section>
-
-    <div class="alert-strip mb-3"
-         *ngIf="insights?.alertMessage && insights?.alertLevel !== 'ok'"
-         role="status"
-         [ngClass]="{
-           'alert-strip--ok': insights?.alertLevel === 'ok',
-           'alert-strip--warn': insights?.alertLevel === 'warn',
-           'alert-strip--danger': insights?.alertLevel === 'danger'
-         }">
-      <i class="fas mr-2"
-         aria-hidden="true"
-         [ngClass]="{
-           'fa-check-circle': insights?.alertLevel === 'ok',
-           'fa-exclamation-triangle': insights?.alertLevel === 'warn',
-           'fa-times-circle': insights?.alertLevel === 'danger'
-         }"></i>
-      {{ insights?.alertMessage }}
-    </div>
-
-    <ng-container *ngIf="total > 0; else emptyState">
-      <section class="row dashboard-grid" aria-label="Distribución de gastos">
-        <div class="col-lg-5 mb-4">
-          <article class="dashboard-card h-100">
-            <div class="dashboard-card__header dashboard-card__header--stack">
-              <span>Distribución por categoría</span>
-              <small *ngIf="topCategory">Mayor gasto: {{ topCategory.category }}</small>
-            </div>
+        <div class="category-overview__content">
+          <div class="chart-column">
             <div class="chart-container">
-              <canvas baseChart
-                [data]="doughnutChartData"
-                [legend]="false"
-                [type]="doughnutChartType"
-                [options]="chartOptions"
-                aria-label="Gráfico de distribución de gastos por categoría">
-              </canvas>
-              <div class="chart-center" aria-hidden="true">
-                <span>Total</span>
-                <strong>{{ total | currency: 'CLP':'$':'1.0-0' }}</strong>
+              <canvas baseChart [data]="doughnutChartData" [legend]="false" [type]="doughnutChartType" [options]="chartOptions" (chartClick)="onChartClick($event)" aria-label="Gráfico circular de gastos por categoría. Toca un segmento para ver sus detalles."></canvas>
+              <div class="chart-center" aria-hidden="true"><span>{{ hasExclusions ? 'Análisis' : 'Total del período' }}</span><strong>{{ (hasExclusions ? adjustedChartTotal : total) | currency: 'CLP':'$':'1.0-0' }}</strong></div>
+            </div>
+            <button type="button" class="chart-reset" *ngIf="hasExclusions" (click)="clearCategoryExclusion()"><i class="fas fa-rotate-left" aria-hidden="true"></i> Restablecer análisis</button>
+            <p class="category-overview__excluded" *ngIf="hasExclusions">{{ exclusionSummary }} fuera del análisis · {{ totalExcludedAmount | currency: 'CLP':'$':'1.0-0' }}</p>
+          </div>
+
+          <div class="category-list" role="list" aria-label="Categorías de gasto, ordenadas de mayor a menor">
+            <article class="category-item" [class.category-item--lead]="item.category === topCategory?.category" [class.category-item--excluded]="isCategoryExcluded(item.category)" *ngFor="let item of analysisCategoryBreakdown" role="listitem">
+              <div class="category-item__topline">
+                <button type="button" class="category-item__expand" (click)="toggleCategoryDetails(item.category)" [attr.aria-expanded]="expandedCategory === item.category" [attr.aria-label]="(expandedCategory === item.category ? 'Ocultar detalle de ' : 'Ver detalle de ') + item.category">
+                  <span class="category-item__identity"><span class="category-item__dot" [style.background-color]="item.color" aria-hidden="true"></span><span class="category-item__name">{{ item.category }}</span></span>
+                  <i class="fas fa-chevron-down category-item__chevron" [class.category-item__chevron--open]="expandedCategory === item.category" aria-hidden="true"></i>
+                </button>
               </div>
-            </div>
-          </article>
-        </div>
-        <div class="col-lg-7 mb-4">
-          <article class="dashboard-card h-100">
-            <div class="dashboard-card__header dashboard-card__header--stack">
-              <span>Detalle por categoría</span>
-              <small>{{ categoryBreakdown.length }} categorías con movimiento</small>
-            </div>
-            <div class="category-list">
-              <div class="category-item" *ngFor="let item of categoryBreakdown">
-                <div class="category-item__row">
-                  <div class="category-item__info">
-                    <span class="category-item__dot" [style.background-color]="item.color" aria-hidden="true"></span>
-                    <span class="category-item__name">{{ item.category }}</span>
-                  </div>
-                  <div class="category-item__right">
-                    <span class="category-item__amount">{{ item.amount | currency: 'CLP':'$':'1.0-0' }}</span>
-                    <span class="category-item__pct">{{ item.percentage | number: '1.0-1' }}%</span>
-                  </div>
-                </div>
-                <div class="category-item__bar" aria-hidden="true">
-                  <div class="category-item__bar-fill" [style.background-color]="item.color" [style.width.%]="item.percentage"></div>
-                </div>
+              <div class="category-item__value"><strong class="category-item__amount">{{ item.amount | currency: 'CLP':'$':'1.0-0' }}</strong></div>
+              <div class="category-item__footer">
+                <span class="category-item__pct">{{ item.percentage | number: '1.0-1' }}% del gasto</span>
+                <button type="button" class="category-item__exclude" (click)="toggleCategoryExclusion(item.category)" [attr.aria-pressed]="isCategoryExcluded(item.category)" [attr.aria-label]="getCategoryToggleLabel(item.category)">{{ isCategoryExcluded(item.category) ? 'Incluir' : 'Excluir' }}</button>
               </div>
-            </div>
-          </article>
+              <div class="category-item__bar" aria-hidden="true"><div class="category-item__bar-fill" [style.background-color]="item.color" [style.width.%]="item.percentage"></div></div>
+              <div class="category-item__details" *ngIf="expandedCategory === item.category">
+                <div class="category-subcategory" *ngFor="let subcategory of item.subcategories"><span>{{ subcategory.name }}</span><strong>{{ subcategory.amount | currency: 'CLP':'$':'1.0-0' }}</strong></div>
+                <p class="category-item__no-detail" *ngIf="!item.subcategories.length">No hay subcategorías en este período.</p>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
     </ng-container>
 
     <ng-template #emptyState>
-      <section class="empty-state text-center py-5" aria-label="Sin gastos registrados">
-        <i class="fa-regular fa-chart-pie empty-state__icon mb-3" aria-hidden="true"></i>
-        <p class="empty-state__title">Sin gastos registrados</p>
-        <p class="empty-state__sub">No hay gastos para {{ displayMonthName }} {{ displayYear }}.</p>
-        <a class="quick-action mt-3" routerLink="/gastos">
-          <i class="fa-solid fa-plus" aria-hidden="true"></i>
-          <span>Registrar gasto</span>
-        </a>
-      </section>
+      <section class="empty-state text-center py-5" aria-label="Sin gastos registrados"><i class="fa-regular fa-chart-pie empty-state__icon mb-3" aria-hidden="true"></i><p class="empty-state__title">Sin gastos registrados</p><p class="empty-state__sub">No hay gastos para {{ displayMonthName }} {{ displayYear }}.</p><a class="quick-action mt-3" routerLink="/gastos"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>Registrar gasto</span></a></section>
     </ng-template>
 
+    <details class="dashboard-disclosure mb-3">
+      <summary><span><strong>Seguimiento y proyección</strong><small>Ritmo diario, presupuesto y alertas del período</small></span><i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+      <section class="daily-spend-card" aria-labelledby="daily-spend-title" [attr.aria-busy]="isDailySpendLoading">
+        <div class="daily-spend-card__header"><div><span class="daily-spend-card__eyebrow">Seguimiento diario</span><h2 id="daily-spend-title">¿Cuánto llevas gastado?</h2><p>Consulta un día y revisa la comparación del período seleccionado.</p></div>
+          <div class="daily-spend-card__controls"><div class="daily-spend-card__shortcuts" aria-label="Fechas rápidas"><button type="button" class="date-shortcut" [class.date-shortcut--active]="isYesterdaySpendDate" (click)="showYesterdaySpend()" [attr.aria-pressed]="isYesterdaySpendDate">Ayer</button><button type="button" class="date-shortcut" [class.date-shortcut--active]="isTodaySpendDate" (click)="showTodaySpend()" [attr.aria-pressed]="isTodaySpendDate">Hoy</button></div><label class="sr-only" for="daily-spend-date">Fecha para consultar gastos</label><input id="daily-spend-date" class="daily-spend-card__date-input" type="date" [value]="spendDate" [max]="maxSpendDate" (change)="onSpendDateChange($any($event.target).value)"></div>
+        </div>
+        <div class="daily-spend-card__metrics">
+          <article class="daily-spend-metric" *ngIf="!isDailySpendLoading && !dailySpendLoadError; else dailySpendLoading"><span class="daily-spend-metric__label">Gastado el {{ selectedSpendDateLabel }}</span><strong>{{ spendOnSelectedDate | currency: 'CLP':'$':'1.0-0' }}</strong><small>{{ spendOnSelectedDateCount }} gasto{{ spendOnSelectedDateCount !== 1 ? 's' : '' }} registrado{{ spendOnSelectedDateCount !== 1 ? 's' : '' }}</small></article>
+          <ng-container *ngIf="!isComparisonLoading && hasSpendComparison && !comparisonLoadError; else comparisonLoadingOrError">
+            <article class="daily-spend-metric daily-spend-metric--primary"><span class="daily-spend-metric__label">Período actual: {{ spendComparisonLabel }}</span><strong>{{ monthToDateSpend | currency: 'CLP':'$':'1.0-0' }}</strong><small>Gastos directos acumulados en el período seleccionado</small></article>
+            <article class="daily-spend-metric"><span class="daily-spend-metric__label">Período anterior: {{ previousSpendComparisonLabel }}</span><strong>{{ previousMonthToDateSpend | currency: 'CLP':'$':'1.0-0' }}</strong><small [class.daily-spend-metric__comparison--higher]="monthToDateDifference > 0" [class.daily-spend-metric__comparison--lower]="monthToDateDifference < 0"><i class="fas" [ngClass]="monthToDateDifference > 0 ? 'fa-arrow-up' : monthToDateDifference < 0 ? 'fa-arrow-down' : 'fa-equals'" aria-hidden="true"></i> {{ monthToDateDifferenceLabel }}: {{ (monthToDateDifference < 0 ? -monthToDateDifference : monthToDateDifference) | currency: 'CLP':'$':'1.0-0' }}</small></article>
+          </ng-container>
+        </div>
+        <ng-template #dailySpendLoading><article class="daily-spend-metric" role="status"><span *ngIf="isDailySpendLoading">Cargando gasto diario…</span><span *ngIf="dailySpendLoadError">No pudimos cargar el gasto de este día. Cambia la fecha para intentar nuevamente.</span></article></ng-template>
+        <ng-template #comparisonLoadingOrError><div class="daily-spend-metric" role="status"><span *ngIf="isComparisonLoading">Cargando comparación del período…</span><span *ngIf="comparisonLoadError">No pudimos cargar la comparación del período. Intenta cambiar el período.</span><span *ngIf="comparisonNotStarted">Este período aún no comienza.</span></div></ng-template>
+        <p class="daily-spend-card__note"><i class="fas fa-circle-info" aria-hidden="true"></i>Incluye gastos registrados por fecha; cuotas y cobros recurrentes se muestran en el total del período.</p>
+      </section>
+      <div class="insight-message" *ngIf="insights as currentInsights"
+        [class.insight-message--empty]="!currentInsights.hasIncome"
+        [class.insight-message--ok]="currentInsights.hasIncome && currentInsights.alertLevel === 'ok'"
+        [class.insight-message--warn]="currentInsights.hasIncome && currentInsights.alertLevel === 'warn'"
+        [class.insight-message--danger]="currentInsights.hasIncome && currentInsights.alertLevel === 'danger'"
+        [attr.role]="currentInsights.hasIncome && currentInsights.alertLevel === 'danger' ? 'alert' : 'status'"
+        [attr.aria-live]="currentInsights.hasIncome && currentInsights.alertLevel === 'danger' ? 'assertive' : 'polite'">
+        <i class="fas" [ngClass]="!currentInsights.hasIncome ? 'fa-circle-info' : currentInsights.alertLevel === 'danger' ? 'fa-triangle-exclamation' : currentInsights.alertLevel === 'warn' ? 'fa-circle-exclamation' : 'fa-circle-check'" aria-hidden="true"></i>
+        <span><strong>{{ !currentInsights.hasIncome ? 'Falta registrar ingresos' : currentInsights.alertLevel === 'danger' ? 'Proyección por sobre tus ingresos' : currentInsights.alertLevel === 'warn' ? 'Poco margen para ahorro' : 'Período dentro del plan' }}</strong><span>{{ primaryInsightText }}</span></span>
+      </div>
+      <section class="budget-health-card" *ngIf="insights" aria-label="Salud del presupuesto">
+        <div class="budget-health-card__top"><div class="budget-health-card__left"><span class="budget-health-card__label">Consumo del presupuesto</span><span class="budget-health-card__pct" [ngClass]="budgetPctClass">{{ insights.budgetPct | number: '1.0-1' }}%</span></div>
+          <div class="budget-health-card__kpis"><span class="kpi"><span class="kpi__label">Margen de ingresos</span><span class="kpi__value" [ngClass]="insights.savingsRate >= prefs.savingsRate ? 'kpi__value--good' : 'kpi__value--bad'">{{ insights.savingsRate | number: '1.0-1' }}%</span></span><span class="kpi kpi--divider" aria-hidden="true"></span><span class="kpi"><span class="kpi__label">Gasto diario</span><span class="kpi__value">{{ insights.burnRate | currency: 'CLP':'$':'1.0-0' }}/día</span></span><span class="kpi kpi--divider" aria-hidden="true"></span><span class="kpi"><span class="kpi__label">Proyección</span><span class="kpi__value" [ngClass]="insights.projectedExpenses > totalIncome && totalIncome > 0 ? 'kpi__value--bad' : ''">{{ insights.projectedExpenses | currency: 'CLP':'$':'1.0-0' }}</span></span></div>
+        </div>
+        <div class="budget-bar" role="progressbar" aria-label="Porcentaje de ingresos consumidos" [attr.aria-valuenow]="insights.budgetPct | number:'1.0-0'" aria-valuemin="0" aria-valuemax="100"><div class="budget-bar__fill" [ngClass]="budgetBarClass" [style.width.%]="insights.budgetPct > 100 ? 100 : insights.budgetPct"></div></div>
+      </section>
+      <section class="expense-composition" *ngIf="total > 0" aria-label="Composición del gasto"><div class="expense-composition__item"><span class="expense-composition__label">Variables</span><strong>{{ totalVariable | currency: 'CLP':'$':'1.0-0' }}</strong><span>{{ variableExpensePct | number: '1.0-1' }}%</span></div><div class="expense-composition__track" aria-hidden="true"><span class="expense-composition__fill expense-composition__fill--variable" [style.width.%]="variableExpensePct"></span><span class="expense-composition__fill expense-composition__fill--recurring" [style.width.%]="recurringExpensePct"></span></div><div class="expense-composition__item expense-composition__item--right"><span class="expense-composition__label">Recurrentes y cuotas</span><strong>{{ totalFixedAndSubs | currency: 'CLP':'$':'1.0-0' }}</strong><span>{{ recurringExpensePct | number: '1.0-1' }}%</span></div></section>
+      <section class="installments-disclosure" *ngIf="activeInstallments.length > 0"><details #installmentDetails><summary [attr.aria-expanded]="installmentDetails.open" [attr.aria-label]="(installmentDetails.open ? 'Ocultar' : 'Mostrar') + ' detalle de compras en cuotas'"><span class="installments-disclosure__copy"><strong>Compras en cuotas</strong><small>{{ activeInstallments.length }} compra{{ activeInstallments.length !== 1 ? 's' : '' }} incluidas en este período</small></span><strong class="installments-disclosure__amount">{{ totalInstallmentsAmount | currency: 'CLP':'$':'1.0-0' }}</strong><span class="installments-disclosure__toggle"><span>{{ installmentDetails.open ? 'Ocultar' : 'Ver detalle' }}</span><i class="fas fa-chevron-down installments-disclosure__chevron" aria-hidden="true"></i></span></summary><div class="installments-disclosure__actions"><button type="button" class="category-item__exclude" (click)="toggleInstallmentExclusion()" [attr.aria-pressed]="installmentsExcluded">{{ installmentsExcluded ? 'Incluir cuotas en el gráfico' : 'Excluir cuotas del gráfico' }}</button></div><div class="installment-list"><div class="installment-item" *ngFor="let p of activeInstallments"><div class="installment-item__info"><span class="installment-item__title">{{ p.title }}</span><span class="installment-item__sub">Cuota {{ getInstallmentNumber(p) }} de {{ p.totalInstallments }}</span></div><span class="installment-item__amount">{{ p.installmentAmount | currency: 'CLP':'$':'1.0-0' }}</span></div></div></details></section>
+    </details>
   </ng-container>
 
+  <app-savings-summary [period]="incomePeriod"></app-savings-summary>
 </div>
