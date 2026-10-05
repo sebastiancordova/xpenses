@@ -1,65 +1,65 @@
-# Agentes de Xpenses
+# Xpenses Agent Team
 
-Configuración adaptada de Long Dog Chaos el 2026-10-01 para Angular y Firebase.
-Los perfiles viven en `agents/*.toml` y se registran en [config.toml](config.toml).
+Configuration adapted from Long Dog Chaos on 2026-10-01 for Angular and Firebase.
+Profiles live in `agents/*.toml` and are registered in [config.toml](config.toml).
 
-## Equipo y modelos
+## Team and models
 
-| Perfil | Responsabilidad | Modelo / esfuerzo |
+| Profile | Responsibility | Model / effort |
 | --- | --- | --- |
-| [tech_lead](agents/tech_lead.toml) | Tareas, delegación, contratos e integración | gpt-6.1-sol / high |
-| [product_designer](agents/product_designer.toml) | Flujos, reglas y criterios de aceptación | gpt-6.1-sol / high |
-| [frontend_engineer](agents/frontend_engineer.toml) | Lógica Angular, formularios y cálculos | gpt-6.1-sol / high |
-| [firebase_engineer](agents/firebase_engineer.toml) | Datos, AngularFire, autenticación y reglas | gpt-6.1-sol / high |
-| [ui_engineer](agents/ui_engineer.toml) | Presentación, responsive y accesibilidad | gpt-6.1-sol / high |
-| [qa_reviewer](agents/qa_reviewer.toml) | Revisión independiente, solo lectura | gpt-6-luna / medium |
+| [tech_lead](agents/tech_lead.toml) | Task planning, delegation, contracts, and integration | gpt-6.1-sol / medium |
+| [product_designer](agents/product_designer.toml) | Flows, rules, and acceptance criteria | gpt-6-luna / high |
+| [frontend_engineer](agents/frontend_engineer.toml) | Angular logic, forms, and calculations | gpt-6-luna / medium |
+| [firebase_engineer](agents/firebase_engineer.toml) | Data, AngularFire, authentication, and rules | gpt-6-luna / medium |
+| [ui_engineer](agents/ui_engineer.toml) | Presentation, responsive behavior, and accessibility | gpt-6-luna / medium |
+| [qa_reviewer](agents/qa_reviewer.toml) | Independent, read-only review | gpt-6-luna / medium |
 
-El modelo general es `gpt-6-luna` con esfuerzo `medium`; cada perfil fija su override.
-Estos valores reflejan los TOML actuales del proyecto de origen. Los roles específicos
-de videojuegos y Blender se adaptaron a necesidades de Xpenses.
-Se heredan permisos del cliente, salvo la restricción de solo lectura de QA.
-No se modifican ajustes globales ni servidores MCP.
+The default model is `gpt-6-luna` with `medium` effort; each profile sets its own override.
+These values reflect the current TOML files in this repository. The game-development and
+Blender-specific roles were adapted for Xpenses. Client permissions are inherited, except
+for QA's read-only restriction. Global settings and MCP servers are not changed.
 
-## Contexto y flujo
+## Context and workflow
 
-Leer [instrucciones compartidas](../AGENTS.md), [README](../README.md), [guía técnica del proyecto](../docs/project-guidelines.md) y
-[arquitectura](../.github/.architecture.md). Contrastar documentos con implementación:
-pueden contener descripciones históricas. Consultar .ai si se añade en el futuro.
+Read [shared instructions](../AGENTS.md), the [README](../README.md), the
+[project technical guide](../docs/project-guidelines.md), and the
+[architecture reference](../.github/.architecture.md). Compare documents with the
+implementation because they may contain historical descriptions. Consult `.ai` if it is
+added in the future.
 
-`AGENTS.md` reúne las reglas operativas; `docs/project-guidelines.md` es la fuente
-canónica de convenciones, contratos y reglas de negocio. Actualizar esa guía cuando
-cambie el comportamiento. El archivo de Copilot se conserva como copia de
-compatibilidad y no es una lectura requerida para Codex.
+`AGENTS.md` contains operational rules; `docs/project-guidelines.md` is the canonical source
+for conventions, contracts, and business rules. Update that guide when behavior changes.
+The former Copilot instructions were migrated into the technical guide and are no longer
+present as a compatibility copy; Codex does not need to read them.
 
-1. El Tech Lead define resultado, criterios, dependencias y archivos de cada tarea.
-2. Delega áreas independientes en los especialistas apropiados.
-3. Cada archivo tiene un único escritor y los contratos compartidos se acuerdan antes.
-4. Los especialistas entregan cambios y evidencia; QA revisa según riesgo.
-5. El Tech Lead integra y actualiza la documentación existente.
+1. The Tech Lead defines the outcome, criteria, dependencies, and files for each task.
+2. They delegate independent areas to suitable specialists.
+3. Each file has one writer, and shared contracts are agreed before implementation.
+4. Specialists deliver changes and evidence; QA reviews according to risk.
+5. The Tech Lead integrates the work and updates existing documentation.
 
-La delegación se aplica a solicitudes de desarrollo del propietario. No lanzar todos
-los agentes por defecto ni crear chats separados. Preservar cambios locales ajenos.
-Los perfiles no autorizan commits, despliegues ni migraciones de datos.
-Desarrollo y producción pueden compartir Firebase: usar emuladores/datos sintéticos
-y comprobar destino antes de probar escrituras.
+Delegation applies to development requests from the owner. Do not launch every agent by
+default or create separate chats. Preserve unrelated local changes. Profiles do not authorize
+commits, deployments, or data migrations. Development and production may share Firebase:
+use emulators or synthetic data and check the target before testing writes.
 
-## Uso
+## Usage
 
-En una nueva sesión de Xpenses, pedir por ejemplo:
+For example, in a new Xpenses session:
 
-> Usa tech_lead para desarrollar esta funcionalidad. Divide el trabajo y delega en frontend_engineer, firebase_engineer o ui_engineer según corresponda.
+> Use tech_lead to develop this feature. Divide the work and delegate to frontend_engineer, firebase_engineer, or ui_engineer as appropriate.
 
-> Delega en qa_reviewer la revisión de estos cambios; no implementes correcciones.
+> Delegate review of these changes to qa_reviewer; do not implement fixes.
 
-Crear estos archivos no inicia agentes. La sesión debe cargar los perfiles; si no están
-disponibles, abrir una nueva sesión del proyecto y comprobar la configuración del cliente.
-Los cambios no modifican el modelo de turnos que ya estén activos.
+Creating these files does not start agents. The session must load the profiles; if they are
+unavailable, start a new project session and check the client configuration. These changes
+do not alter the turn model of sessions that are already active.
 
-## Validación
+## Validation
 
-Para cambios de código, usar `npm run build` y pruebas pertinentes según `package.json`.
-Existe `npm test` (Angular/Karma); no existe `npm run check`.
-Para cambios solo de configuración, validar sintaxis TOML, nombres y rutas de perfiles.
-La validación de archivos no prueba la carga efectiva de agentes ni disponibilidad de modelos.
+For code changes, use `npm run build` and tests appropriate to the task, based on
+`package.json`. `npm test` is available (Angular/Karma); `npm run check` does not exist.
+For configuration-only changes, validate TOML syntax, names, and profile paths. File
+validation does not prove that agents loaded successfully or that models are available.
 
-Formato contrastado con [OpenAI Docs: subagentes](https://learn.chatgpt.com/docs/agent-configuration/subagents).
+Format checked against [OpenAI Docs: subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents).

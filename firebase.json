@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "target": "xpenses",
     "public": "dist/xpenses",
     "ignore": [
       "firebase.json",
