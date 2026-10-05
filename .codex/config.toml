@@ -1,0 +1,29 @@
+# Defaults copied from Long Dog Chaos; specialist overrides live in agents/*.toml.
+[agents]
+default_subagent_model = "gpt-6-luna"
+default_subagent_reasoning_effort = "medium"
+max_concurrent_threads_per_session = 4
+
+[agents.tech_lead]
+description = "Planifica y delega trabajo de Xpenses; coordina arquitectura, contratos, integración y continuidad."
+config_file = "./agents/tech_lead.toml"
+
+[agents.product_designer]
+description = "Define flujos, reglas de producto y criterios de aceptación para gastos, ingresos, cuotas y presupuestos."
+config_file = "./agents/product_designer.toml"
+
+[agents.frontend_engineer]
+description = "Implementa lógica Angular, formularios reactivos, flujos, cálculos y estado de Xpenses."
+config_file = "./agents/frontend_engineer.toml"
+
+[agents.firebase_engineer]
+description = "Implementa servicios AngularFire, autenticación, contratos de datos y reglas Firestore de Xpenses."
+config_file = "./agents/firebase_engineer.toml"
+
+[agents.ui_engineer]
+description = "Diseña e implementa interfaces móviles, formularios, gráficos y accesibilidad de Xpenses."
+config_file = "./agents/ui_engineer.toml"
+
+[agents.qa_reviewer]
+description = "Revisa regresiones, cálculos, seguridad de datos y evidencia de aceptación; trabaja en solo lectura."
+config_file = "./agents/qa_reviewer.toml"
