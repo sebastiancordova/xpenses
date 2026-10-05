@@ -67,7 +67,7 @@
         <div class="form-group" *ngIf="isCreditPaymentMethod">
           <label class="field-label" for="payment-method-billing-day">Día de facturación</label>
           <input id="payment-method-billing-day" type="number" min="1" max="28" inputmode="numeric" class="form-control payment-field payment-field--day" formControlName="billingCycleDay">
-          <small class="field-hint">Las compras y cuotas de esta tarjeta usarán este ciclo en el Dashboard.</small>
+          <small class="field-hint">El análisis del Dashboard parte este día y termina la víspera del siguiente período; los cargos de cuotas quedan programados para este día.</small>
         </div>
         <p class="field-error" role="alert" *ngIf="paymentMethodError">{{ paymentMethodError }}</p>
         <div class="payment-method-form__actions">

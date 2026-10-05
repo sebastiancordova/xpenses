@@ -126,9 +126,10 @@ $danger: #b42318;
   justify-content: center;
   padding: 0;
   width: 38px;
+  flex: none;
 }
 .month-nav__btn:disabled { cursor: not-allowed; opacity: .38; }
-.month-nav__label { color: $color-grey-darker; font-size: .92rem; font-weight: 800; min-width: 10.25rem; text-align: center; }
+.month-nav__label { color: $color-grey-darker; font-size: .92rem; font-weight: 800; min-width: 0; text-align: center; }
 .month-selector__range { align-items: center; color: $muted; display: flex; font-size: .72rem; font-weight: 700; gap: .35rem; justify-content: center; line-height: 1.35; margin: 0; }
 .month-selector__range i { color: $color-brand-primary; }
 .quick-action:focus-visible, .month-nav__btn:focus-visible { outline: 2px solid $color-brand-primary; }
@@ -151,7 +152,7 @@ $danger: #b42318;
   box-shadow: 0 8px 24px rgba(27, 32, 43, .07);
   overflow: hidden;
 }
-.daily-spend-card__header { align-items: center; display: flex; gap: 1rem; justify-content: space-between; padding: 1rem 1.25rem; }
+.daily-spend-card__header { align-items: flex-start; display: flex; gap: 1.25rem; justify-content: space-between; padding: 1.25rem; }
 .daily-spend-card__eyebrow { color: $color-brand-primary; display: block; font-size: .7rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 .daily-spend-card h2 { color: $color-grey-darker; font-size: 1rem; font-weight: 800; margin: .2rem 0; }
 .daily-spend-card__header p, .daily-spend-card__note { color: $muted; font-size: .76rem; line-height: 1.4; margin: 0; }
@@ -162,10 +163,9 @@ $danger: #b42318;
 .date-shortcut:hover { background: $color-milkier; }
 .date-shortcut:focus-visible, .daily-spend-card__date-input:focus-visible { outline: 2px solid $color-brand-primary; outline-offset: 2px; }
 .daily-spend-card__date-input { border: 1px solid $border; border-radius: 8px; color: $color-grey-darker; font-size: .82rem; font-weight: 700; min-height: 44px; padding: 0 .55rem; }
-.daily-spend-card__metrics { border-top: 1px solid $border; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.daily-spend-metric { display: flex; flex-direction: column; gap: .28rem; min-height: 112px; padding: 1rem 1.25rem; }
-.daily-spend-metric + .daily-spend-metric { border-left: 1px solid $border; }
-.daily-spend-metric--primary { background: #fcfaf9; }
+.daily-spend-card__metrics { display: grid; gap: .75rem; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0 1.25rem 1.25rem; }
+.daily-spend-metric { background: $color-milkier; border-radius: 8px; display: flex; flex-direction: column; gap: .5rem; min-width: 0; min-height: 112px; padding: 1rem; }
+.daily-spend-metric--primary { background: rgba($color-brand-primary, .07); }
 .daily-spend-metric__label { color: $muted; font-size: .69rem; font-weight: 800; line-height: 1.35; text-transform: uppercase; }
 .daily-spend-metric strong { color: $color-grey-darker; font-size: clamp(1.1rem, 2vw, 1.45rem); font-variant-numeric: tabular-nums; font-weight: 800; line-height: 1.15; overflow-wrap: anywhere; }
 .daily-spend-metric small { color: $muted; font-size: .72rem; line-height: 1.35; }
@@ -207,39 +207,33 @@ $danger: #b42318;
 .stat-card__watermark { bottom: .75rem; color: #fff; font-size: 3rem; opacity: .12; pointer-events: none; position: absolute; right: 1rem; }
 
 .budget-health-card, .dashboard-card, .expense-composition { padding: 1.2rem 1.25rem; }
-.budget-health-card__top { align-items: center; display: flex; gap: 1rem; justify-content: space-between; margin-bottom: .9rem; }
-.budget-health-card__left { align-items: baseline; display: flex; gap: .5rem; }
+.budget-health-card__left { align-items: baseline; display: flex; gap: 1rem; justify-content: space-between; }
 .budget-health-card__label, .dashboard-card__header, .kpi__label, .expense-composition__label { color: $muted; font-size: .72rem; font-weight: 800; text-transform: uppercase; }
-.budget-health-card__pct { font-size: 1.18rem; font-weight: 800; }
+.budget-health-card__pct { flex-shrink: 0; font-size: 1.18rem; font-variant-numeric: tabular-nums; font-weight: 800; }
 .budget-health-card__pct--ok, .kpi__value--good { color: $success; }
 .budget-health-card__pct--warn { color: $warning; }
 .budget-health-card__pct--danger, .kpi__value--bad { color: $danger; }
-.budget-health-card__kpis { align-items: center; display: flex; flex-wrap: wrap; gap: .65rem; }
-.kpi { align-items: flex-end; display: flex; flex-direction: column; min-width: 92px; }
+.kpi { align-items: flex-start; background: $color-milkier; border-radius: 8px; display: flex; flex-direction: column; gap: .35rem; min-width: 0; padding: .85rem; }
 .kpi__label { font-size: .68rem; }
 .kpi__value { color: $color-grey-darker; font-size: .86rem; font-variant-numeric: tabular-nums; font-weight: 800; overflow-wrap: anywhere; }
-.kpi--divider { background: $border; height: 2rem; min-width: 1px; width: 1px; }
 
 .budget-bar, .expense-composition__track, .category-item__bar { background: $color-milkier; border-radius: 999px; overflow: hidden; }
-.budget-bar { height: 10px; }
+.budget-bar { height: 10px; order: 1; }
 .budget-bar__fill, .expense-composition__fill, .category-item__bar-fill { display: block; height: 100%; }
 .budget-bar__fill--ok { background: $success; }
 .budget-bar__fill--warn { background: #d99000; }
 .budget-bar__fill--danger { background: $danger; }
 
-.expense-composition { align-items: center; display: grid; gap: 1rem; grid-template-columns: minmax(130px, auto) minmax(160px, 1fr) minmax(130px, auto); }
-.expense-composition__item { color: $muted; display: flex; flex-direction: column; font-size: .76rem; line-height: 1.35; }
-.expense-composition__item strong { color: $color-grey-darker; font-size: 1rem; font-variant-numeric: tabular-nums; }
-.expense-composition__item--right { text-align: right; }
-.expense-composition__track { display: flex; height: 12px; }
+.expense-composition { align-items: center; display: grid; gap: 1.25rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.expense-composition__item { color: $muted; display: flex; flex-direction: column; font-size: .76rem; gap: .35rem; line-height: 1.35; min-width: 0; }
+.expense-composition__item strong { color: $color-grey-darker; font-size: 1rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.expense-composition__track { display: flex; grid-column: 1 / -1; grid-row: 3; height: 12px; }
 .expense-composition__fill--variable { background: $color-brand-primary; }
 .expense-composition__fill--recurring { background: $color-brand-quaternary; }
 
 .dashboard-card { display: flex; flex-direction: column; }
 .dashboard-card__header { border-bottom: 1px solid $border; margin-bottom: 1rem; padding-bottom: .8rem; }
 .dashboard-card__header i { color: $color-brand-primary; }
-.dashboard-card__header--split { align-items: center; display: flex; gap: 1rem; justify-content: space-between; }
-.dashboard-card__header--split strong { color: $color-brand-primary; font-size: .9rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .dashboard-card__header--stack { display: flex; flex-direction: column; gap: .16rem; }
 .dashboard-card__header--stack small { color: $color-grey; font-size: .78rem; font-weight: 600; line-height: 1.45; text-transform: none; }
 .chart-container { align-items: center; display: flex; flex: 1; justify-content: center; min-height: 292px; position: relative; }
@@ -248,10 +242,9 @@ $danger: #b42318;
 .chart-reset { align-self: center; background: transparent; border: 0; color: $color-brand-primary; cursor: pointer; font-size: .78rem; font-weight: 800; min-height: 44px; padding: .4rem .65rem; }
 .chart-reset:focus-visible { outline: 2px solid $color-brand-primary; outline-offset: 2px; }
 
-.installment-item { align-items: center; border-bottom: 1px solid $border; display: flex; gap: 1rem; justify-content: space-between; padding: .72rem 0; }
-.installment-item:last-child { border-bottom: 0; }
+.installment-item { align-items: center; background: $color-milkier; border-radius: 8px; display: grid; gap: .75rem; grid-template-columns: minmax(0, 1fr) auto; padding: 1rem; }
 .installment-list, .installment-item__info { display: flex; flex-direction: column; }
-.installment-item__info { min-width: 0; }
+.installment-item__info { gap: .25rem; min-width: 0; overflow-wrap: anywhere; }
 .installment-item__title { color: $color-grey-darker; font-size: .88rem; font-weight: 800; line-height: 1.3; }
 .installment-item__sub { color: $muted; font-size: .76rem; line-height: 1.45; }
 .installment-item__amount { color: $color-grey-darker; flex-shrink: 0; font-size: .94rem; font-variant-numeric: tabular-nums; font-weight: 800; }
@@ -288,11 +281,6 @@ $danger: #b42318;
 }
 @media (max-width: $break-xs) {
   .quick-action { flex: 1; padding: 0 .75rem; }
-  .installment-item { align-items: flex-start; flex-direction: column; gap: .25rem; }
-}
-
-@media (min-width: $break-md) {
-  .installment-item { align-items: center; flex-direction: row; }
 }
 
 /* Dashboard v2: show the essentials first and keep analysis details on demand. */
@@ -301,15 +289,16 @@ $danger: #b42318;
 .stat-card__topline { margin-bottom: .5rem; }
 .stat-card__sub { font-size: .74rem; }
 .category-overview { padding: 1rem 1.15rem; }
+.category-overview__heading small { display: block; }
 .category-overview__content { align-items: center; display: grid; gap: 1rem; grid-template-columns: minmax(220px, .85fr) minmax(0, 1.35fr); }
 .chart-container { min-height: 250px; }
-.category-overview .chart-reset { display: flex; margin: 0 auto; }
+.category-overview__body .chart-reset { display: flex; margin: 0 auto; }
 .category-overview__excluded { color: $muted; font-size: .72rem; margin: -.25rem 0 .25rem; text-align: center; }
 .category-list { align-content: start; display: grid; gap: .6rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .category-item { background: #fbfcfe; border: 1px solid $border; border-radius: 10px; padding: .72rem; }
 .category-item--excluded { background: #f7f2ef; }
 .category-item__expand { align-items: flex-start; background: transparent; border: 0; border-radius: 6px; color: inherit; cursor: pointer; display: flex; gap: .35rem; justify-content: space-between; line-height: 1.25; min-height: 44px; padding: .45rem 0; text-align: left; width: 100%; }
-.category-item__expand:focus-visible, .category-item__exclude:focus-visible { border-radius: 6px; outline: 2px solid $color-brand-primary; outline-offset: 2px; }
+.category-item__expand:focus-visible, .analysis-toggle:focus-visible { border-radius: 6px; outline: 2px solid $color-brand-primary; outline-offset: 2px; }
 .category-item__identity { align-items: flex-start; display: flex; min-width: 0; }
 .category-item__name { font-size: .78rem; font-weight: 700; line-height: 1.3; overflow-wrap: break-word; }
 .category-item__dot { flex: 0 0 8px; height: 8px; margin: .22rem .4rem 0 0; width: 8px; }
@@ -319,33 +308,45 @@ $danger: #b42318;
 .category-item__chevron { align-self: center; color: $color-brand-primary; flex: 0 0 auto; font-size: .66rem; margin-left: .1rem; transition: transform .18s ease; }
 .category-item__chevron--open { transform: rotate(180deg); }
 .category-item__footer { align-items: center; display: flex; gap: .5rem; justify-content: space-between; margin-top: .18rem; }
-.category-item__exclude { align-items: center; background: #fff; border: 1px solid $border; border-radius: 7px; color: $muted; cursor: pointer; display: flex; font-size: .68rem; font-weight: 750; justify-content: center; min-height: 44px; min-width: 3.5rem; padding: 0 .4rem; white-space: nowrap; }
-.category-item__exclude:hover { border-color: $color-brand-primary; color: $color-brand-primary; }
+.analysis-toggle { align-items: center; background: transparent; border: 0; border-radius: 6px; color: $color-brand-primary; cursor: pointer; display: flex; font-size: .75rem; font-weight: 700; gap: .5rem; line-height: 1.3; margin-top: .4rem; min-height: 44px; padding: .4rem 0; text-align: left; touch-action: manipulation; width: 100%; transition: background-color .18s ease; }
+.analysis-toggle:hover, .analysis-toggle:active { background: rgba($color-brand-primary, .07); }
+.analysis-toggle__check { align-items: center; background: $color-brand-primary; border: 1px solid $color-brand-primary; border-radius: 4px; color: #fff; display: inline-flex; flex: 0 0 18px; font-size: .6rem; height: 18px; justify-content: center; }
+.analysis-toggle--off { color: $muted; }
+.analysis-toggle--off .analysis-toggle__check { background: transparent; border-color: $muted; }
 .category-item__bar { height: 4px; margin-top: .55rem; }
 .category-item__details { border-top: 1px solid $border; margin-top: .55rem; padding-top: .4rem; }
 .category-subcategory { color: $muted; display: grid; font-size: .75rem; gap: .12rem; line-height: 1.35; padding: .3rem 0; }
 .category-subcategory > span { min-width: 0; overflow-wrap: break-word; }
 .category-subcategory strong { color: $color-grey-dark; font-size: .75rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.category-installments { border-top: 1px solid $border; margin-top: 1.5rem; padding-top: 1.25rem; }
+.category-installments__header { align-items: baseline; display: flex; flex-wrap: wrap; gap: .5rem 1rem; justify-content: space-between; }
+.category-installments h2 { color: $color-grey-darker; font-size: 1rem; font-weight: 800; margin: 0 0 .35rem; }
+.category-installments__header p, .category-installments__note { color: $muted; font-size: .8rem; line-height: 1.5; margin: 0; }
+.category-installments__amount { color: $color-grey-darker; font-size: 1rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.category-installments__note { margin-top: .6rem; }
+.category-installments > .analysis-toggle { width: auto; }
+.category-installments .installment-list { border-top: 1px solid $border; gap: .75rem; margin-top: .5rem; padding-top: 1rem; }
 .dashboard-disclosure { background: #fff; border: 1px solid $border; border-radius: 10px; box-shadow: 0 5px 18px rgba(27, 32, 43, .045); overflow: hidden; }
-.dashboard-disclosure > summary, .installments-disclosure summary { align-items: center; color: $color-grey-darker; cursor: pointer; display: flex; gap: 1rem; justify-content: space-between; list-style: none; min-height: 68px; padding: .85rem 1rem; touch-action: manipulation; }
-.dashboard-disclosure > summary::-webkit-details-marker, .installments-disclosure summary::-webkit-details-marker { display: none; }
-.dashboard-disclosure > summary > span, .installments-disclosure summary > .installments-disclosure__copy { display: grid; gap: .18rem; }
-.dashboard-disclosure > summary strong, .installments-disclosure summary strong { font-size: .9rem; }
-.dashboard-disclosure > summary small, .installments-disclosure summary small { color: $muted; font-size: .74rem; line-height: 1.35; }
+.dashboard-disclosure > summary { align-items: center; color: $color-grey-darker; cursor: pointer; display: flex; gap: 1rem; justify-content: space-between; list-style: none; min-height: 68px; padding: .85rem 1rem; touch-action: manipulation; }
+.dashboard-disclosure > summary::-webkit-details-marker { display: none; }
+.dashboard-disclosure > summary > span { display: grid; gap: .35rem; min-width: 0; }
+.dashboard-disclosure > summary strong { font-size: .9rem; }
+.dashboard-disclosure > summary small { color: $muted; font-size: .74rem; line-height: 1.35; }
 .dashboard-disclosure > summary > i { color: $color-brand-primary; transition: transform .18s ease; }
-.dashboard-disclosure[open] > summary > i, .installments-disclosure details[open] > summary > i { transform: rotate(180deg); }
-.dashboard-disclosure > .daily-spend-card, .dashboard-disclosure > .budget-health-card, .dashboard-disclosure > .expense-composition, .dashboard-disclosure > .installments-disclosure { border-radius: 0; box-shadow: none; margin: 0; }
-.dashboard-disclosure > .daily-spend-card, .dashboard-disclosure > .budget-health-card, .dashboard-disclosure > .expense-composition, .dashboard-disclosure > .installments-disclosure { border-top: 1px solid $border; }
-.dashboard-disclosure > .daily-spend-card { border-left: 0; border-right: 0; }
-.dashboard-disclosure > .budget-health-card, .dashboard-disclosure > .expense-composition { border-bottom: 0; border-left: 0; border-right: 0; }
-.installments-disclosure { border-top: 1px solid $border; }
-.installments-disclosure__amount { color: $color-brand-primary; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.installments-disclosure__toggle { align-items: center; color: $muted; display: inline-flex; flex: 0 0 auto; font-size: .72rem; font-weight: 800; gap: .45rem; justify-content: flex-end; min-height: 44px; min-width: 6.1rem; }
-.installments-disclosure__chevron { color: $color-brand-primary; transition: transform .18s ease; }
-.installments-disclosure details[open] .installments-disclosure__chevron { transform: rotate(180deg); }
-.installments-disclosure__actions { border-bottom: 1px solid $border; padding: 0 1rem .35rem; text-align: right; }
-.installments-disclosure .installment-list { padding: 0 1rem .7rem; }
-.dashboard-disclosure > summary:focus-visible, .installments-disclosure summary:focus-visible { outline: 2px solid $color-brand-primary; outline-offset: -3px; }
+.dashboard-disclosure[open] > summary > i { transform: rotate(180deg); }
+.dashboard-disclosure__body { background: $color-milkier; border-top: 1px solid $border; display: grid; gap: 1.25rem; padding: 1rem; }
+.dashboard-disclosure__body > section, .dashboard-budget-group { background: #fff; border: 1px solid $border; border-radius: 12px; box-shadow: none; margin: 0; min-width: 0; overflow: hidden; }
+.dashboard-budget-group .budget-health-card { border: 0; border-radius: 0; box-shadow: none; margin: 0; }
+.analysis-section-title { color: $color-grey-darker; font-size: 1rem; font-weight: 800; line-height: 1.4; margin: 0 0 1rem; }
+.expense-composition > .analysis-section-title { grid-column: 1 / -1; margin: 0; }
+.calculation-note { border-top: 1px solid $border; }
+.calculation-note > summary { align-items: center; color: $color-brand-primary; cursor: pointer; display: flex; font-size: .8rem; font-weight: 700; gap: .75rem; justify-content: space-between; list-style: none; min-height: 48px; padding: .75rem 1.25rem; }
+.calculation-note > summary::-webkit-details-marker { display: none; }
+.calculation-note > summary > span { align-items: center; display: flex; gap: .5rem; }
+.calculation-note > summary:focus-visible { outline: 2px solid $color-brand-primary; outline-offset: -3px; }
+.calculation-note[open] > summary > i { transform: rotate(180deg); }
+.calculation-note .daily-spend-card__note { background: #fff; display: block; padding-top: 0; }
+.dashboard-disclosure > summary:focus-visible { outline: 2px solid $color-brand-primary; outline-offset: -3px; }
 
 .insight-message { align-items: flex-start; border-left: 3px solid; display: flex; gap: .75rem; margin: 0; padding: 1rem 1.1rem; }
 .insight-message > i { flex: 0 0 auto; margin-top: .12rem; }
@@ -360,11 +361,23 @@ $danger: #b42318;
 .insight-message--warn > i { color: $warning; }
 .insight-message--danger { background: #fff2f0; border-color: $danger; }
 .insight-message--danger > i { color: $danger; }
-.dashboard-disclosure > .insight-message { border-bottom: 1px solid $border; border-left-width: 0; border-top: 1px solid $border; }
-.dashboard-disclosure > .insight-message--empty { box-shadow: inset 3px 0 $muted; }
-.dashboard-disclosure > .insight-message--ok { box-shadow: inset 3px 0 $success; }
-.dashboard-disclosure > .insight-message--warn { box-shadow: inset 3px 0 $warning; }
-.dashboard-disclosure > .insight-message--danger { box-shadow: inset 3px 0 $danger; }
+.dashboard-budget-group .insight-message { border-bottom: 1px solid $border; padding: 1.1rem 1.25rem; }
+
+.budget-health-card { display: flex; flex-direction: column; gap: 1rem; }
+.budget-health-card__top { display: contents; }
+.budget-health-card__kpis { display: grid; gap: .75rem; grid-template-columns: repeat(3, minmax(0, 1fr)); order: 2; }
+.kpi--divider { display: none; }
+@media (max-width: $break-sm) {
+  .dashboard-disclosure__body { gap: 1rem; padding: .75rem; }
+  .daily-spend-card__header { padding: 1rem; }
+  .daily-spend-card__metrics { padding: 0 1rem 1rem; }
+  .daily-spend-card__controls { gap: .75rem; }
+  .daily-spend-card__date-input { font-size: 1rem; max-width: 100%; min-width: 0; }
+  .budget-health-card, .expense-composition { padding: 1rem; }
+  .budget-health-card__kpis { grid-template-columns: 1fr; }
+  .kpi { align-items: baseline; flex-direction: row; flex-wrap: wrap; gap: .35rem .75rem; justify-content: space-between; }
+  .dashboard-budget-group .insight-message { padding: 1rem; }
+}
 
 @media (max-width: $break-md) {
   .category-overview__content { grid-template-columns: minmax(0, 1fr); }
@@ -375,26 +388,13 @@ $danger: #b42318;
   .stat-card__value { font-size: clamp(1.05rem, 5vw, 1.4rem); }
   .stat-card__sub { font-size: .68rem; }
   .category-overview { padding: .9rem; }
+  .category-overview .dashboard-card__header--stack { gap: .5rem; }
   .category-list { gap: .5rem; }
   .category-item { padding: .62rem; }
   .daily-spend-card__header { align-items: stretch; flex-direction: column; }
   .daily-spend-card__controls { justify-content: flex-start; }
   .daily-spend-card__metrics { grid-template-columns: 1fr; }
   .daily-spend-metric { min-height: 0; }
-  .daily-spend-metric + .daily-spend-metric { border-left: 0; border-top: 1px solid $border; }
-  .budget-health-card__top { align-items: stretch; flex-direction: column; }
-  .budget-health-card__kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .kpi { align-items: flex-start; background: #f6f7fb; border-radius: 8px; min-width: 0; padding: .65rem; }
-  .kpi--divider { display: none; }
-  .expense-composition { grid-template-columns: 1fr; }
-  .expense-composition__item--right { text-align: left; }
-}
-@media (max-width: $break-xs) {
-  .budget-health-card__kpis { grid-template-columns: 1fr; }
-  .installments-disclosure summary { flex-wrap: wrap; gap: .25rem .75rem; }
-  .installments-disclosure summary > span:first-child { flex: 1 1 calc(100% - 7rem); }
-  .installments-disclosure__amount { margin-left: auto; }
-  .installments-disclosure__toggle { min-width: auto; }
 }
 
 @media (max-width: 359px) {
@@ -406,5 +406,6 @@ $danger: #b42318;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .installments-disclosure__chevron, .category-item__chevron, .dashboard-disclosure > summary > i { transition: none; }
+  .analysis-toggle { transition: none; }
+  .category-item__chevron, .dashboard-disclosure > summary > i { transition: none; }
 }

@@ -82,8 +82,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
   get billingCycleDescription(): string {
     const day = Number(this.billingCycleDay?.value);
     if (!Number.isFinite(day) || day < 1 || day > 28) return 'Elige un día entre 1 y 28.';
-    if (day === 1) return 'Tu período cierra el día 1; el siguiente comienza el día 2.';
-    return `Tu período va del día ${day + 1} al ${day} del mes siguiente.`;
+    if (day === 1) return 'El Dashboard analiza del día 1 al último día del mes; el cargo de cuota queda programado para el día 1.';
+    return `El Dashboard analiza del día ${day} hasta la víspera del mismo día el mes siguiente; los cargos de cuotas quedan programados para el día ${day}.`;
   }
 
   changeRate(controlName: 'savingsRate' | 'variableRate', change: number): void {

@@ -20,6 +20,8 @@ import { UserPreferencesService } from './user-preferences.service';
 import { PaymentMethodsService } from './payment-methods.service';
 import { PaymentMethod } from '@core/models/payment-method';
 
+export type InstallmentCycleSelection = 'payment-date' | 'billing-cycle';
+
 @Injectable({ providedIn: 'root' })
 export class InstallmentPurchasesService {
   private firestore = inject(Firestore);
@@ -44,11 +46,11 @@ export class InstallmentPurchasesService {
   }
 
   /**
-   * Returns every purchase with a scheduled installment in [start, end].
-   * Completed purchases are intentionally included so historical dashboards
-   * show the installment that belonged to that past statement.
+   * Returns purchases with a scheduled installment in [start, end]. Completed
+   * purchases remain visible in closed historical cycles, while a purchase
+   * completed by the reference date is omitted from the current or a future cycle.
    */
-  getInstallmentsForCycle(start: Date, end: Date, paymentMethodId?: string, legacyPaymentMethodId?: string): Observable<InstallmentPurchase[]> {
+  getInstallmentsForCycle(start: Date, end: Date, paymentMethodId?: string, legacyPaymentMethodId?: string, referenceDate = new Date(), selection: InstallmentCycleSelection = 'payment-date'): Observable<InstallmentPurchase[]> {
     const uid = this.userService.currentUserValue.uid;
     if (!uid) return of([]);
     const colRef = collection(this.firestore, this.colPath()) as CollectionReference<InstallmentPurchase>;
@@ -57,12 +59,27 @@ export class InstallmentPurchasesService {
     return combineLatest([purchases$, this.preferencesService.getPreferences(), this.paymentMethodsService.getAll()]).pipe(
       map(([purchases, preferences, methods]) => this.applyPaymentMethods(purchases, methods, preferences.billingCycleDay)),
       tap(purchases => this.syncCalculatedStatuses(purchases)),
-      map(purchases => purchases.filter(p =>
-        p.startDate &&
-        (!paymentMethodId || (p.paymentMethodId ?? legacyPaymentMethodId) === paymentMethodId) &&
-        this.hasPaymentInCycle(p, start, end)
-      ))
+      map(purchases => this.filterInstallmentsForCycle(purchases, start, end, paymentMethodId, legacyPaymentMethodId, referenceDate, selection))
     );
+  }
+
+  /** Pure selection step used after payment method fallbacks have been applied. */
+  filterInstallmentsForCycle(
+    purchases: InstallmentPurchase[],
+    start: Date,
+    end: Date,
+    paymentMethodId?: string,
+    legacyPaymentMethodId?: string,
+    referenceDate = new Date(),
+    selection: InstallmentCycleSelection = 'payment-date'
+  ): InstallmentPurchase[] {
+    const isHistoricalCycle = end < this.startOfDay(referenceDate);
+    return purchases.filter(p => {
+      if (!p.startDate || (paymentMethodId && (p.paymentMethodId ?? legacyPaymentMethodId) !== paymentMethodId)) return false;
+      const startDate = p.startDate.toDate();
+      if (!isHistoricalCycle && this.isCompleted(startDate, p.paymentDay, p.totalInstallments, referenceDate)) return false;
+      return this.getInstallmentInCycle(p, start, end, selection) !== null;
+    });
   }
 
   async save(purchase: InstallmentPurchase): Promise<any> {
@@ -97,14 +114,15 @@ export class InstallmentPurchasesService {
 
   /**
    * Returns the first calendar date on which the first payment is due.
-   * If the purchase started before or on paymentDay of the same month → same month.
+   * If the purchase started before paymentDay of the same month → same month.
    * If it started after paymentDay → next month.
    */
   getFirstPaymentDate(startDate: Date, paymentDay: number): Date {
-    if (startDate.getDate() <= paymentDay) {
-      return new Date(startDate.getFullYear(), startDate.getMonth(), paymentDay);
+    const effectivePaymentDay = this.clampDay(startDate.getFullYear(), startDate.getMonth(), paymentDay);
+    if (startDate.getDate() < effectivePaymentDay) {
+      return this.getPaymentDate(startDate.getFullYear(), startDate.getMonth(), paymentDay);
     }
-    return new Date(startDate.getFullYear(), startDate.getMonth() + 1, paymentDay);
+    return this.getPaymentDate(startDate.getFullYear(), startDate.getMonth() + 1, paymentDay);
   }
 
   /**
@@ -128,7 +146,7 @@ export class InstallmentPurchasesService {
     const firstPayment = this.getFirstPaymentDate(startDate, paymentDay);
     let count = 0;
     for (let i = 0; i < total; i++) {
-      const paymentDate = new Date(firstPayment.getFullYear(), firstPayment.getMonth() + i, paymentDay);
+      const paymentDate = this.getPaymentDate(firstPayment.getFullYear(), firstPayment.getMonth() + i, paymentDay);
       if (paymentDate < today) count++;
       else break;
     }
@@ -145,13 +163,16 @@ export class InstallmentPurchasesService {
   }
 
   /** Returns the 1-based installment scheduled within a dashboard period. */
-  getInstallmentInCycle(p: InstallmentPurchase, start: Date, end: Date): number | null {
+  getInstallmentInCycle(p: InstallmentPurchase, start: Date, end: Date, selection: InstallmentCycleSelection = 'payment-date'): number | null {
     const startDate = p.startDate.toDate();
     const firstPayment = this.getFirstPaymentDate(startDate, p.paymentDay);
     for (let i = 0; i < p.totalInstallments; i++) {
-      const paymentDate = new Date(firstPayment.getFullYear(), firstPayment.getMonth() + i, p.paymentDay);
-      if (paymentDate >= start && paymentDate <= end) return i + 1;
-      if (paymentDate > end) break;
+      const paymentDate = this.getPaymentDate(firstPayment.getFullYear(), firstPayment.getMonth() + i, p.paymentDay);
+      const attributedDate = selection === 'billing-cycle'
+        ? this.getPaymentDate(paymentDate.getFullYear(), paymentDate.getMonth() - 1, p.paymentDay)
+        : paymentDate;
+      if (attributedDate >= start && attributedDate <= end) return i + 1;
+      if (attributedDate > end) break;
     }
     return null;
   }
@@ -197,5 +218,14 @@ export class InstallmentPurchasesService {
 
   private startOfDay(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  private clampDay(year: number, month: number, day: number): number {
+    return Math.min(day, new Date(year, month + 1, 0).getDate());
+  }
+
+  getPaymentDate(year: number, month: number, day: number): Date {
+    const date = new Date(year, month, 1);
+    return new Date(date.getFullYear(), date.getMonth(), this.clampDay(date.getFullYear(), date.getMonth(), day));
   }
 }

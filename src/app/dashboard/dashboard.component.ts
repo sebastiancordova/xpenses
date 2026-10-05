@@ -15,6 +15,9 @@ import { BaseChartDirective } from 'ng2-charts';
 import { EMPTY, Subject, catchError, combineLatest, defer, firstValueFrom, map, of, switchMap, take, takeUntil, timeout } from 'rxjs';
 import { PaymentMethod } from '@core/models/payment-method';
 import { PaymentMethodsService } from '@core/services/payment-methods.service';
+import { FixedExpenseCharge } from '@core/models/fixed-expense-charge';
+import { FixedExpenseChargesService } from '@core/services/fixed-expense-charges.service';
+import { confirmedFixedChargesInRange, summarizeFixedCharges } from '@core/utils/fixed-expense-charges.utils';
 
 interface CategoryBreakdownItem {
   category: string;
@@ -40,11 +43,12 @@ interface DashboardLoadRequest {
 
 type DashboardLoadResult = {
   request: DashboardLoadRequest;
-  data: [Expense[], FixedExpense[], SubscriptionModel[], Income[], InstallmentPurchase[]] | null;
+  data: [Expense[], FixedExpense[], SubscriptionModel[], Income[], InstallmentPurchase[], FixedExpenseCharge[]] | null;
 };
 
 interface SpendComparisonRequest {
   currentStart: Date; currentEnd: Date; previousStart: Date; previousEnd: Date;
+  currentPeriodEnd: Date; previousPeriodEnd: Date;
   paymentMethodId: string; legacyPaymentMethodId?: string;
 }
 
@@ -74,6 +78,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private expensesService = inject(ExpensesService);
   private fixedExpensesService = inject(FixedExpensesService);
+  private fixedExpenseChargesService = inject(FixedExpenseChargesService);
   private subscriptionsService = inject(SubscriptionsService);
   private incomesService = inject(IncomesService);
   private installmentPurchasesService = inject(InstallmentPurchasesService);
@@ -108,6 +113,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public adjustedChartTotal = 0;
   public totalVariable = 0;
   public totalFixedAndSubs = 0;
+  public estimatedFixedAmount = 0;
   public totalIncome = 0;
   public variableExpensesCount = 0;
   public isLoading = false;
@@ -140,6 +146,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private unfilteredTotal = 0;
   private chartItems: CategoryChartItem[] = [];
   public expandedCategory = '';
+  /** Presentation-only visibility; category analysis starts expanded for each Dashboard instance. */
+  public isCategoryOverviewVisible = true;
 
   private readonly chartColors = [
     '#876656', '#00a98f', '#3b82f6', '#b45309',
@@ -170,7 +178,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.fixedExpensesService.getAll(request.paymentMethodId, request.legacyPaymentMethodId),
           this.subscriptionsService.getAll(request.paymentMethodId, request.legacyPaymentMethodId),
           this.incomesService.getForPeriod(request.incomePeriod),
-          this.installmentPurchasesService.getInstallmentsForCycle(request.startDate, request.endDate, request.paymentMethodId, request.legacyPaymentMethodId),
+          this.installmentPurchasesService.getInstallmentsForCycle(request.startDate, request.endDate, request.paymentMethodId, request.legacyPaymentMethodId, new Date(), this.selectedPaymentMethod?.type === 'credit' ? 'billing-cycle' : 'payment-date'),
+          this.fixedExpenseChargesService.getAll(),
         ])).pipe(
           take(1),
           timeout(10000),
@@ -193,11 +202,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.comparisonRequests$.pipe(
       switchMap(request => {
         if (!request) return EMPTY;
-        return this.expensesService.getAll(request.currentStart, request.currentEnd, request.paymentMethodId, request.legacyPaymentMethodId).pipe(
+        return combineLatest([
+          this.expensesService.getAll(request.currentStart, request.currentEnd, request.paymentMethodId, request.legacyPaymentMethodId),
+          this.expensesService.getAll(request.previousStart, request.previousEnd, request.paymentMethodId, request.legacyPaymentMethodId),
+          this.fixedExpenseChargesService.getAll(),
+          this.subscriptionsService.getAll(request.paymentMethodId, request.legacyPaymentMethodId),
+          this.installmentPurchasesService.getInstallmentsForCycle(request.currentStart, request.currentPeriodEnd, request.paymentMethodId, request.legacyPaymentMethodId, new Date(), this.selectedPaymentMethod?.type === 'credit' ? 'billing-cycle' : 'payment-date'),
+          this.installmentPurchasesService.getInstallmentsForCycle(request.previousStart, request.previousPeriodEnd, request.paymentMethodId, request.legacyPaymentMethodId, new Date(), this.selectedPaymentMethod?.type === 'credit' ? 'billing-cycle' : 'payment-date')
+        ]).pipe(
           take(1), timeout(10000),
-          switchMap(current => this.expensesService.getAll(request.previousStart, request.previousEnd, request.paymentMethodId, request.legacyPaymentMethodId).pipe(
-            take(1), timeout(10000), map(previous => ({ current, previous }))
-          )),
+          map(([current, previous, charges, subscriptions, currentInstallments, previousInstallments]) => ({
+            // Subscriptions have no monthly snapshots or charge day. Apply their
+            // current monthly commitment once to each comparison, never as a payment.
+            // Direct records use the comparable cutoff; recurring commitments
+            // belong to the complete billing cycle, regardless of their charge day.
+            current: [...current, ...confirmedFixedChargesInRange(charges, request.currentStart, request.currentPeriodEnd, request.paymentMethodId, request.legacyPaymentMethodId), ...subscriptions, ...currentInstallments.map(purchase => ({ amount: purchase.installmentAmount }))],
+            previous: [...previous, ...confirmedFixedChargesInRange(charges, request.previousStart, request.previousPeriodEnd, request.paymentMethodId, request.legacyPaymentMethodId), ...subscriptions, ...previousInstallments.map(purchase => ({ amount: purchase.installmentAmount }))]
+          })),
           map(data => ({ data, error: false })), catchError(() => of({ data: null, error: true }))
         );
       }), takeUntil(this.unsubscribe$)
@@ -247,17 +268,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         endDate: new Date(year, month + 1, 0, 23, 59, 59, 999)
       };
     }
-    const cycleDay = this.selectedPaymentMethod.billingCycleDay ?? this.prefs.billingCycleDay ?? 19;
+    const cycleStartDay = this.selectedPaymentMethod.billingCycleDay ?? this.prefs.billingCycleDay ?? 19;
 
-    // The selected month identifies when the statement begins. It must not
-    // depend on displayDate's day, because navigation intentionally uses day 1.
-    // With a 19th closing date, September is always 20 Sep–19 Oct.
+    // The selected month identifies the cycle's start month. Clamp each
+    // month's start independently, then end the cycle one day before the next.
     const daysInStartMonth = new Date(year, month + 1, 0).getDate();
-    const startDate = cycleDay >= daysInStartMonth
-      ? new Date(year, month + 1, 1, 0, 0, 0, 0)
-      : new Date(year, month, cycleDay + 1, 0, 0, 0, 0);
-    const endMonthDays = new Date(year, month + 2, 0).getDate();
-    const endDate = new Date(year, month + 1, Math.min(cycleDay, endMonthDays), 23, 59, 59, 999);
+    const daysInNextMonth = new Date(year, month + 2, 0).getDate();
+    const startDate = new Date(year, month, Math.min(cycleStartDay, daysInStartMonth), 0, 0, 0, 0);
+    const nextStartDate = new Date(year, month + 1, Math.min(cycleStartDay, daysInNextMonth), 0, 0, 0, 0);
+    const endDate = new Date(nextStartDate.getFullYear(), nextStartDate.getMonth(), nextStartDate.getDate() - 1, 23, 59, 59, 999);
 
     return { startDate, endDate };
   }
@@ -292,8 +311,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     data: NonNullable<DashboardLoadResult['data']>,
     request: DashboardLoadRequest
   ): void {
-    const [expenses, fixedExpenses, subscriptions, incomes, installments] = data;
-    const totalFixed = fixedExpenses.reduce((acc, e) => acc + +e.amount, 0);
+    const [expenses, fixedExpenses, subscriptions, incomes, installments, charges] = data;
+    const fixedSummary = summarizeFixedCharges(fixedExpenses, charges, this.getFixedExpenseEstimatePeriod(request.endDate), request.startDate, request.endDate, request.paymentMethodId, request.legacyPaymentMethodId);
+    const totalFixed = fixedSummary.totalAmount;
+    this.estimatedFixedAmount = fixedSummary.estimatedAmount;
     const totalSubs = subscriptions.reduce((acc, s) => acc + +s.amount, 0);
     const totalInstall = installments.reduce((acc, p) => acc + +p.installmentAmount, 0);
     const totalVar = expenses.reduce((acc, e) => acc + +e.amount, 0);
@@ -468,15 +489,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
   }
 
-  /** Calendar month shown in the dashboard, used for monthly income records. */
+  /** Calendar reference month used for global incomes and savings. */
   get incomePeriod(): string {
     return `${this.displayDate.getFullYear()}-${String(this.displayDate.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  get incomeMonthLabel(): string {
+    return `${this.months[this.displayDate.getMonth()].toLowerCase()} ${this.displayDate.getFullYear()}`;
+  }
+
+  get fixedExpenseEstimateMonthLabel(): string {
+    const date = this.periodEndDate instanceof Date && Number.isFinite(this.periodEndDate.getTime())
+      ? this.periodEndDate
+      : this.getPeriodDates().endDate;
+    return `${this.months[date.getMonth()].toLowerCase()} ${date.getFullYear()}`;
+  }
+
+  private getFixedExpenseEstimatePeriod(periodEnd: Date): string {
+    return `${periodEnd.getFullYear()}-${String(periodEnd.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  get periodSelectorLabel(): string {
+    return this.selectedPaymentMethod?.type === 'credit'
+      ? this.periodRangeLabel
+      : `${this.months[this.displayDate.getMonth()]} ${this.displayDate.getFullYear()}`;
+  }
+
+  get periodContextLabel(): string {
+    return this.selectedPaymentMethod?.type === 'credit' ? 'Ciclo de facturación' : 'Mes calendario';
   }
 
   getInstallmentNumber(p: InstallmentPurchase): number {
     if (!p.startDate) return 1;
     return this.installmentPurchasesService.getInstallmentInCycle(
-      p, this.periodStartDate, this.periodEndDate
+      p, this.periodStartDate, this.periodEndDate, this.selectedPaymentMethod?.type === 'credit' ? 'billing-cycle' : 'payment-date'
     ) ?? 1;
   }
 
@@ -514,14 +560,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   get periodRangeLabel(): string {
-    return `${this.formatShortDate(this.periodStartDate)} - ${this.formatShortDate(this.periodEndDate, true)}`;
+    const crossesYear = this.periodStartDate.getFullYear() !== this.periodEndDate.getFullYear();
+    return `${this.formatShortDate(this.periodStartDate, crossesYear)} – ${this.formatShortDate(this.periodEndDate, true)}`;
   }
 
   private getCurrentPeriodReferenceDate(): Date {
     const now = new Date();
     if (this.selectedPaymentMethod?.type !== 'credit') return new Date(now.getFullYear(), now.getMonth(), 1);
-    const closingDay = this.selectedPaymentMethod.billingCycleDay ?? this.prefs.billingCycleDay ?? 19;
-    const cycleStartMonth = now.getDate() <= closingDay ? now.getMonth() - 1 : now.getMonth();
+    const cycleStartDay = this.selectedPaymentMethod.billingCycleDay ?? this.prefs.billingCycleDay ?? 19;
+    const effectiveStartDay = Math.min(cycleStartDay, new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate());
+    const cycleStartMonth = now.getDate() < effectiveStartDay ? now.getMonth() - 1 : now.getMonth();
     return new Date(now.getFullYear(), cycleStartMonth, 1);
   }
 
@@ -831,6 +879,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.comparisonRequests$.next({
       currentStart, currentEnd: this.endOfDay(currentEnd), previousStart,
       previousEnd: this.endOfDay(previousEnd), paymentMethodId: this.selectedPaymentMethod.uid,
+      currentPeriodEnd: this.endOfDay(periodEnd), previousPeriodEnd: this.endOfDay(previous.endDate),
       legacyPaymentMethodId: this.legacyPaymentMethodId
     });
   }
@@ -844,7 +893,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return `${this.formatShortDate(previous.startDate)} – ${this.formatShortDate(this.comparisonPreviousEnd, true)}`;
   }
 
-  private sumExpenseAmounts(expenses: Expense[]): number {
+  private sumExpenseAmounts(expenses: Array<{ amount: string }>): number {
     return expenses.reduce((total, expense) => total + (+expense.amount || 0), 0);
   }
 

@@ -16,12 +16,12 @@
     <form [formGroup]="filtersForm">
       <div class="filters-layout">
         <div class="income-period-picker">
-          <span class="income-period-picker__label">Mes de ingresos</span>
+          <span class="income-period-picker__label">Mes calendario de ingresos</span>
           <div class="income-period-picker__controls">
             <button type="button" class="period-nav-button" (click)="previousMonth()" aria-label="Ver mes anterior">
               <i class="fas fa-chevron-left" aria-hidden="true"></i>
             </button>
-            <label class="sr-only" for="income-period">Mes de ingresos</label>
+            <label class="sr-only" for="income-period">Mes calendario de ingresos</label>
             <input id="income-period" type="month" formControlName="period" class="form-control period-input" />
             <button type="button" class="period-nav-button" (click)="nextMonth()" [disabled]="isCurrentMonth" aria-label="Ver mes siguiente">
               <i class="fas fa-chevron-right" aria-hidden="true"></i>

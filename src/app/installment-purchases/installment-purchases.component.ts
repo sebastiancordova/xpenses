@@ -95,7 +95,7 @@ export class InstallmentPurchasesComponent implements OnInit, OnDestroy {
   getEndingDate(p: InstallmentPurchase): string {
     if (!p.startDate) return '';
     const first = this.service.getFirstPaymentDate(p.startDate.toDate(), p.paymentDay);
-    const last = new Date(first.getFullYear(), first.getMonth() + p.totalInstallments - 1, p.paymentDay);
+    const last = this.service.getPaymentDate(first.getFullYear(), first.getMonth() + p.totalInstallments - 1, p.paymentDay);
     return `${this.months[last.getMonth()]} ${last.getFullYear()}`;
   }
 
