@@ -2,6 +2,55 @@
 
 :host { display: block; }
 
+.monthly-filters { display: grid; gap: 1rem; }
+.monthly-navigation {
+  display: flex; gap: .5rem; align-items: center; justify-content: space-between;
+  label { display: block; margin: 0; color: $color-grey; font-size: .85rem; }
+  input { width: 100%; min-width: 0; border: 0; color: $color-grey-darker; background: transparent; font-size: 1rem; min-height: 44px; }
+  button { background: $color-milkier; color: $color-brand-primary; border: 0; border-radius: 8px; min-width: 44px; min-height: 44px; cursor: pointer; }
+  div { min-width: 0; }
+}
+.monthly-summary {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem;
+  margin-bottom: 1rem; padding: 1rem; background: $color-milkiest; border: 1px solid $color-milky; border-radius: 14px;
+  span { display: block; color: $color-grey; font-size: .9rem; }
+  strong { display: block; font-size: clamp(1.1rem, 4vw, 1.5rem); font-variant-numeric: tabular-nums; color: $color-grey-darker; overflow-wrap: anywhere; }
+  p { grid-column: 1 / -1; margin: 0; font-size: .875rem; color: $color-grey; }
+}
+.monthly-list { display: grid; gap: 1rem; margin-bottom: 1rem; }
+.monthly-card {
+  background: white; border: 1px solid $color-milky; border-radius: 14px; padding: 1rem;
+  &__top { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; margin-bottom: .5rem; }
+  h2 { font-size: 1.1rem; font-weight: 700; margin: 0; overflow-wrap: anywhere; }
+  &__amount { display: block; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+  &__meta { color: $color-grey; font-size: .9rem; margin: .25rem 0 .5rem; overflow-wrap: anywhere; }
+  &__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+}
+.monthly-status { font-size: .8rem; padding: .25rem .6rem; border-radius: 1rem; white-space: nowrap; color: $color-grey-dark; background: $color-milkier; &--confirmed { color: #23632c; background: #eaf6ec; } }
+.monthly-action {
+  background: white; color: $color-brand-primary; border: 1px solid $color-milky; border-radius: 8px; padding: .5rem .75rem; min-height: 44px; min-width: 44px;
+  cursor: pointer; font-size: .95rem; font-weight: 600; transition: background-color .18s;
+  &:hover { background: $color-milkier; }
+  &:focus-visible { outline: 3px solid $color-brand-secondary; outline-offset: 2px; }
+  &:disabled { opacity: .5; cursor: wait; }
+  &--primary { color: white; background: $color-brand-primary; border-color: $color-brand-primary; &:hover { background: darken($color-brand-primary, 8%); } }
+}
+.monthly-modal {
+  &__header { padding: 1rem; display: flex; justify-content: space-between; align-items: center; gap: .5rem; border-bottom: 1px solid $color-milky; h2 { margin: 0; font-size: 1.2rem; } p { margin: .25rem 0 0; color: $color-grey; } }
+  &__body { padding: 1rem; label { font-weight: 600; } input, select { min-height: 48px; font-size: 1rem; border-radius: 8px; background: $color-milkier; } small { display: block; color: $color-grey; margin-top: .25rem; font-size: .85rem; } }
+  &__hint { font-size: .875rem; color: $color-grey; margin-bottom: 0; }
+  &__footer { padding: 1rem; display: flex; gap: .5rem; justify-content: flex-end; border-top: 1px solid $color-milky; }
+  &__secondary { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0 1rem 1rem; }
+}
+::ng-deep .monthly-fixed-charge-modal {
+  // ng-bootstrap 15's backdrop uses 1055; Bootstrap 4's modal defaults to 1050.
+  z-index: 1060;
+  .modal-dialog { max-width: 32rem; }
+  .modal-content { border-radius: 14px; overflow: hidden; }
+}
+@media (min-width: 768px) { .monthly-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) { .monthly-action { transition: none; } }
+
 .module-wrapper {
   padding: 2rem;
   max-width: 1200px;
@@ -34,57 +83,6 @@
   &:focus { border-color: $color-brand-secondary; box-shadow: 0 0 0 3px rgba(189,153,136,0.2); background-color: white; }
 }
 
-.module-summary {
-  display: none; padding: 1rem; border: 1px solid rgba(135, 102, 86, 0.16); border-radius: 14px;
-  background: linear-gradient(135deg, #fff 0%, #f7f1ee 100%); color: $color-grey-darker; margin-bottom: 1rem;
-  strong { display: block; margin: 0.2rem 0; font-size: 1.55rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-  &__label, &__meta { display: block; }
-  &__label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: $color-grey-light; }
-  &__meta { font-size: 0.82rem; color: $color-grey-light; }
-}
-.module-mobile-list { display: none; }
-.module-mobile-card {
-  width: 100%; min-height: 76px; padding: 0.9rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-  text-align: left; border: 1px solid $color-milky; border-radius: 12px; background: white; color: $color-grey-darker;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; touch-action: manipulation; transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  &:active { transform: scale(0.985); background: $color-milkiest; }
-  &:focus-visible { outline: 3px solid rgba(135, 102, 86, 0.4); outline-offset: 2px; }
-  &__content { min-width: 0; display: grid; gap: 0.2rem; }
-  &__title { font-size: 0.98rem; font-weight: 650; overflow-wrap: anywhere; }
-  &__meta { font-size: 0.8rem; color: $color-grey-light; }
-  &__amount { flex: 0 0 auto; text-align: right; font-size: 1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-  small { margin-left: 0.15rem; font-size: 0.72rem; font-weight: 500; color: $color-grey-light; }
-}
-.mobile-pagination { display: none; }
-
-.table-card { background-color: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); overflow: hidden; }
-
-.module-table {
-  thead th {
-    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-    color: $color-grey-light; border-bottom: 1px solid $color-milkier; border-top: none;
-    padding: 0.85rem 1rem; white-space: nowrap;
-  }
-  tbody td { padding: 0.85rem 1rem; border-top: 1px solid $color-milkier; vertical-align: middle; font-size: 0.875rem; color: $color-grey-dark; }
-}
-
-.item-row {
-  cursor: pointer; transition: background-color 0.14s;
-  &:hover { background-color: $color-milkiest; }
-}
-.item-title { font-weight: 500; color: $color-grey-darker; }
-.item-amount { font-weight: 600; color: $color-grey-darker; white-space: nowrap; }
-
-.total-row td { padding: 0.85rem 1rem; border-top: 2px solid $color-milky; font-size: 0.875rem; color: $color-grey-darker; background-color: $color-milkiest; }
-
-.table-footer {
-  padding: 0.6rem 1rem; border-top: 1px solid $color-milkier;
-  small { color: $color-grey-lighter; }
-  ::ng-deep ngb-pagination .page-link { border-radius: 6px; font-size: 0.8rem; color: $color-brand-primary; border: none; background: transparent;
-    &:hover { background-color: $color-milkier; }
-  }
-  ::ng-deep ngb-pagination .page-item.active .page-link { background-color: $color-brand-primary; color: white; }
-}
 
 .empty-state {
   background-color: white; border-radius: 12px; padding: 3rem 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -102,12 +100,4 @@
   .module-header .btn-add { width: 100%; justify-content: center; }
   .filters-card { padding: 0.75rem; margin-bottom: 1rem; box-shadow: none; border: 1px solid $color-milky; }
   .filter-input { min-width: unset; width: 100%; }
-  .module-summary, .module-mobile-list, .mobile-pagination { display: grid; }
-  .module-mobile-list { gap: 0.75rem; }
-  .mobile-pagination { place-items: center; margin-top: 1rem;
-    ::ng-deep .pagination { margin-bottom: 0; }
-  }
-  .table-footer { flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem;
-    ::ng-deep ngb-pagination .pagination { margin-bottom: 0; }
-  }
 }

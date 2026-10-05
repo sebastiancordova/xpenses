@@ -19,6 +19,7 @@ export class EditFixedExpenseComponent {
   @Input() fixedExpense!: FixedExpense
   public editFixedExpenseForm!: FormGroup;
   public loading = false
+  public confirmDelete = false;
   public activeModal: NgbActiveModal = inject(NgbActiveModal);
   public paymentMethods: PaymentMethod[] = [];
 
@@ -28,7 +29,7 @@ export class EditFixedExpenseComponent {
   constructor() {
     this.editFixedExpenseForm = this.fb.group({
       title: ['', Validators.required],
-      amount: ['', Validators.required],
+      amount: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.min(1), Validators.max(Number.MAX_SAFE_INTEGER)]],
       paymentMethodId: ['', Validators.required]
     })
 
@@ -59,6 +60,7 @@ export class EditFixedExpenseComponent {
   }
 
   delete() {
+    if (!this.confirmDelete) { this.confirmDelete = true; return; }
     this.loading = true;
     this.deleteFixedExpense$.emit(this.fixedExpense.uid);
     this.activeModal.close();

@@ -25,7 +25,7 @@ export class AddFixedExpenseComponent {
   constructor() {
     this.addFixedExpenseForm = this.fb.group({
       title: ['', Validators.required],
-      amount: ['', Validators.required],
+      amount: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.min(1), Validators.max(Number.MAX_SAFE_INTEGER)]],
       paymentMethodId: ['', Validators.required]
     })
 

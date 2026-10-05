@@ -18,15 +18,15 @@
     </div>
 
     <div class="form-group">
-      <label class="field-label" for="amount">Monto mensual</label>
+      <label class="field-label" for="amount">Monto mensual estimado</label>
       <div class="amount-input-wrapper">
         <span class="amount-prefix">$</span>
         <input autocomplete="off" type="text" pattern="[0-9]*" inputmode="numeric"
           class="form-control field-input field-input--amount" id="amount" formControlName="amount" placeholder="0"
           aria-describedby="fixed-expense-amount-error" [attr.aria-invalid]="amount?.invalid && amount?.touched">
       </div>
-      <small id="fixed-expense-amount-error" class="field-error" role="alert" *ngIf="amount?.invalid && amount?.touched && amount?.hasError('required')">
-        El monto es obligatorio
+      <small id="fixed-expense-amount-error" class="field-error" role="alert" *ngIf="amount?.invalid && amount?.touched">
+        Ingresa un monto entero mayor que cero, sin puntos.
       </small>
     </div>
 
@@ -39,6 +39,7 @@
       <small class="field-error" *ngIf="paymentMethodId?.invalid && paymentMethodId?.touched">Selecciona el método que cobra este gasto.</small>
     </div>
 
+    <p class="text-muted">Este monto sirve para estimar los próximos meses. Luego podrás registrar el cargo real de cada mes.</p>
     <div class="modal-actions">
       <button type="button" class="btn-modal btn-modal--secondary" (click)="activeModal.dismiss()">Cancelar</button>
       <button type="submit" class="btn-modal btn-modal--primary" [disabled]="addFixedExpenseForm.invalid || loading">

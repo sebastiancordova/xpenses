@@ -1,110 +1,60 @@
 <div class="module-wrapper">
-
-  <!-- Header -->
   <div class="module-header d-flex align-items-center justify-content-between flex-wrap">
-    <div>
-      <h1 class="module-title mb-0">Gastos Fijos</h1>
-      <p class="module-subtitle mb-0">Gastos recurrentes del mes</p>
-    </div>
-    <button type="button" class="btn-add" (click)="openCreateModal()">
-      <i class="fas fa-plus mr-2"></i>Nuevo gasto fijo
-    </button>
+    <div><h1 class="module-title mb-0">Gastos fijos</h1><p class="module-subtitle mb-0">Tus cuentas recurrentes, con el monto real de cada mes</p></div>
+    <button type="button" class="btn-add" (click)="openCreateModal()"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Nuevo gasto fijo</button>
   </div>
 
-  <!-- Filters -->
-  <div class="filters-card">
-    <form [formGroup]="filtersForm">
-      <div class="d-flex flex-wrap align-items-center">
-        <div class="filter-input-wrapper">
-          <i class="fas fa-search filter-icon"></i>
-          <label class="sr-only" for="fixed-expense-search">Buscar gastos fijos</label>
-          <input id="fixed-expense-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar gastos fijos" />
+  <section class="filters-card monthly-filters" aria-label="Filtrar gastos fijos">
+    <div class="monthly-navigation">
+      <button type="button" (click)="moveMonth(-1)" aria-label="Ver mes anterior"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+      <div><label for="fixed-period">Mes calendario del gasto</label><input id="fixed-period" type="month" [value]="selectedPeriod" (change)="setPeriod($any($event.target).value)" /></div>
+      <button type="button" (click)="moveMonth(1)" aria-label="Ver mes siguiente"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+    </div>
+    <form [formGroup]="filtersForm"><div class="filter-input-wrapper"><i class="fas fa-search filter-icon" aria-hidden="true"></i><label class="sr-only" for="fixed-expense-search">Buscar gastos fijos</label><input id="fixed-expense-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar gastos fijos" /></div></form>
+  </section>
+
+  <div *ngIf="loadingPage" class="loading-state text-center py-5" role="status"><span class="spinner-border loading-state__spinner" aria-hidden="true"></span><span class="sr-only">Cargando gastos fijos</span></div>
+  <div *ngIf="loadError" class="alert alert-warning" role="alert">No pudimos cargar tus gastos. <button type="button" class="btn monthly-action" (click)="loadMonthlyExpenses()">Reintentar</button></div>
+
+  <ng-container *ngIf="!loadingPage && !loadError">
+    <section class="monthly-summary" aria-label="Resumen del mes" aria-live="polite">
+      <div><span>Cargos confirmados</span><strong>{{ confirmedAmount | currency: 'CLP':'$':'1.0-0' }}</strong></div>
+      <div><span>Pendientes estimados</span><strong>{{ estimatedAmount | currency: 'CLP':'$':'1.0-0' }}</strong></div>
+      <p>Los pendientes son estimaciones. Registra cada cargo cuando conozcas su monto y fecha.</p>
+    </section>
+
+    <div class="monthly-list" *ngIf="rows.length; else emptyState" aria-label="Gastos fijos del mes">
+      <article class="monthly-card" *ngFor="let row of rows">
+        <div class="monthly-card__top"><h2>{{ row.title }}</h2><span class="monthly-status" [class.monthly-status--confirmed]="row.charge?.status === 'confirmed'">{{ !row.charge ? 'Pendiente' : row.charge.status === 'confirmed' ? 'Confirmado' : 'Omitido' }}</span></div>
+        <strong class="monthly-card__amount">{{ row.charge?.status === 'skipped' ? 'Sin cargo este mes' : (row.amount | currency: 'CLP':'$':'1.0-0') }}</strong>
+        <p class="monthly-card__meta">{{ paymentMethodName(row) }}<span *ngIf="row.charge?.status === 'confirmed'"> · Cargo el {{ row.charge?.chargeDate | date:'dd/MM/yyyy' }}</span><span *ngIf="!row.charge"> · Monto estimado</span></p>
+        <small *ngIf="row.charge && row.charge.period !== selectedPeriod" class="monthly-card__meta">Cuenta de {{ periodName(row.charge.period) }}</small>
+        <small *ngIf="!row.template" class="monthly-card__meta">Registro histórico · recurrente eliminado</small>
+        <div class="monthly-card__actions">
+          <button type="button" class="monthly-action monthly-action--primary" (click)="openCharge(row)">{{ row.charge ? 'Editar registro mensual' : 'Registrar cargo' }}</button>
+          <button *ngIf="row.template as template" type="button" class="monthly-action" (click)="openEditModal(template)" [attr.aria-label]="'Editar recurrente ' + template.title">Editar recurrente</button>
         </div>
+      </article>
+    </div>
+    <ngb-pagination *ngIf="collectionSize > pageSize" [collectionSize]="collectionSize" [maxSize]="3" [(page)]="page" (pageChange)="filter()" [pageSize]="pageSize"></ngb-pagination>
+    <ng-template #emptyState><div class="empty-state text-center"><i class="fas fa-file-invoice-dollar empty-state__icon mb-3" aria-hidden="true"></i><p class="empty-state__title">{{ search?.value ? 'Sin resultados' : 'Sin gastos fijos para este mes' }}</p><p class="empty-state__sub">{{ search?.value ? 'Prueba otro nombre o monto.' : 'Añade un recurrente y registra su cargo cada mes.' }}</p></div></ng-template>
+  </ng-container>
+</div>
+
+<ng-template #chargeModal let-modal>
+  <div class="monthly-modal" [attr.aria-busy]="savingCharge">
+    <header class="monthly-modal__header"><div><h2 id="monthly-charge-title">{{ activeRow?.charge ? 'Editar cargo mensual' : 'Registrar cargo' }}</h2><p>{{ activeRow?.title }} · Cuenta de {{ accountPeriodLabel }}</p></div><button type="button" class="monthly-action" (click)="modal.dismiss()" [disabled]="savingCharge" aria-label="Cerrar registro mensual"><i class="fas fa-times" aria-hidden="true"></i></button></header>
+    <form [formGroup]="chargeForm" (ngSubmit)="saveCharge('confirmed')" novalidate>
+      <div class="monthly-modal__body">
+        <div class="form-group"><label for="monthly-amount">Monto real del cargo</label><input id="monthly-amount" class="form-control" type="text" inputmode="numeric" formControlName="amount" ngbAutofocus aria-describedby="monthly-amount-error" [attr.aria-invalid]="chargeForm.get('amount')?.invalid && chargeForm.get('amount')?.touched" /><small id="monthly-amount-error" class="text-danger" *ngIf="chargeForm.get('amount')?.invalid && chargeForm.get('amount')?.touched">Ingresa un monto entero mayor que cero, sin puntos.</small></div>
+        <div class="form-group"><label for="monthly-date">Fecha de cargo</label><input id="monthly-date" class="form-control" type="date" formControlName="chargeDate" aria-describedby="monthly-date-help" /><small id="monthly-date-help">Usamos esta fecha para el período de facturación. Puede ser distinta al mes de la cuenta. El cargo se mostrará en el mes de su fecha real.</small><small *ngIf="chargeDisplayPeriod" aria-live="polite">Aparecerá en los cargos de {{ chargeDisplayPeriod }}.</small><small class="text-danger" *ngIf="chargeForm.get('chargeDate')?.invalid && chargeForm.get('chargeDate')?.touched">Selecciona una fecha válida.</small></div>
+        <div class="form-group"><label for="monthly-method">Método de pago</label><select id="monthly-method" class="form-control" formControlName="paymentMethodId"><option value="" disabled>Selecciona un método</option><option *ngFor="let method of selectableMethods" [value]="method.uid">{{ method.name }}</option></select><small class="text-danger" *ngIf="chargeForm.get('paymentMethodId')?.invalid && chargeForm.get('paymentMethodId')?.touched">Selecciona un método de pago.</small></div>
+        <p class="monthly-modal__hint">Este registro corresponde a la cuenta de {{ accountPeriodLabel }} y reemplaza su estimación. El cargo se muestra según su fecha real y ya contará en tus gastos: evita registrarlo también como gasto manual.</p>
+        <p *ngIf="chargeError" class="text-danger" role="alert">{{ chargeError }}</p>
+        <p *ngIf="resetRequested" role="alert">Se quitará el registro de la cuenta de {{ accountPeriodLabel }}. Si el recurrente existe, volverá a mostrarse como estimado en ese mes.</p>
       </div>
+      <footer class="monthly-modal__footer"><button type="button" class="monthly-action" (click)="modal.dismiss()" [disabled]="savingCharge">Cancelar</button><button type="submit" class="monthly-action monthly-action--primary" [disabled]="savingCharge"><span *ngIf="savingCharge">Guardando…</span><span *ngIf="!savingCharge">Confirmar cargo</span></button></footer>
+      <div class="monthly-modal__secondary"><button type="button" class="monthly-action" (click)="saveCharge('skipped')" [disabled]="savingCharge">Omitir cuenta de {{ accountPeriodLabel }}</button><button *ngIf="activeRow?.charge" type="button" class="monthly-action text-danger" (click)="resetCharge()" [disabled]="savingCharge">{{ resetRequested ? 'Confirmar restablecimiento' : 'Restablecer registro' }}</button></div>
     </form>
   </div>
-
-  <!-- Loading -->
-  <div *ngIf="loadingPage" class="loading-state d-flex justify-content-center align-items-center py-5">
-    <div class="spinner-border loading-state__spinner" role="status">
-      <span class="sr-only">Cargando...</span>
-    </div>
-  </div>
-
-  <ng-container *ngIf="!loadingPage">
-
-    <ng-container *ngIf="fireFixedExpenses.length > 0; else emptyState">
-      <section class="module-summary" aria-label="Resumen de gastos fijos">
-        <span class="module-summary__label">Gastos fijos del mes</span>
-        <strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong>
-        <span class="module-summary__meta">{{ collectionSize }} gasto{{ collectionSize !== 1 ? 's' : '' }} recurrente{{ collectionSize !== 1 ? 's' : '' }}</span>
-      </section>
-
-      <div class="module-mobile-list d-md-none" aria-label="Lista de gastos fijos">
-        <button type="button" *ngFor="let fixedExpense of fixedExpenses" class="module-mobile-card"
-          (click)="openEditModal(fixedExpense)" [attr.aria-label]="'Editar gasto fijo ' + fixedExpense.title">
-          <span class="module-mobile-card__content">
-            <span class="module-mobile-card__title">{{ fixedExpense.title }}</span>
-            <span class="module-mobile-card__meta">Gasto recurrente</span>
-          </span>
-          <span class="module-mobile-card__amount">{{ fixedExpense.amount | currency: 'CLP':'$':'1.0-0' }}<small>/mes</small></span>
-        </button>
-      </div>
-
-      <div class="mobile-pagination d-md-none">
-        <ngb-pagination [collectionSize]="collectionSize" [maxSize]="5" [(page)]="page" (pageChange)="filter()" [pageSize]="pageSize"></ngb-pagination>
-      </div>
-
-      <div class="table-card d-none d-md-block">
-        <div class="table-responsive">
-          <table class="table module-table mb-0">
-            <caption class="sr-only">Lista de gastos fijos</caption>
-            <thead>
-              <tr>
-                <th scope="col">Nombre</th>
-                <th scope="col" class="text-right">Monto</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let fixedExpense of fixedExpenses" (click)="openEditModal(fixedExpense)" class="item-row">
-                <td>
-                  <div class="item-title">{{ fixedExpense.title }}</div>
-                </td>
-                <td class="item-amount text-right">{{ fixedExpense.amount | currency: 'CLP':'$':'1.0-0' }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr class="total-row">
-                <td class="font-weight-bold">Total</td>
-                <td class="font-weight-bold text-right">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-        <div class="table-footer d-flex justify-content-between align-items-center">
-          <small class="text-muted">{{ collectionSize }} gasto{{ collectionSize !== 1 ? 's' : '' }}</small>
-          <ngb-pagination
-            [collectionSize]="collectionSize"
-            [maxSize]="5"
-            [(page)]="page"
-            (pageChange)="filter()"
-            [pageSize]="pageSize">
-          </ngb-pagination>
-        </div>
-      </div>
-    </ng-container>
-
-    <ng-template #emptyState>
-      <div class="empty-state text-center py-5">
-        <i class="fas fa-file-invoice-dollar empty-state__icon mb-3"></i>
-        <p class="empty-state__title">Sin gastos fijos registrados</p>
-        <p class="empty-state__sub">Añade tus gastos recurrentes para llevar un mejor control.</p>
-        <button type="button" class="btn-add" (click)="openCreateModal()">
-          <i class="fas fa-plus mr-2"></i>Agregar primer gasto fijo
-        </button>
-      </div>
-    </ng-template>
-
-  </ng-container>
-
-</div>
+</ng-template>
