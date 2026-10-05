@@ -165,6 +165,23 @@
   text-transform: uppercase;
 }
 
+.filter-payment-method {
+  width: min(100%, 27rem);
+
+  &__select {
+    min-width: 0;
+    padding-left: .8rem;
+    padding-right: .8rem;
+    height: auto;
+  }
+}
+
+.filter-help {
+  color: $color-grey-light;
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
 .category-chips {
   display: flex;
   gap: .5rem;

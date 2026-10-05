@@ -9,6 +9,8 @@ import { ExpensesService } from '@core/services/expenses.service';
 import { Expense, EXPENSE_CATEGORY_OPTIONS } from '@core/models/expense';
 import { EditExpenseComponent } from './edit-expense/edit-expense.component';
 import { RangeDateSelectorComponent } from '@shared/components/range-date-selector/range-date-selector.component';
+import { PaymentMethod } from '@core/models/payment-method';
+import { PaymentMethodsService } from '@core/services/payment-methods.service';
 
 @Component({
   selector: 'app-expenses',
@@ -35,12 +37,19 @@ export class ExpensesComponent implements OnDestroy {
   public sortColumn = '';
   public sortAsc = false;
   public hasCustomDateRange = false;
+  public paymentMethods: PaymentMethod[] = [];
+  public paymentMethodsLoading = true;
+  public paymentMethodsError = false;
+  public readonly unassignedPaymentMethod = '__unassigned__';
+  public visibleDateRange = this.getDefaultDateRange();
+  private paymentMethodsService = inject(PaymentMethodsService);
   private dateFilter$ = new BehaviorSubject<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
 
   constructor() {
     this.filtersForm = this.fb.group({
       search: '',
-      category: ''
+      category: '',
+      paymentMethodId: ''
     });
   }
 
@@ -49,8 +58,8 @@ export class ExpensesComponent implements OnDestroy {
   }
 
   get hasActiveFilters(): boolean {
-    const { search, category } = this.filtersForm.value;
-    return Boolean(search?.trim() || category || this.hasCustomDateRange);
+    const { search, category, paymentMethodId } = this.filtersForm.value;
+    return Boolean(search?.trim() || category || paymentMethodId || this.hasCustomDateRange);
   }
 
   get activeCategory(): string {
@@ -66,6 +75,17 @@ export class ExpensesComponent implements OnDestroy {
   }
 
   ngOnInit(): void {
+    this.paymentMethodsService.getAll().pipe(takeUntil(this.unsubscribe$)).subscribe({
+      next: methods => {
+        this.paymentMethods = methods.filter(method => Boolean(method.uid));
+        this.paymentMethodsLoading = false;
+        this.paymentMethodsError = false;
+      },
+      error: () => {
+        this.paymentMethodsLoading = false;
+        this.paymentMethodsError = true;
+      }
+    });
     this.dateFilter$.pipe(
       takeUntil(this.unsubscribe$),
       switchMap(({ from, to }) => this.expensesService.getAll(from, to))
@@ -86,7 +106,13 @@ export class ExpensesComponent implements OnDestroy {
     let expenses = this.fireExpenses;
     this.totalAmountFiltered = 0;
     // filters
-    const { search, category } = this.filtersForm.value;
+    const { search, category, paymentMethodId } = this.filtersForm.value;
+
+    if (paymentMethodId) {
+      expenses = expenses.filter(expense => paymentMethodId === this.unassignedPaymentMethod
+        ? !expense.paymentMethodId
+        : expense.paymentMethodId === paymentMethodId);
+    }
 
     if (search !== '') {
       expenses = expenses.filter(expense => expense.title.toLowerCase().includes(search.toLowerCase()) || expense.amount.toLowerCase().includes(search.toLowerCase()));
@@ -137,6 +163,9 @@ export class ExpensesComponent implements OnDestroy {
   filterByDate(date: { from: Date | undefined; to: Date | undefined }) {
     this.page = 1;
     this.hasCustomDateRange = Boolean(date.from && date.to);
+    this.visibleDateRange = date.from && date.to
+      ? { from: new Date(date.from), to: new Date(date.to) }
+      : this.getDefaultDateRange();
     this.dateFilter$.next(date);
   }
 
@@ -149,13 +178,23 @@ export class ExpensesComponent implements OnDestroy {
   }
 
   clearFilters(): void {
-    this.filtersForm.reset({ search: '', category: '' });
+    this.page = 1;
+    this.filtersForm.reset({ search: '', category: '', paymentMethodId: '' });
     this.hasCustomDateRange = false;
     if (this.rangeDateSelector) {
       this.rangeDateSelector.goToCurrentPeriod();
       return;
     }
     this.filterByDate({ from: undefined, to: undefined });
+  }
+
+  private getDefaultDateRange(): { from: Date; to: Date } {
+    const today = new Date();
+    const month = today.getMonth() - (today.getDate() < 19 ? 1 : 0);
+    return {
+      from: new Date(today.getFullYear(), month, 19),
+      to: new Date(today.getFullYear(), month + 1, 18)
+    };
   }
 
   openCreateModal() {
