@@ -67,7 +67,7 @@
 
 .filters-selectors {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 1rem;
   align-items: stretch;
 }
@@ -289,7 +289,8 @@
   font-size: .9rem;
   font-weight: 500;
   line-height: 1.25;
-  overflow-wrap: anywhere;
+  white-space: normal;
+  overflow-wrap: normal;
   pointer-events: none;
 }
 
@@ -710,10 +711,6 @@
       }
     }
   }
-}
-
-@media (max-width: 389px) {
-  .filters-selectors { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 380px) {

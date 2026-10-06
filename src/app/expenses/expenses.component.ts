@@ -74,7 +74,7 @@ export class ExpensesComponent implements OnDestroy {
 
   get selectedPaymentMethodLabel(): string {
     const paymentMethodId = this.filtersForm.get('paymentMethodId')?.value;
-    if (!paymentMethodId) return 'Todos los métodos';
+    if (!paymentMethodId) return 'Todos';
     if (paymentMethodId === this.unassignedPaymentMethod) return 'Sin asignar';
 
     const method = this.paymentMethods.find(item => item.uid === paymentMethodId);
@@ -85,12 +85,15 @@ export class ExpensesComponent implements OnDestroy {
 
   get visibleDateRangeLabel(): string {
     const { from, to } = this.visibleDateRange;
-    const shortDate = this.shortDateFormatter.format(from).replace(/sept\.?/gi, 'sep');
-    const fullDate = this.fullDateFormatter.format(to).replace(/sept\.?/gi, 'sep');
+    const formatEndpoint = (date: Date, includeYear: boolean): string =>
+      (includeYear ? this.fullDateFormatter : this.shortDateFormatter)
+        .format(date)
+        .replace(/sept\.?/gi, 'sep')
+        .replace(/[ \u00a0\u202f]/g, '\u00a0');
 
     return from.getFullYear() === to.getFullYear()
-      ? `${shortDate} – ${fullDate}`
-      : `${this.fullDateFormatter.format(from).replace(/sept\.?/gi, 'sep')} – ${fullDate}`;
+      ? `${formatEndpoint(from, false)} – ${formatEndpoint(to, true)}`
+      : `${formatEndpoint(from, true)} – ${formatEndpoint(to, true)}`;
   }
 
   get amountSortLabel(): string {
