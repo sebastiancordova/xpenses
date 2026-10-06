@@ -34,31 +34,32 @@
       </div>
 
       <div class="filters-selectors">
-      <div class="filter-section filter-payment-method">
-        <label class="filter-section__label mb-0" for="expense-payment-method">Método de pago</label>
-        <select id="expense-payment-method" class="form-control filter-input filter-payment-method__select"
-          formControlName="paymentMethodId" aria-describedby="expense-payment-help" [attr.aria-busy]="paymentMethodsLoading">
-          <option value="">Todos los métodos</option>
-          <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }}{{ !method.isActive ? ' (inactivo)' : '' }}</option>
-          <option [value]="unassignedPaymentMethod">Sin asignar</option>
-        </select>
-      </div>
+        <div class="filter-control filter-payment-method">
+          <label class="filter-control__label" for="expense-payment-method">Método<span class="sr-only"> de pago</span></label>
+          <span class="filter-control__value" aria-hidden="true">{{ selectedPaymentMethodLabel }}</span>
+          <i class="fas fa-chevron-down filter-control__caret" aria-hidden="true"></i>
+          <select id="expense-payment-method" class="filter-control__select"
+            formControlName="paymentMethodId" [attr.aria-busy]="paymentMethodsLoading">
+            <option value="">Todos los métodos</option>
+            <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }}{{ !method.isActive ? ' (inactivo)' : '' }}</option>
+            <option [value]="unassignedPaymentMethod">Sin asignar</option>
+          </select>
+        </div>
 
-      <div class="filter-period">
-        <span class="filter-section__label">Período</span>
-        <div class="filter-period__control">
-          <app-range-date-selector (rangeSelected)="filterByDate($event)"></app-range-date-selector>
+        <div class="filter-control filter-period">
+          <span class="filter-control__label">Período</span>
+          <div class="filter-period__control">
+            <app-range-date-selector (rangeSelected)="filterByDate($event)"></app-range-date-selector>
+            <i class="fas fa-chevron-down filter-control__caret filter-period__caret" aria-hidden="true"></i>
+          </div>
         </div>
       </div>
-      </div>
-      <div class="filters-selectors-help">
+      <div class="filters-selectors-help" *ngIf="paymentMethodsLoading || paymentMethodsError">
         <small *ngIf="paymentMethodsLoading" class="filter-help" role="status">Cargando métodos de pago…</small>
         <small *ngIf="paymentMethodsError" class="filter-help" role="status">No se pudieron cargar los métodos. Puedes consultar todos o los gastos sin asignar.</small>
-        <small id="expense-payment-help" class="filter-help">Sin asignar muestra gastos que aún no tienen método de pago.</small>
-        <small class="filter-help">{{ visibleDateRange.from | date: 'dd MMM yyyy' }} – {{ visibleDateRange.to | date: 'dd MMM yyyy' }}. Cambiar el método mantiene este rango; puedes ajustarlo para compararlo con el Dashboard.</small>
       </div>
-      <div class="filters-actions">
-        <button *ngIf="hasActiveFilters" type="button" class="filters-clear" (click)="clearFilters()">
+      <div class="filters-actions" *ngIf="hasActiveFilters">
+        <button type="button" class="filters-clear" (click)="clearFilters()">
           Limpiar <span class="sr-only">todos los filtros</span>
         </button>
       </div>

@@ -69,7 +69,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .filters-clear {
@@ -152,14 +152,66 @@
   text-transform: uppercase;
 }
 
+.filter-control {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-content: center;
+  gap: .15rem;
+  min-width: 0;
+  min-height: 72px;
+  padding: .55rem .85rem;
+  border: 1px solid $color-milky;
+  border-radius: 8px;
+  background: white;
+  color: $color-grey-dark;
+  transition: border-color .18s, box-shadow .18s;
+
+  &:focus-within {
+    border-color: $color-brand-secondary;
+    box-shadow: 0 0 0 3px rgba(189, 153, 136, .2);
+  }
+
+  &__label {
+    display: block;
+    color: $color-grey;
+    font-size: .88rem;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  &__value {
+    display: block;
+    min-width: 0;
+    padding-right: 1.2rem;
+    color: $color-grey-darker;
+    font-size: .9rem;
+    font-weight: 500;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  &__caret {
+    position: absolute;
+    right: .9rem;
+    bottom: .95rem;
+    color: $color-grey;
+    font-size: .8rem;
+    pointer-events: none;
+  }
+}
+
 .filter-payment-method {
   width: 100%;
 
-  &__select {
-    min-width: 0;
-    padding-left: .8rem;
-    padding-right: .8rem;
-    height: auto;
+  .filter-control__select {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
   }
 }
 
@@ -207,14 +259,35 @@
 }
 
 .filter-period__control {
+  position: relative;
   width: 100%;
+  min-width: 0;
+  align-self: center;
 
-  ::ng-deep app-range-date-selector { display: block; width: 100%; min-width: 0; }
+  ::ng-deep app-range-date-selector { display: block; width: calc(100% - 1.45rem); min-width: 0; }
   ::ng-deep .date-selector-wrapper, ::ng-deep .date-trigger { width: 100%; min-width: 0; }
-  ::ng-deep .date-trigger { justify-content: space-between; white-space: normal; background-color: white; border-color: $color-milky; }
-  ::ng-deep .date-trigger__open { flex: 1; min-width: 0; flex-wrap: wrap; gap: .25rem; padding: 0 .35rem; }
-  ::ng-deep .date-trigger__from, ::ng-deep .date-trigger__to { overflow-wrap: anywhere; }
+  ::ng-deep .date-trigger { min-height: 0; justify-content: space-between; white-space: normal; background: transparent; border: 0; font-size: 1rem; }
+  ::ng-deep .date-trigger__icon { display: none; }
+  ::ng-deep .date-trigger__open { flex: 1; min-width: 0; min-height: 44px; flex-wrap: wrap; justify-content: flex-start; gap: .25rem; padding: 0; font-size: .9rem; font-weight: 500; text-align: left; }
+  ::ng-deep .date-trigger__label, ::ng-deep .date-trigger__from, ::ng-deep .date-trigger__to { font-size: .9rem; font-weight: 500; text-align: left; overflow-wrap: anywhere; }
   ::ng-deep .date-trigger__clear { width: 44px; height: 44px; margin-right: 0; }
+}
+
+.filter-period__caret {
+  right: .25rem;
+  bottom: .55rem;
+}
+
+@media (max-width: $break-sm) {
+  .filter-period__control {
+    ::ng-deep ngb-datepicker {
+      position: absolute !important;
+      top: 100% !important;
+      right: 0 !important;
+      left: auto !important;
+      transform: none !important;
+    }
+  }
 }
 
 .filters-actions { display: flex; justify-content: flex-end; }

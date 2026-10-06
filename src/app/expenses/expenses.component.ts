@@ -70,6 +70,17 @@ export class ExpensesComponent implements OnDestroy {
     return this.filtersForm.get('category')?.value || '';
   }
 
+  get selectedPaymentMethodLabel(): string {
+    const paymentMethodId = this.filtersForm.get('paymentMethodId')?.value;
+    if (!paymentMethodId) return 'Todos los métodos';
+    if (paymentMethodId === this.unassignedPaymentMethod) return 'Sin asignar';
+
+    const method = this.paymentMethods.find(item => item.uid === paymentMethodId);
+    return method
+      ? `${method.name}${method.isActive ? '' : ' (inactivo)'}`
+      : 'Método no disponible';
+  }
+
   get amountSortLabel(): string {
     return this.sortColumn === 'amount' && this.sortAsc ? 'Menor monto' : 'Mayor monto';
   }
