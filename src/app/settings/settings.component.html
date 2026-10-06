@@ -1,8 +1,8 @@
 <main class="settings-wrapper" aria-labelledby="settings-title">
   <header class="settings-header">
-    <p class="settings-eyebrow"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Preferencias</p>
-    <h1 id="settings-title" class="settings-title">Configura tu presupuesto</h1>
-    <p class="settings-subtitle">Administra cómo pagas y cómo quieres distribuir cada ingreso.</p>
+    <p class="settings-eyebrow"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Configura tu presupuesto</p>
+    <h1 id="settings-title" class="settings-title">Configuración</h1>
+    <p class="settings-subtitle">Administra tus métodos de pago y distribuye tus ingresos como prefieras.</p>
   </header>
 
   <section *ngIf="loadError" class="settings-notice settings-notice--error" role="alert">
@@ -25,7 +25,7 @@
         <span class="settings-card__icon settings-card__icon--payment"><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span>
         <div>
           <h2 id="payment-methods-title" class="settings-card__title">Métodos de pago</h2>
-          <p class="settings-card__desc">Agrega tus tarjetas, débito o efectivo. Las cuotas solo se pueden asociar a una tarjeta de crédito.</p>
+          <p class="settings-card__desc">Administra tus tarjetas y cuentas para llevar un mejor seguimiento de tus gastos. Las cuotas solo se pueden asociar a una tarjeta de crédito.</p>
         </div>
       </div>
 
@@ -36,18 +36,28 @@
           </span>
           <div class="payment-method__content">
             <strong>{{ method.name }}</strong>
-            <span>{{ paymentMethodTypeLabels[method.type] }}<ng-container *ngIf="method.type === 'credit'"> · Cierre día {{ method.billingCycleDay }}</ng-container></span>
+            <span>{{ paymentMethodTypeLabels[method.type] }}<ng-container *ngIf="method.type === 'credit' && method.billingCycleDay"> · Cierre día {{ method.billingCycleDay }}</ng-container></span>
+            <span class="payment-method__default" *ngIf="method.isDefault"><i class="fa-solid fa-star" aria-hidden="true"></i> Principal</span>
           </div>
-          <span class="payment-method__default" *ngIf="method.isDefault">Principal</span>
-          <button type="button" class="payment-method__edit" (click)="editPaymentMethod(method)" [attr.aria-label]="'Editar ' + method.name">
-            <i class="fa-solid fa-pen" aria-hidden="true"></i><span class="sr-only">Editar</span>
-          </button>
-          <button *ngIf="!method.isDefault" type="button" class="payment-method__toggle" (click)="togglePaymentMethod(method)" [attr.aria-label]="(method.isActive ? 'Desactivar ' : 'Activar ') + method.name">
-            {{ method.isActive ? 'Activo' : 'Inactivo' }}
-          </button>
+          <div class="payment-method__actions">
+            <span class="payment-method__status" [class.payment-method__status--inactive]="!method.isActive">{{ method.isActive ? 'Activo' : 'Inactivo' }}</span>
+            <button type="button" class="payment-method__edit" (click)="editPaymentMethod(method)" [disabled]="paymentMethodSaving" [attr.aria-label]="'Editar ' + method.name">
+              <i class="fa-solid fa-pen" aria-hidden="true"></i><span>Editar</span>
+            </button>
+            <button *ngIf="!method.isDefault" type="button" class="payment-method__toggle" (click)="togglePaymentMethod(method)" [disabled]="paymentMethodSaving" [attr.aria-label]="(method.isActive ? 'Desactivar ' : 'Activar ') + method.name">
+              <i class="fa-solid" [ngClass]="method.isActive ? 'fa-toggle-off' : 'fa-toggle-on'" aria-hidden="true"></i>
+              {{ method.isActive ? 'Desactivar' : 'Activar' }}
+            </button>
+          </div>
         </article>
       </div>
       <ng-template #methodsPending><div class="payment-method-loading" role="status">Cargando métodos de pago…</div></ng-template>
+
+      <div *ngIf="paymentMethodError && !showPaymentMethodForm" class="payment-method-error">
+        <p role="alert"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>{{ paymentMethodError }}</p>
+        <button type="button" class="payment-method-retry" (click)="retryPaymentMethods()"
+          [disabled]="paymentMethodsLoading || paymentMethodSaving || preferencesLoading || loadError">Reintentar métodos</button>
+      </div>
 
       <form *ngIf="showPaymentMethodForm" [formGroup]="paymentMethodForm" (ngSubmit)="savePaymentMethod()" class="payment-method-form" novalidate>
         <h3>{{ editingPaymentMethod ? 'Editar método' : 'Nuevo método' }}</h3>
@@ -71,14 +81,14 @@
         </div>
         <p class="field-error" role="alert" *ngIf="paymentMethodError">{{ paymentMethodError }}</p>
         <div class="payment-method-form__actions">
-          <button type="button" class="payment-method-cancel" (click)="cancelPaymentMethod()">Cancelar</button>
+          <button type="button" class="payment-method-cancel" (click)="cancelPaymentMethod()" [disabled]="paymentMethodSaving">Cancelar</button>
           <button type="submit" class="payment-method-save" [disabled]="paymentMethodSaving">
             {{ paymentMethodSaving ? 'Guardando…' : (editingPaymentMethod ? 'Guardar' : 'Agregar método') }}
           </button>
         </div>
       </form>
-      <button *ngIf="!showPaymentMethodForm" type="button" class="payment-method-add" (click)="startPaymentMethod()">
-        <i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar método de pago
+      <button *ngIf="!showPaymentMethodForm" type="button" class="payment-method-add" (click)="startPaymentMethod()" [disabled]="paymentMethodSaving">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i><span>Agregar método de pago</span>
       </button>
     </section>
 
@@ -88,7 +98,7 @@
           <span class="settings-card__icon settings-card__icon--budget"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i></span>
           <div>
             <h2 id="allocation-title" class="settings-card__title">Distribución del presupuesto</h2>
-            <p class="settings-card__desc">Reserva una parte de tus ingresos para ahorro y gastos del día a día. El resto queda para gastos fijos y suscripciones.</p>
+            <p class="settings-card__desc">Define qué porcentaje de tus ingresos destinar a cada categoría. El resto queda para gastos fijos y suscripciones.</p>
           </div>
         </div>
 
@@ -101,9 +111,10 @@
             </div>
             <div class="budget-control__adjuster">
               <button type="button" class="step-button" (click)="changeRate('savingsRate', -5)" [disabled]="savingsRate?.value <= 0" aria-label="Reducir ahorro en 5 puntos porcentuales"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
-              <input type="range" id="savingsRate" min="0" max="100" step="1" class="range-input" formControlName="savingsRate" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="savingsRate?.value" [attr.aria-valuetext]="savingsRate?.value + '% de ahorro'">
+              <input type="range" id="savingsRate" min="0" max="100" step="1" class="range-input" formControlName="savingsRate" [style.--range-progress]="savingsRate?.value + '%'" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="savingsRate?.value" [attr.aria-valuetext]="savingsRate?.value + '% de ahorro'">
               <button type="button" class="step-button" (click)="changeRate('savingsRate', 5)" [disabled]="savingsRate?.value >= 100" aria-label="Aumentar ahorro en 5 puntos porcentuales"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
             </div>
+            <div class="range-bounds" aria-hidden="true"><span>0%</span><span>100%</span></div>
           </div>
 
           <div class="budget-control">
@@ -113,16 +124,16 @@
             </div>
             <div class="budget-control__adjuster">
               <button type="button" class="step-button" (click)="changeRate('variableRate', -5)" [disabled]="variableRate?.value <= 0" aria-label="Reducir gastos variables en 5 puntos porcentuales"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
-              <input type="range" id="variableRate" min="0" max="100" step="1" class="range-input" formControlName="variableRate" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="variableRate?.value" [attr.aria-valuetext]="variableRate?.value + '% de gastos variables'">
+              <input type="range" id="variableRate" min="0" max="100" step="1" class="range-input" formControlName="variableRate" [style.--range-progress]="variableRate?.value + '%'" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="variableRate?.value" [attr.aria-valuetext]="variableRate?.value + '% de gastos variables'">
               <button type="button" class="step-button" (click)="changeRate('variableRate', 5)" [disabled]="variableRate?.value >= 100" aria-label="Aumentar gastos variables en 5 puntos porcentuales"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
             </div>
+            <div class="range-bounds" aria-hidden="true"><span>0%</span><span>100%</span></div>
           </div>
         </fieldset>
 
         <section class="allocation-summary" [class.allocation-summary--warning]="allocationWarning" aria-labelledby="allocation-summary-title">
           <div class="allocation-summary__heading">
             <h3 id="allocation-summary-title">Así se distribuye cada ingreso</h3>
-            <button type="button" class="recommendation-button" (click)="useRecommendedAllocation()">Usar recomendación</button>
           </div>
           <div class="allocation-bar" role="img" [attr.aria-label]="'Ahorro ' + savingsRate?.value + ' por ciento, gastos variables ' + variableRate?.value + ' por ciento, gastos fijos y suscripciones ' + fixedRate + ' por ciento'">
             <span class="allocation-bar__savings" [style.width.%]="savingsRate?.value"></span>
@@ -136,6 +147,7 @@
           </ul>
           <p class="allocation-message" *ngIf="!allocationWarning">La recomendación inicial es 20% ahorro, 50% gastos variables y 30% gastos fijos.</p>
           <p class="field-error allocation-error" role="alert" *ngIf="allocationWarning"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Ahorro y gastos variables no pueden superar el 100%. Reduce uno de los dos valores.</p>
+          <button type="button" class="recommendation-button" (click)="useRecommendedAllocation()"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Usar recomendación</button>
         </section>
       </section>
 

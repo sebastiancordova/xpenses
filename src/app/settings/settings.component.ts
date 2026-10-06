@@ -109,6 +109,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
     if (!this.preferencesLoading) this.loadPreferences();
   }
 
+  retryPaymentMethods(): void {
+    if (this.paymentMethodsLoading || this.paymentMethodSaving || this.preferencesLoading || this.loadError) return;
+    this.paymentMethodError = '';
+    void this.loadPaymentMethods(Number(this.billingCycleDay?.value || 19));
+  }
+
   startPaymentMethod(): void {
     this.editingPaymentMethod = undefined;
     this.paymentMethodForm.reset({ name: '', type: 'credit', billingCycleDay: this.billingCycleDay?.value || 19 });
