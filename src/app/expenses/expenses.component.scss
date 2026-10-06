@@ -59,11 +59,7 @@
 
 // ─── Filters card ────────────────────────────────────────────────────────────
 .filters-card {
-  background-color: white;
-  border: 1px solid $color-milky;
-  border-radius: 16px;
-  padding: 1.15rem 1.25rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  padding: 0;
   margin-bottom: 1.25rem;
 }
 
@@ -109,8 +105,8 @@
 .filter-input {
   min-height: 44px;
   font-size: 1rem;
-  background-color: $color-milkier;
-  border: 1px solid transparent;
+  background-color: white;
+  border: 1px solid $color-milky;
   border-radius: 8px;
   padding-left: 2rem;
   min-width: 14rem;
@@ -215,7 +211,7 @@
 
   ::ng-deep app-range-date-selector { display: block; width: 100%; min-width: 0; }
   ::ng-deep .date-selector-wrapper, ::ng-deep .date-trigger { width: 100%; min-width: 0; }
-  ::ng-deep .date-trigger { justify-content: space-between; white-space: normal; }
+  ::ng-deep .date-trigger { justify-content: space-between; white-space: normal; background-color: white; border-color: $color-milky; }
   ::ng-deep .date-trigger__open { flex: 1; min-width: 0; flex-wrap: wrap; gap: .25rem; padding: 0 .35rem; }
   ::ng-deep .date-trigger__from, ::ng-deep .date-trigger__to { overflow-wrap: anywhere; }
   ::ng-deep .date-trigger__clear { width: 44px; height: 44px; margin-right: 0; }
@@ -579,7 +575,7 @@
   }
 
   .expenses-title { font-size: 1.75rem; }
-  .filters-card { padding: 1rem; margin-bottom: 1rem; box-shadow: none; }
+  .filters-card { padding: 0; margin-bottom: 1rem; }
 
   .filter-input-wrapper {
     width: 100%;
