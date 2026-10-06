@@ -57,6 +57,10 @@ export class ExpensesComponent implements OnDestroy {
     return 'category--' + category.toLowerCase().replace(/\s+/g, '-');
   }
 
+  getCategoryIcon(category: string): string {
+    return this.categoryOptions.find(option => option.category === category)?.icon || 'fa-tag';
+  }
+
   get hasActiveFilters(): boolean {
     const { search, category, paymentMethodId } = this.filtersForm.value;
     return Boolean(search?.trim() || category || paymentMethodId || this.hasCustomDateRange);

@@ -4,7 +4,6 @@
   <div class="expenses-header d-flex align-items-center justify-content-between flex-wrap">
     <div>
       <h1 class="expenses-title mb-0">Gastos</h1>
-      <p class="expenses-subtitle mb-0">Consulta tus gastos registrados</p>
     </div>
     <button class="btn-add" (click)="openCreateModal()">
       <i class="fas fa-plus mr-2"></i>Nuevo gasto
@@ -14,18 +13,8 @@
   <!-- Filters -->
   <section class="filters-card" aria-label="Filtros de gastos">
     <form [formGroup]="filtersForm" class="filters-form">
-      <div class="filters-heading">
-        <div>
-          <span class="filters-heading__eyebrow">Explora tus gastos</span>
-          <h2 class="filters-heading__title">Filtrar y encontrar</h2>
-        </div>
-        <button *ngIf="hasActiveFilters" type="button" class="filters-clear" (click)="clearFilters()">
-          Limpiar <span class="sr-only">todos los filtros</span>
-        </button>
-      </div>
-
       <div class="filter-input-wrapper filter-search">
-          <i class="fas fa-search filter-icon"></i>
+          <i class="fas fa-search filter-icon" aria-hidden="true"></i>
           <label class="sr-only" for="expense-search">Buscar gastos</label>
           <input id="expense-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar gastos" />
           <button *ngIf="filtersForm.get('search')?.value" type="button" class="filter-search__clear" (click)="clearSearch()" aria-label="Borrar búsqueda">
@@ -36,14 +25,15 @@
       <div class="filter-section" aria-label="Filtrar por categoría">
         <span class="filter-section__label">Categoría</span>
         <div class="category-chips" role="group" aria-label="Seleccionar categoría">
-          <button type="button" class="category-chip" [class.category-chip--active]="!activeCategory" (click)="selectCategory('')">Todas</button>
+          <button type="button" class="category-chip" [class.category-chip--active]="!activeCategory" [attr.aria-pressed]="!activeCategory" (click)="selectCategory('')"><i class="fas fa-border-all" aria-hidden="true"></i><span>Todas</span></button>
           <button type="button" *ngFor="let option of categoryOptions" class="category-chip"
-            [class.category-chip--active]="activeCategory === option.category" (click)="selectCategory(option.category)">
-            {{ option.category }}
+            [class.category-chip--active]="activeCategory === option.category" [attr.aria-pressed]="activeCategory === option.category" (click)="selectCategory(option.category)">
+            <i class="fas" [ngClass]="option.icon" aria-hidden="true"></i><span>{{ option.category }}</span>
           </button>
         </div>
       </div>
 
+      <div class="filters-selectors">
       <div class="filter-section filter-payment-method">
         <label class="filter-section__label mb-0" for="expense-payment-method">Método de pago</label>
         <select id="expense-payment-method" class="form-control filter-input filter-payment-method__select"
@@ -52,9 +42,6 @@
           <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }}{{ !method.isActive ? ' (inactivo)' : '' }}</option>
           <option [value]="unassignedPaymentMethod">Sin asignar</option>
         </select>
-        <small *ngIf="paymentMethodsLoading" class="filter-help" role="status">Cargando métodos de pago…</small>
-        <small *ngIf="paymentMethodsError" class="filter-help" role="status">No se pudieron cargar los métodos. Puedes consultar todos o los gastos sin asignar.</small>
-        <small id="expense-payment-help" class="filter-help">Sin asignar muestra gastos que aún no tienen método de pago.</small>
       </div>
 
       <div class="filter-period">
@@ -62,12 +49,18 @@
         <div class="filter-period__control">
           <app-range-date-selector (rangeSelected)="filterByDate($event)"></app-range-date-selector>
         </div>
+      </div>
+      </div>
+      <div class="filters-selectors-help">
+        <small *ngIf="paymentMethodsLoading" class="filter-help" role="status">Cargando métodos de pago…</small>
+        <small *ngIf="paymentMethodsError" class="filter-help" role="status">No se pudieron cargar los métodos. Puedes consultar todos o los gastos sin asignar.</small>
+        <small id="expense-payment-help" class="filter-help">Sin asignar muestra gastos que aún no tienen método de pago.</small>
         <small class="filter-help">{{ visibleDateRange.from | date: 'dd MMM yyyy' }} – {{ visibleDateRange.to | date: 'dd MMM yyyy' }}. Cambiar el método mantiene este rango; puedes ajustarlo para compararlo con el Dashboard.</small>
       </div>
-
-      <div class="filters-feedback" *ngIf="!loadingPage" aria-live="polite">
-        <span>{{ collectionSize }} gasto{{ collectionSize !== 1 ? 's' : '' }} encontrado{{ collectionSize !== 1 ? 's' : '' }}</span>
-        <strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong>
+      <div class="filters-actions">
+        <button *ngIf="hasActiveFilters" type="button" class="filters-clear" (click)="clearFilters()">
+          Limpiar <span class="sr-only">todos los filtros</span>
+        </button>
       </div>
     </form>
   </section>
@@ -94,35 +87,28 @@
   <ng-container *ngIf="!loadingPage">
 
     <!-- Results strip -->
-    <div class="results-strip d-none d-md-flex" *ngIf="fireExpenses.length > 0">
-      <span class="results-strip__count">{{ collectionSize }} gasto{{ collectionSize !== 1 ? 's' : '' }}</span>
-      <span class="results-strip__total">Total: <strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong></span>
+    <div class="results-toolbar" aria-live="polite">
+      <p class="results-summary mb-0"><span>{{ collectionSize }} gasto{{ collectionSize !== 1 ? 's' : '' }} encontrado{{ collectionSize !== 1 ? 's' : '' }}</span><strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong></p>
+      <button *ngIf="collectionSize > 0" type="button" class="expense-sort" (click)="toggleAmountSort()"
+        [attr.aria-label]="'Ordenar por ' + amountSortLabel.toLowerCase()">
+        <i class="fas" [ngClass]="amountSortIcon" aria-hidden="true"></i>{{ amountSortLabel }}
+      </button>
     </div>
 
     <ng-container *ngIf="collectionSize > 0; else emptyState">
-      <div class="expenses-list-toolbar d-md-none">
-        <span class="expenses-list-toolbar__label">Ordenar gastos</span>
-        <button type="button" class="expense-sort" (click)="toggleAmountSort()"
-          [attr.aria-label]="'Ordenar por ' + amountSortLabel.toLowerCase()">
-          <i class="fas" [ngClass]="amountSortIcon" aria-hidden="true"></i>
-          {{ amountSortLabel }}
-        </button>
-      </div>
-
       <div class="expense-mobile-list d-md-none" aria-label="Lista de gastos">
         <button type="button" *ngFor="let expense of expenses" class="expense-mobile-card"
-          [ngClass]="getCategoryClass(expense.category)" (click)="openEditModal(expense)"
-          [attr.aria-label]="'Editar gasto ' + expense.title">
+          [ngClass]="getCategoryClass(expense.category)" (click)="openEditModal(expense)">
+          <span class="expense-mobile-card__icon" aria-hidden="true"><i class="fas" [ngClass]="getCategoryIcon(expense.category)"></i></span>
           <span class="expense-mobile-card__topline">
             <span class="expense-mobile-card__content">
+              <span class="sr-only">Editar gasto: </span>
               <span class="expense-mobile-card__title">{{ expense.title }}</span>
+              <span class="category-badge" [ngClass]="getCategoryClass(expense.category)">{{ expense.category }}<ng-container *ngIf="expense.subcategory"> · {{ expense.subcategory }}</ng-container></span>
               <span class="expense-mobile-card__comment" *ngIf="expense.comment">{{ expense.comment }}</span>
+              <span class="expense-mobile-card__date"><i class="fas fa-calendar-days" aria-hidden="true"></i>{{ expense.createdAt.toDate() | date: 'd MMM yyyy' }}</span>
             </span>
             <span class="expense-mobile-card__amount">{{ expense.amount | currency: 'CLP':'$':'1.0-0' }}</span>
-          </span>
-          <span class="expense-mobile-card__meta">
-            <span class="category-badge" [ngClass]="getCategoryClass(expense.category)">{{ expense.category }}<ng-container *ngIf="expense.subcategory"> · {{ expense.subcategory }}</ng-container></span>
-            <span>{{ expense.createdAt.toDate() | date: 'dd MMM yyyy' }}</span>
           </span>
         </button>
       </div>
@@ -167,7 +153,7 @@
                 </td>
                 <td class="d-none d-md-table-cell">
                   <span class="category-badge" [ngClass]="getCategoryClass(expense.category)">
-                    {{ expense.category }}<ng-container *ngIf="expense.subcategory"> · {{ expense.subcategory }}</ng-container>
+                    <i class="fas" [ngClass]="getCategoryIcon(expense.category)" aria-hidden="true"></i>{{ expense.category }}<ng-container *ngIf="expense.subcategory"> · {{ expense.subcategory }}</ng-container>
                   </span>
                 </td>
                 <td class="expense-date d-none d-md-table-cell">{{ expense.createdAt.toDate() | date: 'dd/MM/yyyy' }}</td>

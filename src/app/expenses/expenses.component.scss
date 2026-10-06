@@ -26,12 +26,6 @@
   line-height: 1.2;
 }
 
-.expenses-subtitle {
-  font-size: 0.8rem;
-  color: $color-grey-light;
-  margin-top: 0.2rem;
-}
-
 // ─── Add button ───────────────────────────────────────────────────────────────
 .btn-add {
   display: inline-flex;
@@ -75,18 +69,15 @@
 
 .filters-form { display: grid; gap: 1rem; }
 
-.filters-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.filters-selectors {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
-
-  &__eyebrow { display: block; color: $color-grey-light; font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
-  &__title { margin: .15rem 0 0; color: $color-grey-darker; font-size: 1rem; font-weight: 700; }
+  align-items: start;
 }
 
 .filters-clear {
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 .55rem;
   border: 0;
   border-radius: 6px;
@@ -113,11 +104,11 @@
   }
 }
 
-.filter-search { width: min(100%, 27rem); }
+.filter-search { width: 100%; }
 
 .filter-input {
   min-height: 44px;
-  font-size: 0.82rem;
+  font-size: 1rem;
   background-color: $color-milkier;
   border: 1px solid transparent;
   border-radius: 8px;
@@ -140,8 +131,8 @@
   top: 50%;
   right: .45rem;
   display: grid;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   place-items: center;
   transform: translateY(-50%);
@@ -166,7 +157,7 @@
 }
 
 .filter-payment-method {
-  width: min(100%, 27rem);
+  width: 100%;
 
   &__select {
     min-width: 0;
@@ -182,6 +173,11 @@
   line-height: 1.5;
 }
 
+.filters-selectors-help {
+  display: grid;
+  gap: .25rem;
+}
+
 .category-chips {
   display: flex;
   gap: .5rem;
@@ -191,17 +187,22 @@
   -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar { display: none; }
+  &:focus-visible { outline: 3px solid rgba(135, 102, 86, .35); outline-offset: 2px; }
 }
 
 .category-chip {
-  min-height: 38px;
-  padding: 0 .8rem;
+  min-height: 44px;
+  padding: 0 .95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
   flex: 0 0 auto;
   border: 1px solid $color-milky;
   border-radius: 999px;
   background: white;
   color: $color-grey;
-  font-size: .78rem;
+  font-size: .88rem;
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
@@ -210,25 +211,17 @@
 }
 
 .filter-period__control {
-  width: min(100%, 20rem);
+  width: 100%;
 
-  ::ng-deep app-range-date-selector { display: block; }
-  ::ng-deep .date-trigger { width: 100%; justify-content: space-between; }
-  ::ng-deep .date-trigger__open { flex: 1; }
+  ::ng-deep app-range-date-selector { display: block; width: 100%; min-width: 0; }
+  ::ng-deep .date-selector-wrapper, ::ng-deep .date-trigger { width: 100%; min-width: 0; }
+  ::ng-deep .date-trigger { justify-content: space-between; white-space: normal; }
+  ::ng-deep .date-trigger__open { flex: 1; min-width: 0; flex-wrap: wrap; gap: .25rem; padding: 0 .35rem; }
+  ::ng-deep .date-trigger__from, ::ng-deep .date-trigger__to { overflow-wrap: anywhere; }
+  ::ng-deep .date-trigger__clear { width: 44px; height: 44px; margin-right: 0; }
 }
 
-.filters-feedback {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-top: .85rem;
-  border-top: 1px solid $color-milkier;
-  color: $color-grey-light;
-  font-size: .78rem;
-
-  strong { color: $color-grey-darker; font-size: .9rem; font-variant-numeric: tabular-nums; }
-}
+.filters-actions { display: flex; justify-content: flex-end; }
 
 .sortable {
   background: transparent;
@@ -350,7 +343,9 @@
 
 // ─── Category badges ─────────────────────────────────────────────────────────
 .category-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
   padding: 0.2rem 0.6rem;
   border-radius: 20px;
   font-size: 0.72rem;
@@ -492,43 +487,29 @@
 @media (prefers-reduced-motion: reduce) {
   .expense-row  { animation: none; }
   .skeleton     { animation: none; }
+  .btn-add, .expense-mobile-card { transition: none; }
 }
 
-// ─── Results strip ───────────────────────────────────────────────────────────
-.results-strip {
+.results-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.4rem 0.25rem;
-  margin-bottom: 0.65rem;
-
-  &__count {
-    font-size: 0.8rem;
-    color: $color-grey-lighter;
-  }
-
-  &__total {
-    font-size: 0.8rem;
-    color: $color-grey-light;
-
-    strong {
-      color: $color-grey-darker;
-      font-variant-numeric: tabular-nums;
-    }
-  }
+  gap: 1rem;
+  margin: .25rem 0 .8rem;
 }
 
-// ─── Mobile-first list controls and cards ──────────────────────────────────
-.expenses-list-toolbar {
+.results-summary {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .75rem;
-  margin: 0 0 .75rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: .45rem;
+  color: $color-grey;
+  font-size: .94rem;
 
-  &__label { color: $color-grey-light; font-size: .78rem; font-weight: 700; }
+  strong { color: $color-grey-darker; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
 }
 
+// ─── Mobile-first list cards ─────────────────────────────────────────────────
 .expense-sort {
   display: inline-flex;
   align-items: center;
@@ -551,30 +532,21 @@
 .expense-mobile-list { display: grid; gap: 0.75rem; }
 
 .expense-mobile-card {
-  width: 100%; min-height: 102px; padding: 0.9rem 1rem; display: grid; gap: 0.7rem;
-  text-align: left; border: 1px solid $color-milky; border-left: 4px solid $color-grey-lightest; border-radius: 12px;
+  width: 100%; min-height: 112px; padding: 1rem; display: grid; grid-template-columns: 3.25rem minmax(0, 1fr); align-items: center; gap: .9rem;
+  text-align: left; border: 1px solid $color-milky; border-radius: 14px;
   background: white; color: $color-grey-darker; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  cursor: pointer; touch-action: manipulation; transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  cursor: pointer; touch-action: manipulation; transition: box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
 
-  &:active { transform: scale(0.985); background: $color-milkiest; }
+  &:hover { border-color: rgba(135, 102, 86, .35); box-shadow: 0 4px 14px rgba(0,0,0,.07); }
+  &:active { background: $color-milkiest; }
   &:focus-visible { outline: 3px solid rgba(135, 102, 86, 0.4); outline-offset: 2px; }
-  &.category--supermercado   { border-left-color: #2e7d32; }
-  &.category--transporte      { border-left-color: #1565c0; }
-  &.category--casa            { border-left-color: #e65100; }
-  &.category--cuentas         { border-left-color: #c62828; }
-  &.category--entretenimiento { border-left-color: #6a1b9a; }
-  &.category--subscripciones  { border-left-color: #00838f; }
-  &.category--ropa            { border-left-color: #ad1457; }
-  &.category--auto-cuidado    { border-left-color: #283593; }
-  &.category--gasto-fijo      { border-left-color: #bf360c; }
-  &.category--otros           { border-left-color: #9e9e9e; }
-
-  &__topline { min-width: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
-  &__content { min-width: 0; display: grid; gap: 0.2rem; }
-  &__title { font-size: 0.98rem; font-weight: 650; overflow-wrap: anywhere; }
-  &__comment { font-size: 0.8rem; line-height: 1.35; color: $color-grey-light; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  &__amount { flex: 0 0 auto; text-align: right; font-size: 1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-  &__meta { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 0.78rem; color: $color-grey-light; }
+  &__icon { width: 3.25rem; height: 3.25rem; display: grid; place-items: center; border-radius: 50%; background: rgba(189, 153, 136, .16); color: $color-brand-primary; font-size: 1.35rem; }
+  &__topline { min-width: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: .7rem; }
+  &__content { min-width: 0; display: grid; justify-items: start; gap: 0.3rem; }
+  &__title { font-size: 1rem; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+  &__comment { max-width: 100%; font-size: 0.82rem; line-height: 1.35; color: $color-grey; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  &__date { display: inline-flex; align-items: center; gap: .4rem; color: $color-grey; font-size: .85rem; }
+  &__amount { flex: 0 0 auto; text-align: right; font-size: 1.12rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 }
 
 .mobile-pagination {
@@ -593,23 +565,22 @@
 
 // ─── Responsive ───────────────────────────────────────────────────────────────
 @media (max-width: $break-sm) {
-  // Header: button full-width when it wraps
   .expenses-header {
-    align-items: stretch !important;
-    row-gap: 1rem;
+    align-items: center !important;
+    gap: .75rem;
     margin-bottom: 1rem;
 
     .btn-add {
-      width: 100%;
+      width: auto;
+      flex: 0 0 auto;
       justify-content: center;
+      padding: .45rem .8rem;
     }
   }
 
-  .expenses-title { font-size: 1.65rem; }
-  .expenses-subtitle { font-size: 0.9rem; }
+  .expenses-title { font-size: 1.75rem; }
   .filters-card { padding: 1rem; margin-bottom: 1rem; box-shadow: none; }
 
-  // Filters: all inputs stack full-width
   .filter-input-wrapper {
     width: 100%;
     margin-right: 0 !important;
@@ -620,10 +591,15 @@
     width: 100%;
   }
 
-  .filter-search,
-  .filter-period__control { width: 100%; }
+  .filter-search { width: 100%; }
 
-  .filters-feedback { padding-top: .8rem; }
+  .filters-form { gap: .8rem; }
+  .filters-selectors { gap: .8rem; }
+
+  .results-toolbar { align-items: flex-start; }
+  .results-summary { font-size: .85rem; gap: .25rem .4rem; }
+  .results-summary strong { width: 100%; font-size: 1.05rem; }
+  .expense-sort { padding: 0 .6rem; font-size: .75rem; white-space: nowrap; }
 
   // Comment: release fixed max-width
   .expense-comment {
@@ -643,4 +619,15 @@
       }
     }
   }
+}
+
+@media (max-width: 389px) {
+  .filters-selectors { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 380px) {
+  .expense-mobile-card { grid-template-columns: 2.8rem minmax(0, 1fr); gap: .65rem; padding: .8rem; }
+  .expense-mobile-card__icon { width: 2.8rem; height: 2.8rem; font-size: 1.15rem; }
+  .expense-mobile-card__amount { font-size: 1rem; }
+  .expenses-header .btn-add { font-size: .78rem; }
 }
