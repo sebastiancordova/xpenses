@@ -1,125 +1,152 @@
 <div class="module-wrapper">
-
-  <!-- Header -->
-  <div class="module-header d-flex align-items-center justify-content-between flex-wrap">
-    <div>
-      <h1 class="module-title mb-0">Ingresos</h1>
-      <p class="module-subtitle mb-0">Registra cada mes sin perder tu historial.</p>
+  <header class="module-header">
+    <div class="module-header__copy">
+      <h1 class="module-title">Ingresos</h1>
+      <p class="module-subtitle">Aquí puedes ver y administrar tus ingresos del mes.</p>
     </div>
     <button type="button" class="btn-add" (click)="openCreateModal()">
-      <i class="fas fa-plus mr-2"></i>Nuevo ingreso
+      <i class="fas fa-plus" aria-hidden="true"></i>
+      <span>Nuevo ingreso</span>
     </button>
-  </div>
+  </header>
 
-  <!-- Filters -->
-  <div class="filters-card">
-    <form [formGroup]="filtersForm">
-      <div class="filters-layout">
-        <div class="income-period-picker">
-          <span class="income-period-picker__label">Mes calendario de ingresos</span>
-          <div class="income-period-picker__controls">
-            <button type="button" class="period-nav-button" (click)="previousMonth()" aria-label="Ver mes anterior">
-              <i class="fas fa-chevron-left" aria-hidden="true"></i>
-            </button>
-            <label class="sr-only" for="income-period">Mes calendario de ingresos</label>
-            <input id="income-period" type="month" formControlName="period" class="form-control period-input" />
-            <button type="button" class="period-nav-button" (click)="nextMonth()" [disabled]="isCurrentMonth" aria-label="Ver mes siguiente">
-              <i class="fas fa-chevron-right" aria-hidden="true"></i>
-            </button>
-          </div>
-        </div>
-        <div class="filter-input-wrapper">
-          <i class="fas fa-search filter-icon"></i>
-          <label class="sr-only" for="income-search">Buscar ingresos</label>
-          <input id="income-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar ingresos" />
+  <section class="income-filters" aria-label="Filtros de ingresos">
+    <form [formGroup]="filtersForm" class="filters-layout">
+      <div class="income-period-picker">
+        <label class="income-period-picker__label" for="income-period">Mes calendario de ingresos</label>
+        <div class="income-period-picker__controls">
+          <button type="button" class="period-nav-button" (click)="previousMonth()" aria-label="Ver mes anterior">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+          </button>
+          <input id="income-period" type="month" formControlName="period" class="form-control period-input" />
+          <button type="button" class="period-nav-button" (click)="nextMonth()" [disabled]="isCurrentMonth" aria-label="Ver mes siguiente">
+            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+          </button>
         </div>
       </div>
-    </form>
-  </div>
 
-  <!-- Loading -->
-  <div *ngIf="loadingPage" class="loading-state d-flex justify-content-center align-items-center py-5">
-    <div class="spinner-border loading-state__spinner" role="status">
-      <span class="sr-only">Cargando...</span>
-    </div>
+      <div class="filter-input-wrapper">
+        <i class="fas fa-search filter-icon" aria-hidden="true"></i>
+        <label class="sr-only" for="income-search">Buscar ingresos</label>
+        <input id="income-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar ingresos…" />
+      </div>
+    </form>
+  </section>
+
+  <div *ngIf="loadingPage" class="loading-state" role="status" aria-live="polite">
+    <div class="spinner-border loading-state__spinner" aria-hidden="true"></div>
+    <span>Cargando ingresos…</span>
   </div>
 
   <ng-container *ngIf="!loadingPage">
-
-    <ng-container *ngIf="collectionSize > 0; else emptyState">
-      <section class="module-summary" aria-label="Resumen de ingresos">
-        <span class="module-summary__label">Ingresos de {{ selectedPeriodLabel }}</span>
+    <section class="module-summary" aria-labelledby="income-summary-label">
+      <span class="module-summary__icon" aria-hidden="true"><i class="fas fa-coins"></i></span>
+      <div class="module-summary__content">
+        <h2 id="income-summary-label" class="module-summary__label">
+          {{ collectionSize }} ingreso{{ collectionSize !== 1 ? 's' : '' }} · {{ selectedPeriodLabel }}
+        </h2>
         <strong>{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</strong>
-        <span class="module-summary__meta">{{ collectionSize }} ingreso{{ collectionSize !== 1 ? 's' : '' }}</span>
-      </section>
+      </div>
+    </section>
 
-      <div class="module-mobile-list d-md-none" aria-label="Lista de ingresos">
-        <button type="button" *ngFor="let income of incomes" class="module-mobile-card"
-          (click)="openEditModal(income)" [attr.aria-label]="'Editar ingreso ' + income.title">
-          <span class="module-mobile-card__content">
-            <span class="module-mobile-card__title">{{ income.title }}</span>
-            <span class="module-mobile-card__meta">{{ getIncomeTypeLabel(income) }}</span>
-          </span>
-          <span class="module-mobile-card__amount">{{ income.amount | currency: 'CLP':'$':'1.0-0' }}</span>
-        </button>
+    <section class="income-results" aria-labelledby="income-results-title">
+      <div class="results-heading">
+        <h2 id="income-results-title">Ingresos registrados</h2>
+        <span>{{ collectionSize }} ingreso{{ collectionSize !== 1 ? 's' : '' }}</span>
       </div>
 
-      <div class="mobile-pagination d-md-none">
-        <ngb-pagination [collectionSize]="collectionSize" [maxSize]="5" [(page)]="page" (pageChange)="filter()" [pageSize]="pageSize"></ngb-pagination>
-      </div>
-
-      <div class="table-card d-none d-md-block">
-        <div class="table-responsive">
-          <table class="table module-table mb-0">
-            <caption class="sr-only">Lista de ingresos</caption>
-            <thead>
-              <tr>
-                <th scope="col">Nombre</th>
-                <th scope="col">Tipo</th>
-                <th scope="col" class="text-right">Monto</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let income of incomes" (click)="openEditModal(income)" class="item-row">
-                <td>
-                  <div class="item-title">{{ income.title }}</div>
-                </td>
-                <td><span class="income-type-badge" [class.income-type-badge--variable]="income.type === 'variable'">{{ getIncomeTypeLabel(income) }}</span></td>
-                <td class="item-amount text-right">{{ income.amount | currency: 'CLP':'$':'1.0-0' }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr class="total-row">
-                <td class="font-weight-bold" colspan="2">Total</td>
-                <td class="font-weight-bold text-right">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
-              </tr>
-            </tfoot>
-          </table>
+      <ng-container *ngIf="collectionSize > 0; else emptyState">
+        <div class="module-mobile-list d-md-none" role="list" aria-label="Lista de ingresos">
+          <article *ngFor="let income of incomes" class="module-mobile-card" role="listitem">
+            <span class="module-mobile-card__icon" aria-hidden="true">
+              <i class="fas" [ngClass]="income.type === 'variable' ? 'fa-laptop' : 'fa-briefcase'"></i>
+            </span>
+            <div class="module-mobile-card__content">
+              <h3 class="module-mobile-card__title">{{ income.title }}</h3>
+              <span class="income-type-badge" [class.income-type-badge--variable]="income.type === 'variable'">
+                {{ getIncomeTypeLabel(income) }}
+              </span>
+              <span *ngIf="getIncomeCreatedAtLabel(income) as createdAtLabel" class="module-mobile-card__date">
+                <i class="fas fa-calendar-days" aria-hidden="true"></i>
+                <span>Registrado el {{ createdAtLabel }}</span>
+              </span>
+            </div>
+            <div class="module-mobile-card__actions">
+              <strong class="module-mobile-card__amount">{{ income.amount | currency: 'CLP':'$':'1.0-0' }}</strong>
+              <button type="button" class="income-edit-button" (click)="openEditModal(income)" [attr.aria-label]="'Editar ingreso: ' + income.title">
+                <i class="fas fa-pen" aria-hidden="true"></i><span>Editar</span>
+              </button>
+            </div>
+          </article>
         </div>
-        <div class="table-footer d-flex justify-content-between align-items-center">
-          <small class="text-muted">{{ collectionSize }} ingreso{{ collectionSize !== 1 ? 's' : '' }}</small>
-          <ngb-pagination
-            [collectionSize]="collectionSize"
-            [maxSize]="5"
-            [(page)]="page"
-            (pageChange)="filter()"
-            [pageSize]="pageSize">
-          </ngb-pagination>
+
+        <div class="mobile-pagination d-md-none" aria-label="Paginación de ingresos">
+          <ngb-pagination [collectionSize]="collectionSize" [maxSize]="5" [(page)]="page" (pageChange)="filter()" [pageSize]="pageSize"></ngb-pagination>
         </div>
-      </div>
-    </ng-container>
 
-    <ng-template #emptyState>
-      <div class="empty-state text-center py-5">
-        <i class="fas fa-coins empty-state__icon mb-3"></i>
-        <p class="empty-state__title">Sin ingresos registrados</p>
-        <p class="empty-state__sub">No hay ingresos en {{ selectedPeriodLabel }}. Puedes agregar sueldo fijo, horas extra o bonos.</p>
-        <button type="button" class="btn-add" (click)="openCreateModal()">
-          <i class="fas fa-plus mr-2"></i>Agregar primer ingreso
-        </button>
-      </div>
-    </ng-template>
+        <div class="table-card d-none d-md-block">
+          <div class="table-responsive">
+            <table class="table module-table mb-0">
+              <caption class="sr-only">Ingresos registrados para {{ selectedPeriodLabel }}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Tipo</th>
+                  <th scope="col" class="text-right">Monto</th>
+                  <th scope="col" class="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let income of incomes" class="item-row">
+                  <td><div class="item-title">{{ income.title }}</div></td>
+                  <td>
+                    <span class="income-type-badge" [class.income-type-badge--variable]="income.type === 'variable'">
+                      {{ getIncomeTypeLabel(income) }}
+                    </span>
+                  </td>
+                  <td class="item-amount text-right">{{ income.amount | currency: 'CLP':'$':'1.0-0' }}</td>
+                  <td class="text-right">
+                    <button type="button" class="income-edit-button" (click)="openEditModal(income)" [attr.aria-label]="'Editar ingreso: ' + income.title">
+                      <i class="fas fa-pen" aria-hidden="true"></i><span>Editar</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td class="font-weight-bold" colspan="2">Total del período</td>
+                  <td class="font-weight-bold text-right">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <div class="table-footer">
+            <small>{{ collectionSize }} ingreso{{ collectionSize !== 1 ? 's' : '' }}</small>
+            <ngb-pagination [collectionSize]="collectionSize" [maxSize]="5" [(page)]="page" (pageChange)="filter()" [pageSize]="pageSize"></ngb-pagination>
+          </div>
+        </div>
+      </ng-container>
 
+      <ng-template #emptyState>
+        <div class="empty-state">
+          <span class="empty-state__icon" aria-hidden="true"><i class="fas fa-coins"></i></span>
+          <ng-container *ngIf="isSearchActive; else periodEmptyState">
+            <h3 class="empty-state__title">No encontramos ingresos</h3>
+            <p class="empty-state__sub">No hay coincidencias para “{{ search?.value }}” en {{ selectedPeriodLabel }}.</p>
+            <button type="button" class="empty-state__action" (click)="clearSearch()">Limpiar búsqueda</button>
+          </ng-container>
+          <ng-template #periodEmptyState>
+            <h3 class="empty-state__title">{{ fireIncomes.length ? 'Sin ingresos en este mes' : 'Sin ingresos registrados' }}</h3>
+            <p class="empty-state__sub">
+              {{ fireIncomes.length ? 'No hay ingresos en ' + selectedPeriodLabel + '.' : 'Registra sueldo fijo, ingresos variables o bonos para comenzar.' }}
+            </p>
+            <button type="button" class="btn-add" (click)="openCreateModal()">
+              <i class="fas fa-plus" aria-hidden="true"></i><span>Agregar primer ingreso</span>
+            </button>
+          </ng-template>
+        </div>
+      </ng-template>
+    </section>
   </ng-container>
-
 </div>

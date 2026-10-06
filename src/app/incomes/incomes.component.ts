@@ -31,6 +31,11 @@ export class IncomesComponent {
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
+  private readonly incomeCreatedAtFormatter = new Intl.DateTimeFormat('es-CL', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
 
   constructor() {
     this.filtersForm = this.fb.group({
@@ -119,6 +124,14 @@ export class IncomesComponent {
     return this.filtersForm.get('search');
   }
 
+  get isSearchActive(): boolean {
+    return Boolean(this.search?.value);
+  }
+
+  clearSearch(): void {
+    this.filtersForm.patchValue({ search: '' });
+  }
+
   get selectedPeriod(): string {
     return this.filtersForm.get('period')?.value || this.currentPeriod();
   }
@@ -134,6 +147,12 @@ export class IncomesComponent {
 
   getIncomeTypeLabel(income: Income): string {
     return income.type === 'variable' ? 'Ingreso variable' : 'Sueldo fijo';
+  }
+
+  getIncomeCreatedAtLabel(income: Income): string | null {
+    if (!income.createdAt || typeof income.createdAt.toDate !== 'function') return null;
+
+    return this.incomeCreatedAtFormatter.format(income.createdAt.toDate());
   }
 
   previousMonth(): void {
