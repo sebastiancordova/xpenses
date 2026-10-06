@@ -69,7 +69,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 1rem;
-  align-items: stretch;
+  align-items: start;
 }
 
 .filters-clear {
@@ -202,16 +202,67 @@
 }
 
 .filter-payment-method {
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  gap: .15rem;
   width: 100%;
 
-  .filter-control__select {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
+  .filter-control__trigger {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
     width: 100%;
-    height: 100%;
-    opacity: 0;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
     cursor: pointer;
+
+    &::after { display: none; }
+    &:focus-visible { outline: 3px solid rgba(135, 102, 86, .35); outline-offset: 2px; }
+  }
+
+  .filter-payment-method__caret {
+    position: static;
+    flex: 0 0 auto;
+    margin-left: auto;
+    transition: transform .15s ease;
+  }
+
+  &.show .filter-payment-method__caret { transform: rotate(180deg); }
+
+  .filter-payment-method__menu {
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    float: none;
+    width: 100%;
+    min-width: 0;
+    max-height: min(60vh, 20rem);
+    overflow-y: auto;
+    margin: .35rem 0 0;
+    padding: .25rem;
+    border: 1px solid $color-milky;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+  }
+
+  .filter-payment-method__menu [ngbDropdownItem] {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: .55rem .7rem;
+    border-radius: 6px;
+    color: $color-grey-dark;
+    white-space: normal;
+    overflow-wrap: anywhere;
+
+    &:hover, &:focus-visible { background: $color-milkier; color: $color-grey-darker; }
+    &:focus-visible { outline: 2px solid $color-brand-secondary; outline-offset: -2px; }
+    &[aria-current="true"] { color: $color-brand-primary; font-weight: 700; }
   }
 }
 
@@ -266,9 +317,9 @@
   min-width: 0;
   align-self: center;
 
-  ::ng-deep app-range-date-selector { position: relative; z-index: 1; display: block; grid-area: 1 / 1; width: calc(100% - 1.45rem); min-width: 0; height: 100%; justify-self: start; }
-  ::ng-deep .date-selector-wrapper, ::ng-deep .date-trigger { width: 100%; min-width: 0; height: 100%; }
-  ::ng-deep .date-trigger { min-height: 44px; justify-content: space-between; white-space: normal; background: transparent; border: 0; font-size: 1rem; }
+  ::ng-deep app-range-date-selector { position: relative; z-index: 1; display: block; grid-area: 1 / 1; width: calc(100% - 1.45rem); min-width: 0; height: auto; justify-self: start; }
+  ::ng-deep .date-selector-wrapper { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: .35rem; width: 100%; min-width: 0; height: auto; }
+  ::ng-deep .date-trigger { grid-area: 1 / 1; width: 100%; min-width: 0; height: auto; min-height: 44px; justify-content: space-between; white-space: normal; background: transparent; border: 0; font-size: 1rem; }
   ::ng-deep .date-trigger__icon,
   ::ng-deep .date-trigger__label,
   ::ng-deep .date-trigger__from,
@@ -276,14 +327,18 @@
   ::ng-deep .date-trigger__arrow { display: none; }
   ::ng-deep .date-trigger__open { position: relative; z-index: 1; align-self: stretch; flex: 1; min-width: 0; min-height: 44px; flex-wrap: wrap; justify-content: flex-start; gap: .25rem; padding: 0; font-size: .9rem; font-weight: 500; text-align: left; }
   ::ng-deep .date-trigger__clear { width: 44px; height: 44px; margin-right: 0; }
+  ::ng-deep ngb-datepicker { position: static !important; grid-area: 2 / 1; inset: auto !important; transform: none !important; justify-self: start; width: max-content; max-width: 100%; margin: .35rem 0 0; }
 }
 
 .filter-period__value {
   grid-area: 1 / 1;
-  align-self: center;
+  align-self: start;
+  display: flex;
+  align-items: center;
   width: 100%;
   min-width: 0;
-  z-index: 0;
+  min-height: 44px;
+  z-index: 2;
   padding-right: 1.45rem;
   color: $color-grey-darker;
   font-size: .9rem;
@@ -298,19 +353,9 @@
 
 .filter-period__caret {
   right: .25rem;
-  bottom: .55rem;
-}
-
-@media (max-width: $break-sm) {
-  .filter-period__control {
-    ::ng-deep ngb-datepicker {
-      position: absolute !important;
-      top: 100% !important;
-      right: 0 !important;
-      left: auto !important;
-      transform: none !important;
-    }
-  }
+  top: 1.375rem;
+  bottom: auto;
+  transform: translateY(-50%);
 }
 
 .filters-actions { display: flex; justify-content: flex-end; }

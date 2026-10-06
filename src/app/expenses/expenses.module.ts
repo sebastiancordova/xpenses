@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ExpensesComponent } from './expenses.component';
 import { ExpensesRoutingModule } from './expenses-routing.module';
 import { SharedModule } from '@shared/shared.module';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { AddExpenseComponent } from './add-expense/add-expense.component';
 import { EditExpenseComponent } from './edit-expense/edit-expense.component';
 
@@ -17,7 +18,8 @@ import { EditExpenseComponent } from './edit-expense/edit-expense.component';
   imports: [
     CommonModule,
     ExpensesRoutingModule,
-    SharedModule
+    SharedModule,
+    NgbDropdownModule
   ]
 })
 export class ExpensesModule { }

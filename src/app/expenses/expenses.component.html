@@ -34,16 +34,23 @@
       </div>
 
       <div class="filters-selectors">
-        <div class="filter-control filter-payment-method">
-          <label class="filter-control__label" for="expense-payment-method">Método<span class="sr-only"> de pago</span></label>
-          <span class="filter-control__value" aria-hidden="true">{{ selectedPaymentMethodLabel }}</span>
-          <i class="fas fa-chevron-down filter-control__caret" aria-hidden="true"></i>
-          <select id="expense-payment-method" class="filter-control__select"
-            formControlName="paymentMethodId" [attr.aria-busy]="paymentMethodsLoading">
-            <option value="">Todos los métodos</option>
-            <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }}{{ !method.isActive ? ' (inactivo)' : '' }}</option>
-            <option [value]="unassignedPaymentMethod">Sin asignar</option>
-          </select>
+        <div class="filter-control filter-payment-method" ngbDropdown #paymentMethodDropdown="ngbDropdown" [autoClose]="true" display="static">
+          <span id="expense-payment-method-label" class="filter-control__label">Método de pago</span>
+          <button #paymentMethodTrigger id="expense-payment-method" type="button" class="filter-control__trigger" ngbDropdownToggle
+            [attr.aria-labelledby]="'expense-payment-method-label expense-payment-method-value'"
+            [attr.aria-busy]="paymentMethodsLoading">
+            <span id="expense-payment-method-value" class="filter-control__value">{{ selectedPaymentMethodLabel }}</span>
+            <i class="fas fa-chevron-down filter-control__caret filter-payment-method__caret" aria-hidden="true"></i>
+          </button>
+          <div ngbDropdownMenu class="filter-payment-method__menu" aria-labelledby="expense-payment-method-label">
+            <button type="button" ngbDropdownItem [attr.aria-current]="!filtersForm.get('paymentMethodId')?.value ? 'true' : null"
+              (click)="selectPaymentMethod(''); paymentMethodDropdown.close(); paymentMethodTrigger.focus()">Todos los métodos</button>
+            <button type="button" ngbDropdownItem *ngFor="let method of paymentMethods"
+              [attr.aria-current]="filtersForm.get('paymentMethodId')?.value === method.uid ? 'true' : null"
+              (click)="selectPaymentMethod(method.uid); paymentMethodDropdown.close(); paymentMethodTrigger.focus()">{{ method.name }}{{ !method.isActive ? ' (inactivo)' : '' }}</button>
+            <button type="button" ngbDropdownItem [attr.aria-current]="filtersForm.get('paymentMethodId')?.value === unassignedPaymentMethod ? 'true' : null"
+              (click)="selectPaymentMethod(unassignedPaymentMethod); paymentMethodDropdown.close(); paymentMethodTrigger.focus()">Sin asignar</button>
+          </div>
         </div>
 
         <div class="filter-control filter-period" [class.filter-period--custom]="hasCustomDateRange"

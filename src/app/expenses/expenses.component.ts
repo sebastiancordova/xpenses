@@ -203,6 +203,11 @@ export class ExpensesComponent implements OnDestroy {
     this.filtersForm.patchValue({ category });
   }
 
+  selectPaymentMethod(paymentMethodId: string | undefined): void {
+    if (paymentMethodId === undefined) return;
+    this.filtersForm.patchValue({ paymentMethodId });
+  }
+
   clearSearch(): void {
     this.filtersForm.patchValue({ search: '' });
   }

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Timestamp } from '@angular/fire/firestore';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExpensesService } from '@core/services/expenses.service';
 import { PaymentMethodsService } from '@core/services/payment-methods.service';
 import { SharedModule } from '@shared/shared.module';
@@ -28,7 +29,7 @@ describe('ExpensesComponent payment-method filtering', () => {
     ])) };
     await TestBed.configureTestingModule({
       declarations: [ExpensesComponent],
-      imports: [CommonModule, SharedModule],
+      imports: [CommonModule, SharedModule, NgbDropdownModule],
       providers: [
         { provide: ExpensesService, useValue: expensesService },
         { provide: PaymentMethodsService, useValue: methodsService },
@@ -37,17 +38,29 @@ describe('ExpensesComponent payment-method filtering', () => {
     }).compileComponents();
   });
 
-  it('filters exact IDs through the native selector and keeps unassigned records in all methods', fakeAsync(() => {
+  it('filters exact IDs through the payment-method menu and keeps unassigned records in all methods', fakeAsync(() => {
     const fixture = TestBed.createComponent(ExpensesComponent);
     fixture.detectChanges();
     const component = fixture.componentInstance;
-    const select = fixture.nativeElement.querySelector('#expense-payment-method') as HTMLSelectElement;
-    expect(select.labels?.[0].textContent).toContain('Método de pago');
-    expect(select.textContent).toContain('Débito (inactivo)');
+    const trigger = fixture.nativeElement.querySelector('#expense-payment-method') as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-labelledby')).toContain('expense-payment-method-label');
+    expect(fixture.nativeElement.querySelector('#expense-payment-method-label').textContent).toContain('Método de pago');
     expect(component.collectionSize).toBe(6);
     expect(component.totalAmountFiltered).toBe(410);
-    select.value = 'credit';
-    select.dispatchEvent(new Event('change'));
+    trigger.click();
+    fixture.detectChanges();
+    const menu = fixture.nativeElement.querySelector('.filter-payment-method__menu') as HTMLElement;
+    expect(menu.textContent).toContain('Débito (inactivo)');
+    const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true });
+    Object.defineProperty(escapeEvent, 'which', { get: () => 27 });
+    trigger.dispatchEvent(escapeEvent);
+    fixture.detectChanges();
+    expect(menu.classList.contains('show')).toBeFalse();
+    trigger.click();
+    fixture.detectChanges();
+    const menuItems = Array.from(menu.querySelectorAll('button')) as HTMLButtonElement[];
+    menuItems.find(item => item.textContent?.trim() === 'Crédito')?.click();
+    expect(document.activeElement).toBe(trigger);
     tick(200);
     expect(component.expenses.map(record => record.uid)).toEqual(['a', 'c']);
     expect(component.totalAmountFiltered).toBe(150);
