@@ -44,6 +44,8 @@ export class ExpensesComponent implements OnDestroy {
   public visibleDateRange = this.getDefaultDateRange();
   private paymentMethodsService = inject(PaymentMethodsService);
   private dateFilter$ = new BehaviorSubject<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
+  private readonly shortDateFormatter = new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short' });
+  private readonly fullDateFormatter = new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short', year: 'numeric' });
 
   constructor() {
     this.filtersForm = this.fb.group({
@@ -79,6 +81,16 @@ export class ExpensesComponent implements OnDestroy {
     return method
       ? `${method.name}${method.isActive ? '' : ' (inactivo)'}`
       : 'Método no disponible';
+  }
+
+  get visibleDateRangeLabel(): string {
+    const { from, to } = this.visibleDateRange;
+    const shortDate = this.shortDateFormatter.format(from).replace(/sept\.?/gi, 'sep');
+    const fullDate = this.fullDateFormatter.format(to).replace(/sept\.?/gi, 'sep');
+
+    return from.getFullYear() === to.getFullYear()
+      ? `${shortDate} – ${fullDate}`
+      : `${this.fullDateFormatter.format(from).replace(/sept\.?/gi, 'sep')} – ${fullDate}`;
   }
 
   get amountSortLabel(): string {

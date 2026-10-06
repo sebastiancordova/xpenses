@@ -46,10 +46,12 @@
           </select>
         </div>
 
-        <div class="filter-control filter-period">
-          <span class="filter-control__label">Período</span>
+        <div class="filter-control filter-period" [class.filter-period--custom]="hasCustomDateRange"
+          role="group" aria-labelledby="expense-period-label expense-period-value">
+          <span id="expense-period-label" class="filter-control__label">Período</span>
           <div class="filter-period__control">
             <app-range-date-selector (rangeSelected)="filterByDate($event)"></app-range-date-selector>
+            <span id="expense-period-value" class="filter-period__value">{{ visibleDateRangeLabel }}</span>
             <i class="fas fa-chevron-down filter-control__caret filter-period__caret" aria-hidden="true"></i>
           </div>
         </div>
