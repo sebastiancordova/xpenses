@@ -1,17 +1,8 @@
+import { Firestore } from '@core/firebase/firebase.tokens';
+import { FirebaseStreamsService } from '@core/firebase/firebase-streams.service';
+import { CollectionReference, Timestamp, addDoc, collection, deleteDoc, doc, orderBy, query, updateDoc } from 'firebase/firestore';
 import { Injectable, inject } from '@angular/core';
-import {
-  Firestore,
-  CollectionReference,
-  collection,
-  collectionData,
-  doc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy,
-  Timestamp,
-} from '@angular/fire/firestore';
+
 import { combineLatest, firstValueFrom, Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { InstallmentPurchase } from '@core/models/installment-purchase';
@@ -24,6 +15,7 @@ export type InstallmentCycleSelection = 'payment-date' | 'billing-cycle';
 
 @Injectable({ providedIn: 'root' })
 export class InstallmentPurchasesService {
+  private readonly firebaseStreams = inject(FirebaseStreamsService);
   private firestore = inject(Firestore);
   private userService = inject(UserService);
   private preferencesService = inject(UserPreferencesService);
@@ -38,7 +30,7 @@ export class InstallmentPurchasesService {
     if (!uid) return of([]);
     const colRef = collection(this.firestore, this.colPath()) as CollectionReference<InstallmentPurchase>;
     const q = query(colRef, orderBy('createdAt', 'desc'));
-    const purchases$ = collectionData(q, { idField: 'uid' }) as Observable<InstallmentPurchase[]>;
+    const purchases$ = this.firebaseStreams.collectionData(q, { idField: 'uid' }) as Observable<InstallmentPurchase[]>;
     return combineLatest([purchases$, this.preferencesService.getPreferences(), this.paymentMethodsService.getAll()]).pipe(
       map(([purchases, preferences, methods]) => this.applyPaymentMethods(purchases, methods, preferences.billingCycleDay)),
       tap(purchases => this.syncCalculatedStatuses(purchases))
@@ -55,7 +47,7 @@ export class InstallmentPurchasesService {
     if (!uid) return of([]);
     const colRef = collection(this.firestore, this.colPath()) as CollectionReference<InstallmentPurchase>;
     const q = query(colRef, orderBy('createdAt', 'desc'));
-    const purchases$ = collectionData(q, { idField: 'uid' }) as Observable<InstallmentPurchase[]>;
+    const purchases$ = this.firebaseStreams.collectionData(q, { idField: 'uid' }) as Observable<InstallmentPurchase[]>;
     return combineLatest([purchases$, this.preferencesService.getPreferences(), this.paymentMethodsService.getAll()]).pipe(
       map(([purchases, preferences, methods]) => this.applyPaymentMethods(purchases, methods, preferences.billingCycleDay)),
       tap(purchases => this.syncCalculatedStatuses(purchases)),

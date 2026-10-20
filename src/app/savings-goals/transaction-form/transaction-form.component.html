@@ -51,7 +51,7 @@
       <button type="button" class="savings-button savings-button--secondary" (click)="activeModal.dismiss()" [disabled]="loading">Cancelar</button>
       <button type="submit" class="savings-button savings-button--primary" [disabled]="form.invalid || loading">
         <span *ngIf="!loading">{{ type === 'contribution' ? 'Registrar aporte' : 'Registrar retiro' }}</span>
-        <span *ngIf="loading"><i class="fa-solid fa-spinner fa-spin mr-1" aria-hidden="true"></i>Guardando…</span>
+        <span *ngIf="loading"><i class="fa-solid fa-spinner fa-spin me-1" aria-hidden="true"></i>Guardando…</span>
       </button>
     </div>
   </form>

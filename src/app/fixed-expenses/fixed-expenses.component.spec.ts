@@ -6,7 +6,7 @@ import { SharedModule } from '@shared/shared.module';
 import { FixedExpensesService } from '@core/services/fixed-expenses.service';
 import { FixedExpenseChargesService } from '@core/services/fixed-expense-charges.service';
 import { PaymentMethodsService } from '@core/services/payment-methods.service';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationsService } from '@core/services/notifications.service';
 import { of } from 'rxjs';
 import { NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FixedExpensesComponent } from './fixed-expenses.component';
@@ -76,7 +76,7 @@ describe('FixedExpensesComponent monthly records', () => {
     component.chargeForm = new FormBuilder().group({ amount: '100000', chargeDate: '2027-01-05', paymentMethodId: 'card' });
     component.chargesService = { save: jasmine.createSpy().and.resolveTo(), delete: jasmine.createSpy().and.resolveTo() };
     component.chargeModalRef = { close: jasmine.createSpy() };
-    component.toastr = { success: jasmine.createSpy() };
+    component.notifications = { success: jasmine.createSpy() };
     await component.saveCharge('confirmed');
     expect(component.chargesService.save).toHaveBeenCalledWith(jasmine.objectContaining({ period: '2026-12', chargeDate: '2027-01-05' }), 'light_2026-08');
     expect(component.selectedPeriod).toBe('2027-01');
@@ -103,7 +103,7 @@ describe('FixedExpensesComponent monthly records', () => {
     component.activeRow = { fixedExpenseId: 'light', charge: component.charges[0] };
     component.chargesService = { delete: jasmine.createSpy().and.resolveTo() };
     component.chargeModalRef = { close: jasmine.createSpy() };
-    component.toastr = { success: jasmine.createSpy() };
+    component.notifications = { success: jasmine.createSpy() };
     await component.resetCharge();
     expect(component.chargesService.delete).not.toHaveBeenCalled();
     await component.resetCharge();
@@ -119,7 +119,7 @@ describe('FixedExpensesComponent rendered monthly modal', () => {
         { provide: FixedExpensesService, useValue: { getAll: () => of([{ uid: 'light', title: 'Luz', amount: '110000', paymentMethodId: 'card' }]) } },
         { provide: FixedExpenseChargesService, useValue: { getAll: () => of([]) } },
         { provide: PaymentMethodsService, useValue: { getAll: () => of([{ uid: 'card', name: 'Tarjeta de prueba', isDefault: true, isActive: true }]) } },
-        { provide: ToastrService, useValue: {} }
+        { provide: NotificationsService, useValue: {} }
       ]
     }).compileComponents();
     const fixture = TestBed.createComponent(FixedExpensesComponent);
@@ -142,7 +142,7 @@ describe('FixedExpensesComponent rendered monthly modal', () => {
         { provide: FixedExpensesService, useValue: { getAll: () => of([{ uid: 'light', title: 'Luz', amount: '110000', paymentMethodId: 'card' }]) } },
         { provide: FixedExpenseChargesService, useValue: { getAll: () => of([]), save } },
         { provide: PaymentMethodsService, useValue: { getAll: () => of([{ uid: 'card', name: 'Tarjeta de prueba', isDefault: true, isActive: true }]) } },
-        { provide: ToastrService, useValue: { success: jasmine.createSpy() } }
+        { provide: NotificationsService, useValue: { success: jasmine.createSpy() } }
       ]
     }).compileComponents();
     TestBed.inject(NgbModalConfig).animation = false;

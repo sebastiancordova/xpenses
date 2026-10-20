@@ -1,9 +1,10 @@
+import { User } from 'firebase/auth';
 import { Injectable, inject } from '@angular/core';
 import { Route, UrlSegment, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
 import { Observable, firstValueFrom, of } from 'rxjs';
 import { take, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '@core/services/auth.service';
-import { User } from '@angular/fire/auth';
+
 
 @Injectable({
   providedIn: 'root'

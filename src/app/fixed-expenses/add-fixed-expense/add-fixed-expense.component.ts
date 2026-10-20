@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Expense } from '@core/models/expense';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -8,6 +8,8 @@ import { UserPreferencesService } from '@core/services/user-preferences.service'
 import { firstValueFrom } from 'rxjs';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-add-fixed-expense',
   templateUrl: './add-fixed-expense.component.html',
   styleUrls: ['./add-fixed-expense.component.scss'],

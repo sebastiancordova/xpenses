@@ -1,8 +1,8 @@
-import { Component, OnDestroy, TemplateRef, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, TemplateRef, ViewChild, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IUser } from '@core/models/user';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationsService } from '@core/services/notifications.service';
 import { Subject, combineLatest, debounceTime, take, takeUntil, tap } from 'rxjs';
 import { FixedExpense } from '@core/models/expense';
 import { AddFixedExpenseComponent } from './add-fixed-expense/add-fixed-expense.component';
@@ -23,6 +23,8 @@ interface MonthlyFixedExpenseRow {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-fixed-expenses',
   templateUrl: './fixed-expenses.component.html',
   styleUrls: ['./fixed-expenses.component.scss']
@@ -54,7 +56,7 @@ export class FixedExpensesComponent implements OnDestroy {
   public fireFixedExpenses: FixedExpense[] = [];
   private fixedExpensesService: FixedExpensesService = inject(FixedExpensesService);
   private fb: FormBuilder = inject(FormBuilder);
-  private toastr: ToastrService = inject(ToastrService);
+  private notifications: NotificationsService = inject(NotificationsService);
   private modalService: NgbModal = inject(NgbModal);
   public totalAmountFiltered = 0;
 
@@ -190,7 +192,7 @@ export class FixedExpensesComponent implements OnDestroy {
       this.chargeModalRef?.close();
       if (status === 'confirmed') this.setPeriod(input.chargeDate.slice(0, 7));
       else this.setPeriod(input.period);
-      this.toastr.success(status === 'confirmed' ? 'Cargo mensual registrado' : 'Gasto omitido este mes');
+      this.notifications.success(status === 'confirmed' ? 'Cargo mensual registrado' : 'Gasto omitido este mes');
     } catch {
       this.chargeError = 'No pudimos guardar el cargo. Revisa tu conexión e intenta nuevamente.';
     } finally { this.savingCharge = false; }
@@ -204,7 +206,7 @@ export class FixedExpensesComponent implements OnDestroy {
     try {
       await this.chargesService.delete(this.activeRow.charge.uid ?? getFixedExpenseChargeId(this.activeRow.fixedExpenseId, this.activeRow.charge.period));
       this.chargeModalRef?.close();
-      this.toastr.success('Registro mensual restablecido');
+      this.notifications.success('Registro mensual restablecido');
     } catch { this.chargeError = 'No pudimos restablecer el registro. Intenta nuevamente.'; }
     finally { this.savingCharge = false; }
   }
@@ -227,9 +229,9 @@ export class FixedExpensesComponent implements OnDestroy {
     })
     modalRef.componentInstance.newFixedExpense$.pipe(take(1)).subscribe((fixedExpense: FixedExpense) => {
       this.fixedExpensesService.save(fixedExpense).then(() => {
-        this.toastr.success('Gasto fijo añadido');
+        this.notifications.success('Gasto fijo añadido');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       })
     })
   }
@@ -243,9 +245,9 @@ export class FixedExpensesComponent implements OnDestroy {
     modalRef.componentInstance.fixedExpense = fixedExpense;
     modalRef.componentInstance.editFixedExpense$.pipe(take(1)).subscribe((fixedExpense: FixedExpense) => {
       this.fixedExpensesService.update(fixedExpense).then(() => {
-        this.toastr.success('Gasto fijo editado');
+        this.notifications.success('Gasto fijo editado');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       })
     })
     modalRef.componentInstance.deleteFixedExpense$.pipe(take(1)).subscribe((id: string) => {
@@ -255,9 +257,9 @@ export class FixedExpensesComponent implements OnDestroy {
 
   delete(id: string) {
     this.fixedExpensesService.delete(id).then(() => {
-      this.toastr.success('Gasto fijo eliminado');
+      this.notifications.success('Gasto fijo eliminado');
     }).catch(() => {
-      this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+      this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
     })
   }
 

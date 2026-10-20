@@ -1,12 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { UserCredential } from 'firebase/auth';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AbstractControl, Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
-import {UserCredential, createUserWithEmailAndPassword} from '@angular/fire/auth'
 import { UserService } from '@core/services/user.service';
 import { CustomValidator } from '@core/validators/custom.validators';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']

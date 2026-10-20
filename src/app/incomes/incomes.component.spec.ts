@@ -1,9 +1,10 @@
+import { Timestamp } from 'firebase/firestore';
 import { CommonModule } from '@angular/common';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { Timestamp } from '@angular/fire/firestore';
+
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@shared/shared.module';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationsService } from '@core/services/notifications.service';
 import { Subject, of } from 'rxjs';
 import { Income } from '@core/models/income';
 import { IncomesService } from '@core/services/incomes.service';
@@ -38,7 +39,7 @@ describe('IncomesComponent', () => {
     delete: jasmine.Spy;
   };
   let modalService: { open: jasmine.Spy };
-  let toastr: { success: jasmine.Spy; error: jasmine.Spy };
+  let notifications: { success: jasmine.Spy; error: jasmine.Spy };
   let createModalRef: any;
   let editModalRef: any;
 
@@ -65,7 +66,7 @@ describe('IncomesComponent', () => {
       open: jasmine.createSpy().and.callFake((component: unknown) =>
         component === AddIncomesComponent ? createModalRef : editModalRef)
     };
-    toastr = { success: jasmine.createSpy(), error: jasmine.createSpy() };
+    notifications = { success: jasmine.createSpy(), error: jasmine.createSpy() };
 
     await TestBed.configureTestingModule({
       declarations: [IncomesComponent],
@@ -73,7 +74,7 @@ describe('IncomesComponent', () => {
       providers: [
         { provide: IncomesService, useValue: incomesService },
         { provide: NgbModal, useValue: modalService },
-        { provide: ToastrService, useValue: toastr }
+        { provide: NotificationsService, useValue: notifications }
       ]
     }).compileComponents();
   });

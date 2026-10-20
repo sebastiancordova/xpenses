@@ -1,10 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AbstractControl, Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationsService } from '@core/services/notifications.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -13,7 +15,7 @@ export class LoginComponent {
   public loginForm: FormGroup;
   public loading: boolean;
   public showPassword = false;
-  private toastr: ToastrService = inject(ToastrService);
+  private notifications: NotificationsService = inject(NotificationsService);
   private authService: AuthService = inject(AuthService);
   private fb: FormBuilder = inject(FormBuilder);
   private router: Router = inject(Router);
@@ -36,9 +38,9 @@ export class LoginComponent {
           })
           .catch(err => {
             if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-                this.toastr.error('Usuario o contraseña incorrectos.');
+                this.notifications.error('Usuario o contraseña incorrectos.');
             } else {
-                this.toastr.error('Ocurrió un error');
+                this.notifications.error('Ocurrió un error');
             }
             this.loading = false;
         });

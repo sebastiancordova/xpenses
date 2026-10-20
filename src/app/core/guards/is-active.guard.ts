@@ -1,17 +1,16 @@
+import { User } from 'firebase/auth';
 import { Injectable, inject } from '@angular/core';
 import { CanLoad, CanMatchFn, Route, UrlSegment, UrlTree } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { UserService } from '@core/services/user.service';
-import { ToastrService } from 'ngx-toastr';
 import { Observable, firstValueFrom, of } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { User } from '@angular/fire/auth';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class IsActiveGuard  {
-  //private toastr: ToastrService = inject(ToastrService);
   private authService: AuthService = inject(AuthService);
   constructor() { }
 
@@ -22,7 +21,6 @@ export class IsActiveGuard  {
           return true;
         } else {
           this.authService.logout();
-          //this.toastr.info('Usuario no activado');
           return false;
         }
       });

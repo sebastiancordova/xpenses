@@ -1,6 +1,6 @@
-import { Component, EventEmitter, inject, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Timestamp } from '@angular/fire/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { InstallmentPurchase } from '@core/models/installment-purchase';
 import { EXPENSE_CATEGORY_OPTIONS } from '@core/models/expense';
@@ -10,6 +10,8 @@ import { PaymentMethod } from '@core/models/payment-method';
 import { PaymentMethodsService } from '@core/services/payment-methods.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-add-installment-purchase',
   templateUrl: './add-installment-purchase.component.html',
   styleUrls: ['./add-installment-purchase.component.scss'],
@@ -84,7 +86,7 @@ export class AddInstallmentPurchaseComponent implements OnInit {
       paymentDay: this.billingCycleDay,
       paymentMethodId: val.paymentMethodId,
       category: val.category,
-      subcategory: val.subcategory || undefined,
+      ...(val.subcategory ? { subcategory: val.subcategory } : {}),
       status: 'active',
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),

@@ -6,7 +6,7 @@
       <h1 class="expenses-title mb-0">Gastos</h1>
     </div>
     <button class="btn-add" (click)="openCreateModal()">
-      <i class="fas fa-plus mr-2"></i>Nuevo gasto
+      <i class="fas fa-plus me-2"></i>Nuevo gasto
     </button>
   </div>
 
@@ -15,7 +15,7 @@
     <form [formGroup]="filtersForm" class="filters-form">
       <div class="filter-input-wrapper filter-search">
           <i class="fas fa-search filter-icon" aria-hidden="true"></i>
-          <label class="sr-only" for="expense-search">Buscar gastos</label>
+          <label class="visually-hidden" for="expense-search">Buscar gastos</label>
           <input id="expense-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar gastos" />
           <button *ngIf="filtersForm.get('search')?.value" type="button" class="filter-search__clear" (click)="clearSearch()" aria-label="Borrar búsqueda">
             <i class="fas fa-times" aria-hidden="true"></i>
@@ -69,7 +69,7 @@
       </div>
       <div class="filters-actions" *ngIf="hasActiveFilters">
         <button type="button" class="filters-clear" (click)="clearFilters()">
-          Limpiar <span class="sr-only">todos los filtros</span>
+          Limpiar <span class="visually-hidden">todos los filtros</span>
         </button>
       </div>
     </form>
@@ -81,7 +81,7 @@
       <div class="skeleton skeleton--th" style="width:35%"></div>
       <div class="skeleton skeleton--th d-none d-md-block" style="width:12%"></div>
       <div class="skeleton skeleton--th d-none d-md-block" style="width:10%"></div>
-      <div class="skeleton skeleton--th ml-auto" style="width:10%"></div>
+      <div class="skeleton skeleton--th ms-auto" style="width:10%"></div>
     </div>
     <div class="skeleton-body-row" *ngFor="let n of [1,2,3,4,5,6]">
       <div>
@@ -90,7 +90,7 @@
       </div>
       <div class="skeleton skeleton--badge d-none d-md-block"></div>
       <div class="skeleton skeleton--date d-none d-md-block"></div>
-      <div class="skeleton skeleton--amount ml-auto"></div>
+      <div class="skeleton skeleton--amount ms-auto"></div>
     </div>
   </div>
 
@@ -112,7 +112,7 @@
           <span class="expense-mobile-card__icon" aria-hidden="true"><i class="fas" [ngClass]="getCategoryIcon(expense.category)"></i></span>
           <span class="expense-mobile-card__topline">
             <span class="expense-mobile-card__content">
-              <span class="sr-only">Editar gasto: </span>
+              <span class="visually-hidden">Editar gasto: </span>
               <span class="expense-mobile-card__title">{{ expense.title }}</span>
               <span class="category-badge" [ngClass]="getCategoryClass(expense.category)">{{ expense.category }}<ng-container *ngIf="expense.subcategory"> · {{ expense.subcategory }}</ng-container></span>
               <span class="expense-mobile-card__comment" *ngIf="expense.comment">{{ expense.comment }}</span>
@@ -130,7 +130,7 @@
       <div class="table-card d-none d-md-block">
         <div class="table-responsive">
           <table class="table expenses-table mb-0">
-            <caption class="sr-only">Lista de gastos</caption>
+            <caption class="visually-hidden">Lista de gastos</caption>
             <thead>
               <tr>
                 <th scope="col" [attr.aria-sort]="sortColumn === 'title' ? (sortAsc ? 'ascending' : 'descending') : 'none'">
@@ -141,7 +141,7 @@
                 </th>
                 <th scope="col" class="d-none d-md-table-cell">Categoría</th>
                 <th scope="col" class="d-none d-md-table-cell">Fecha</th>
-                <th scope="col" class="text-right" [attr.aria-sort]="sortColumn === 'amount' ? (sortAsc ? 'ascending' : 'descending') : 'none'">
+                <th scope="col" class="text-end" [attr.aria-sort]="sortColumn === 'amount' ? (sortAsc ? 'ascending' : 'descending') : 'none'">
                   <button type="button" (click)="onOrderBy('amount')" class="sortable"
                     [class.sort-active]="sortColumn === 'amount'">
                     Monto <i class="fas fa-xs" aria-hidden="true" [ngClass]="getSortIcon('amount')"></i>
@@ -167,7 +167,7 @@
                   </span>
                 </td>
                 <td class="expense-date d-none d-md-table-cell">{{ expense.createdAt.toDate() | date: 'dd/MM/yyyy' }}</td>
-                <td class="expense-amount text-right">{{ expense.amount | currency: 'CLP':'$':'1.0-0' }}</td>
+                <td class="expense-amount text-end">{{ expense.amount | currency: 'CLP':'$':'1.0-0' }}</td>
               </tr>
             </tbody>
           </table>
@@ -191,7 +191,7 @@
         <p class="empty-state__sub">{{ hasActiveFilters ? 'No hay gastos que coincidan con estos filtros.' : 'No hay gastos para este período.' }}</p>
         <button *ngIf="hasActiveFilters" type="button" class="filters-clear" (click)="clearFilters()">Limpiar filtros</button>
         <button *ngIf="!hasActiveFilters" class="btn-add" (click)="openCreateModal()">
-          <i class="fas fa-plus mr-2"></i>Agregar primer gasto
+          <i class="fas fa-plus me-2"></i>Agregar primer gasto
         </button>
       </div>
     </ng-template>

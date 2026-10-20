@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationsService } from '@core/services/notifications.service';
 import { Subject, debounceTime, take, takeUntil, tap } from 'rxjs';
 import { AddSubscriptionComponent } from './add-subscription/add-subscription.component';
 import { EditSubscriptionsComponent } from './edit-subscription/edit-subscription.component';
@@ -9,6 +9,8 @@ import { SubscriptionsService } from '@core/services/subscriptions.service';
 import { Subscription } from '@core/models/subscriptions';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-subscriptions',
   templateUrl: './subscriptions.component.html',
   styleUrls: ['./subscriptions.component.scss']
@@ -22,7 +24,7 @@ export class SubscriptionsComponent {
   public collectionSize = 1;
   private subscriptionsService: SubscriptionsService = inject(SubscriptionsService);
   private fb: FormBuilder = inject(FormBuilder);
-  private toastr: ToastrService = inject(ToastrService);
+  private notifications: NotificationsService = inject(NotificationsService);
   private modalService: NgbModal = inject(NgbModal);
   public fireSubscriptions: Subscription[] = [];
   public subscriptions: Subscription[] = [];
@@ -70,9 +72,9 @@ export class SubscriptionsComponent {
     })
     modalRef.componentInstance.newSubscription$.pipe(take(1)).subscribe((subscription: Subscription) => {
       this.subscriptionsService.save(subscription).then(() => {
-        this.toastr.success('Subscripción añadida');
+        this.notifications.success('Subscripción añadida');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       })
     })
   }
@@ -86,9 +88,9 @@ export class SubscriptionsComponent {
     modalRef.componentInstance.subscription = subscription;
     modalRef.componentInstance.editSubscription$.pipe(take(1)).subscribe((subscription: Subscription) => {
       this.subscriptionsService.update(subscription).then(() => {
-        this.toastr.success('Subscripción editada');
+        this.notifications.success('Subscripción editada');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       })
     })
     modalRef.componentInstance.deleteSubscription$.pipe(take(1)).subscribe((id: string) => {
@@ -98,9 +100,9 @@ export class SubscriptionsComponent {
 
   delete(id: string) {
     this.subscriptionsService.delete(id).then(() => {
-      this.toastr.success('Subscripción eliminada');
+      this.notifications.success('Subscripción eliminada');
     }).catch(() => {
-      this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+      this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
     })
   }
 

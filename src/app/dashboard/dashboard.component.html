@@ -40,7 +40,7 @@
 
   <section *ngIf="loadError" class="alert alert-warning d-flex flex-wrap align-items-center mb-3" role="alert" aria-labelledby="dashboard-load-error-title">
     <i class="fa-solid fa-cloud-exclamation" aria-hidden="true"></i><div><h2 id="dashboard-load-error-title">No pudimos cargar este período</h2><p>Revisa tu conexión e inténtalo nuevamente. Tus registros no se modificaron.</p></div>
-    <button type="button" class="quick-action ml-auto mt-2 mt-sm-0" (click)="retryLoadData()"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i><span>Reintentar</span></button>
+    <button type="button" class="quick-action ms-auto mt-2 mt-sm-0" (click)="retryLoadData()"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i><span>Reintentar</span></button>
   </section>
 
   <ng-container *ngIf="!isLoading && !loadError">
@@ -58,7 +58,7 @@
 
       <section class="daily-spend-card mb-3" aria-labelledby="daily-spend-title" [attr.aria-busy]="isDailySpendLoading">
         <div class="daily-spend-card__header"><div><span class="daily-spend-card__eyebrow">Seguimiento diario</span><h2 id="daily-spend-title">¿Cuánto llevas gastado?</h2><p>Consulta un día y revisa la comparación del período seleccionado.</p></div>
-          <div class="daily-spend-card__controls"><div class="daily-spend-card__shortcuts" aria-label="Fechas rápidas"><button type="button" class="date-shortcut" [class.date-shortcut--active]="isYesterdaySpendDate" (click)="showYesterdaySpend()" [attr.aria-pressed]="isYesterdaySpendDate">Ayer</button><button type="button" class="date-shortcut" [class.date-shortcut--active]="isTodaySpendDate" (click)="showTodaySpend()" [attr.aria-pressed]="isTodaySpendDate">Hoy</button></div><label class="sr-only" for="daily-spend-date">Fecha para consultar gastos</label><input id="daily-spend-date" class="daily-spend-card__date-input" type="date" [value]="spendDate" [max]="maxSpendDate" (change)="onSpendDateChange($any($event.target).value)"></div>
+          <div class="daily-spend-card__controls"><div class="daily-spend-card__shortcuts" aria-label="Fechas rápidas"><button type="button" class="date-shortcut" [class.date-shortcut--active]="isYesterdaySpendDate" (click)="showYesterdaySpend()" [attr.aria-pressed]="isYesterdaySpendDate">Ayer</button><button type="button" class="date-shortcut" [class.date-shortcut--active]="isTodaySpendDate" (click)="showTodaySpend()" [attr.aria-pressed]="isTodaySpendDate">Hoy</button></div><label class="visually-hidden" for="daily-spend-date">Fecha para consultar gastos</label><input id="daily-spend-date" class="daily-spend-card__date-input" type="date" [value]="spendDate" [max]="maxSpendDate" (change)="onSpendDateChange($any($event.target).value)"></div>
         </div>
         <div class="daily-spend-card__metrics">
           <article class="daily-spend-metric" *ngIf="!isDailySpendLoading && !dailySpendLoadError; else dailySpendLoading"><span class="daily-spend-metric__label">Gastado el {{ selectedSpendDateLabel }}</span><strong>{{ spendOnSelectedDate | currency: 'CLP':'$':'1.0-0' }}</strong><small>{{ spendOnSelectedDateCount }} gasto{{ spendOnSelectedDateCount !== 1 ? 's' : '' }} registrado{{ spendOnSelectedDateCount !== 1 ? 's' : '' }}</small></article>
@@ -83,7 +83,7 @@
             <small *ngIf="isCategoryOverviewVisible && !hasExclusions">Toca una categoría para ver el detalle. Usa «En gráfico» para incluirla u ocultarla del análisis; tus totales no cambian.</small>
             <small *ngIf="isCategoryOverviewVisible && hasExclusions">Montos y porcentajes ajustados según lo que incluyas en este análisis; tus totales del período no cambian.</small>
           </div>
-          <button type="button" class="chart-reset ml-auto" (click)="isCategoryOverviewVisible = !isCategoryOverviewVisible" [attr.aria-expanded]="isCategoryOverviewVisible" [attr.aria-label]="(isCategoryOverviewVisible ? 'Ocultar' : 'Mostrar') + ' gastos por categoría'" aria-controls="category-analysis-content">
+          <button type="button" class="chart-reset ms-auto" (click)="isCategoryOverviewVisible = !isCategoryOverviewVisible" [attr.aria-expanded]="isCategoryOverviewVisible" [attr.aria-label]="(isCategoryOverviewVisible ? 'Ocultar' : 'Mostrar') + ' gastos por categoría'" aria-controls="category-analysis-content">
             {{ isCategoryOverviewVisible ? 'Ocultar' : 'Mostrar' }}
           </button>
         </div>

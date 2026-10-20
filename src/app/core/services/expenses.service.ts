@@ -1,5 +1,8 @@
+import { Firestore } from '@core/firebase/firebase.tokens';
+import { FirebaseStreamsService } from '@core/firebase/firebase-streams.service';
+import { CollectionReference, Timestamp, addDoc, collection, deleteDoc, doc, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import { Injectable, inject } from '@angular/core';
-import { CollectionReference, Firestore, collection, collectionData, Timestamp, addDoc, doc, orderBy, query, deleteDoc, updateDoc, where } from '@angular/fire/firestore';
+
 import { Expense } from '@core/models/expense';
 import { Observable, map, of } from 'rxjs';
 import { UserService } from './user.service';
@@ -8,6 +11,7 @@ import { UserService } from './user.service';
   providedIn: 'root'
 })
 export class ExpensesService {
+  private readonly firebaseStreams = inject(FirebaseStreamsService);
   private userService = inject(UserService);
   private firestore: Firestore = inject(Firestore);
   private expensesCollection!: CollectionReference<Expense>;
@@ -42,7 +46,7 @@ export class ExpensesService {
 
     const colRef = collection(this.firestore, `users/${userId}/expenses`) as CollectionReference<Expense>;
     const queryRef = query(colRef, orderBy('createdAt', 'desc'), where('createdAt', '>=', finalStartDate), where('createdAt', '<=', finalEndDate));
-    return (collectionData(queryRef, { idField: 'uid' }) as Observable<Expense[]>).pipe(
+    return (this.firebaseStreams.collectionData(queryRef, { idField: 'uid' }) as Observable<Expense[]>).pipe(
       map(expenses => paymentMethodId
         ? expenses.filter(expense => (expense.paymentMethodId ?? legacyPaymentMethodId) === paymentMethodId)
         : expenses)

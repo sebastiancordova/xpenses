@@ -1,6 +1,7 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Timestamp } from 'firebase/firestore';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Timestamp } from '@angular/fire/firestore';
+
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { InstallmentPurchase } from '@core/models/installment-purchase';
 import { EXPENSE_CATEGORY_OPTIONS } from '@core/models/expense';
@@ -11,6 +12,8 @@ import { UserPreferencesService } from '@core/services/user-preferences.service'
 import { firstValueFrom } from 'rxjs';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-edit-installment-purchase',
   templateUrl: './edit-installment-purchase.component.html',
   styleUrls: ['./edit-installment-purchase.component.scss'],

@@ -1,7 +1,8 @@
+import { Timestamp } from 'firebase/firestore';
 import { CommonModule } from '@angular/common';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Timestamp } from '@angular/fire/firestore';
+
 import { of, throwError } from 'rxjs';
 import { PaymentMethod } from '@core/models/payment-method';
 import { DEFAULT_PREFERENCES } from '@core/models/user-preferences';

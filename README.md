@@ -1,6 +1,14 @@
 # Xpenses
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.4.
+Personal finance PWA using Angular 22.2.3, NgModules, RxJS, the modular Firebase SDK,
+Bootstrap 5 and ng-bootstrap 21. The project was originally generated with Angular CLI 16.0.4.
+
+Use Node.js 24.15.0 (see `.nvmrc`) and install dependencies with `npm ci`.
+The combined Angular 22 / Firebase 13 toolchain requires Node `^24.15.0 || >=26.0.0`;
+Firebase 13 packages declare Node >=24.12.0.
+The Firebase integration uses local Angular DI tokens and RxJS listener wrappers under
+`src/app/core/firebase`; AngularFire is no longer required. See the
+[technical guide](docs/project-guidelines.md) for integration conventions.
 
 ## Development server
 
@@ -13,6 +21,10 @@ Run `ng generate component component-name` to generate a new component. You can 
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+
+On macOS x64 hosts where the native embedded Sass compiler aborts, use
+`NG_BUILD_SASS_EMBEDDED=0 npm run build` to select the JavaScript Sass implementation.
+This host-specific workaround was needed during the Angular 22 migration.
 
 ## Historical payment-method migration procedure
 

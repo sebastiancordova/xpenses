@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Output, ViewEncapsulation, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, ViewEncapsulation, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-savings-confirm-action',
   templateUrl: './confirm-action.component.html',
   styleUrls: ['./confirm-action.component.scss'],

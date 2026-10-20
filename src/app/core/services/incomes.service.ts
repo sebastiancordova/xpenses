@@ -1,7 +1,10 @@
+import { Auth, Firestore } from '@core/firebase/firebase.tokens';
+import { FirebaseStreamsService } from '@core/firebase/firebase-streams.service';
+import { CollectionReference, Timestamp, addDoc, collection, deleteDoc, doc, orderBy, query, updateDoc } from 'firebase/firestore';
 import { Injectable, inject } from '@angular/core';
-import { CollectionReference, Firestore, Timestamp, addDoc, collection, collectionData, deleteDoc, doc, orderBy, query, updateDoc } from '@angular/fire/firestore';
+
 import { UserService } from './user.service';
-import { Auth, authState } from '@angular/fire/auth';
+
 import { Observable, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { Income } from '@core/models/income';
 
@@ -9,20 +12,21 @@ import { Income } from '@core/models/income';
   providedIn: 'root'
 })
 export class IncomesService {
+  private readonly firebaseStreams = inject(FirebaseStreamsService);
 
   private userService = inject(UserService);
   private firestore: Firestore = inject(Firestore);
   private auth = inject(Auth);
 
   getAll(): Observable<Income[]> {
-    return authState(this.auth).pipe(
+    return this.firebaseStreams.authState(this.auth).pipe(
       map(user => user?.uid),
       distinctUntilChanged(),
       switchMap(userId => {
         if (!userId) return of([] as Income[]);
         const colRef = collection(this.firestore, `users/${userId}/incomes`) as CollectionReference<Income>;
         const queryRef = query(colRef, orderBy('createdAt', 'desc'));
-        return collectionData(queryRef, { idField: 'uid' }) as Observable<Income[]>;
+        return this.firebaseStreams.collectionData(queryRef, { idField: 'uid' }) as Observable<Income[]>;
       })
     );
   }

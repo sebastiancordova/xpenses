@@ -1,10 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AbstractControl, Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationsService } from '@core/services/notifications.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-reset',
   templateUrl: './reset.component.html',
   styleUrls: ['./reset.component.scss']
@@ -12,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 export class ResetComponent {
   public resetForm: FormGroup;
   public loading: boolean;
-  private toastr: ToastrService = inject(ToastrService)
+  private notifications: NotificationsService = inject(NotificationsService)
   private authService: AuthService = inject(AuthService);
   private fb: FormBuilder = inject(FormBuilder);
   private router: Router = inject(Router);
@@ -29,10 +31,10 @@ export class ResetComponent {
       const { email } = this.resetForm.value;
       this.authService.resetPassword(email)
           .then(x => {
-              this.toastr.success(`Se ha enviado un email a ${email} con indicaciones para restaurar tu contraseña`, '', {tapToDismiss: true, disableTimeOut: true});
+              this.notifications.success(`Se ha enviado un email a ${email} con indicaciones para restaurar tu contraseña`, '', {tapToDismiss: true, disableTimeOut: true});
               this.router.navigate(['/']);
           })
-          .catch(() => this.toastr.error('Ocurrió un error'))
+          .catch(() => this.notifications.error('Ocurrió un error'))
           .finally(() => this.loading = false);
   }
 

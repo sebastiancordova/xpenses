@@ -1,4 +1,5 @@
-import { Timestamp } from '@angular/fire/firestore';
+import { Timestamp } from 'firebase/firestore';
+
 import { SavingsGoal, SavingsGoalInput } from '../models/savings-goal';
 import {
   getActivePercentageTotal,

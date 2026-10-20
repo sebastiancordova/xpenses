@@ -1,11 +1,15 @@
+import { Firestore } from '@core/firebase/firebase.tokens';
+import { FirebaseStreamsService } from '@core/firebase/firebase-streams.service';
+import { CollectionReference, Timestamp, addDoc, collection, doc, getDocs, orderBy, query, updateDoc } from 'firebase/firestore';
 import { Injectable, inject } from '@angular/core';
-import { Firestore, CollectionReference, addDoc, collection, collectionData, doc, getDocs, orderBy, query, Timestamp, updateDoc } from '@angular/fire/firestore';
+
 import { Observable, of, switchMap } from 'rxjs';
 import { PaymentMethod } from '@core/models/payment-method';
 import { UserService } from './user.service';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentMethodsService {
+  private readonly firebaseStreams = inject(FirebaseStreamsService);
   private firestore = inject(Firestore);
   private userService = inject(UserService);
 
@@ -14,7 +18,7 @@ export class PaymentMethodsService {
       switchMap(user => {
         if (!user?.uid) return of([]);
         const methods = collection(this.firestore, `users/${user.uid}/payment-methods`) as CollectionReference<PaymentMethod>;
-        return collectionData(query(methods, orderBy('createdAt', 'asc')), { idField: 'uid' }) as Observable<PaymentMethod[]>;
+        return this.firebaseStreams.collectionData(query(methods, orderBy('createdAt', 'asc')), { idField: 'uid' }) as Observable<PaymentMethod[]>;
       })
     );
   }

@@ -1,6 +1,8 @@
+import { Auth, Firestore } from '@core/firebase/firebase.tokens';
+import { Timestamp } from 'firebase/firestore';
 import { TestBed } from '@angular/core/testing';
-import { Auth } from '@angular/fire/auth';
-import { Firestore, Timestamp } from '@angular/fire/firestore';
+
+
 import { InstallmentPurchase } from '@core/models/installment-purchase';
 import { UserService } from './user.service';
 import { UserPreferencesService } from './user-preferences.service';

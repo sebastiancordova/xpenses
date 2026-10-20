@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationsService } from '@core/services/notifications.service';
 import { Subject, debounceTime, take, takeUntil, tap } from 'rxjs';
 import { AddIncomesComponent } from './add-incomes/add-incomes.component';
 import { Income } from '@core/models/income';
@@ -9,6 +9,8 @@ import { IncomesService } from '../core/services/incomes.service';
 import { EditIncomeComponent } from './edit-income/edit-income.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-incomes',
   templateUrl: './incomes.component.html',
   styleUrls: ['./incomes.component.scss']
@@ -22,7 +24,7 @@ export class IncomesComponent {
   public collectionSize = 1;
   private incomesService: IncomesService = inject(IncomesService);
   private fb: FormBuilder = inject(FormBuilder);
-  private toastr: ToastrService = inject(ToastrService);
+  private notifications: NotificationsService = inject(NotificationsService);
   private modalService: NgbModal = inject(NgbModal);
   public fireIncomes: Income[] = [];
   public incomes: Income[] = [];
@@ -86,9 +88,9 @@ export class IncomesComponent {
     modalRef.componentInstance.period = this.selectedPeriod;
     modalRef.componentInstance.newIncome$.pipe(take(1)).subscribe((income: Income) => {
       this.incomesService.save(income).then(() => {
-        this.toastr.success('Ingreso añadido');
+        this.notifications.success('Ingreso añadido');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       })
     })
   }
@@ -102,9 +104,9 @@ export class IncomesComponent {
     modalRef.componentInstance.income = income;
     modalRef.componentInstance.editIncome$.pipe(take(1)).subscribe((income: Income) => {
       this.incomesService.update(income).then(() => {
-        this.toastr.success('Ingreso editado');
+        this.notifications.success('Ingreso editado');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       })
     })
     modalRef.componentInstance.deleteIncome$.pipe(take(1)).subscribe((id: string) => {
@@ -114,9 +116,9 @@ export class IncomesComponent {
 
   delete(id: string) {
     this.incomesService.delete(id).then(() => {
-      this.toastr.success('Ingreso eliminado');
+      this.notifications.success('Ingreso eliminado');
     }).catch(() => {
-      this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+      this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
     })
   }
 

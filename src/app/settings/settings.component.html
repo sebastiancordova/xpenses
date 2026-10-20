@@ -68,7 +68,7 @@
         </div>
         <div class="form-group">
           <label class="field-label" for="payment-method-type">Tipo</label>
-          <select id="payment-method-type" class="form-control payment-field" formControlName="type">
+          <select id="payment-method-type" class="form-control payment-field form-select" formControlName="type">
             <option value="credit">Tarjeta de crédito</option>
             <option value="debit">Débito</option>
             <option value="cash">Efectivo</option>
@@ -103,16 +103,16 @@
         </div>
 
         <fieldset class="budget-controls">
-          <legend class="sr-only">Porcentajes de distribución</legend>
+          <legend class="visually-hidden">Porcentajes de distribución</legend>
           <div class="budget-control">
             <div class="budget-control__header">
               <label for="savingsRate">Meta de ahorro</label>
               <output class="budget-control__value" aria-live="polite">{{ savingsRate?.value }}%</output>
             </div>
             <div class="budget-control__adjuster">
-              <button type="button" class="step-button" (click)="changeRate('savingsRate', -5)" [disabled]="savingsRate?.value <= 0" aria-label="Reducir ahorro en 5 puntos porcentuales"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+              <button type="button" class="step-button" (click)="changeRate('savingsRate', -5)" [disabled]="$safeNavigationMigration(savingsRate?.value) <= 0" aria-label="Reducir ahorro en 5 puntos porcentuales"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
               <input type="range" id="savingsRate" min="0" max="100" step="1" class="range-input" formControlName="savingsRate" [style.--range-progress]="savingsRate?.value + '%'" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="savingsRate?.value" [attr.aria-valuetext]="savingsRate?.value + '% de ahorro'">
-              <button type="button" class="step-button" (click)="changeRate('savingsRate', 5)" [disabled]="savingsRate?.value >= 100" aria-label="Aumentar ahorro en 5 puntos porcentuales"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+              <button type="button" class="step-button" (click)="changeRate('savingsRate', 5)" [disabled]="$safeNavigationMigration(savingsRate?.value) >= 100" aria-label="Aumentar ahorro en 5 puntos porcentuales"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
             </div>
             <div class="range-bounds" aria-hidden="true"><span>0%</span><span>100%</span></div>
           </div>
@@ -123,9 +123,9 @@
               <output class="budget-control__value" aria-live="polite">{{ variableRate?.value }}%</output>
             </div>
             <div class="budget-control__adjuster">
-              <button type="button" class="step-button" (click)="changeRate('variableRate', -5)" [disabled]="variableRate?.value <= 0" aria-label="Reducir gastos variables en 5 puntos porcentuales"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+              <button type="button" class="step-button" (click)="changeRate('variableRate', -5)" [disabled]="$safeNavigationMigration(variableRate?.value) <= 0" aria-label="Reducir gastos variables en 5 puntos porcentuales"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
               <input type="range" id="variableRate" min="0" max="100" step="1" class="range-input" formControlName="variableRate" [style.--range-progress]="variableRate?.value + '%'" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="variableRate?.value" [attr.aria-valuetext]="variableRate?.value + '% de gastos variables'">
-              <button type="button" class="step-button" (click)="changeRate('variableRate', 5)" [disabled]="variableRate?.value >= 100" aria-label="Aumentar gastos variables en 5 puntos porcentuales"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+              <button type="button" class="step-button" (click)="changeRate('variableRate', 5)" [disabled]="$safeNavigationMigration(variableRate?.value) >= 100" aria-label="Aumentar gastos variables en 5 puntos porcentuales"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
             </div>
             <div class="range-bounds" aria-hidden="true"><span>0%</span><span>100%</span></div>
           </div>

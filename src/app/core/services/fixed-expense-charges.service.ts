@@ -1,17 +1,9 @@
+import { Auth, Firestore } from '@core/firebase/firebase.tokens';
+import { FirebaseStreamsService } from '@core/firebase/firebase-streams.service';
+import { CollectionReference, DocumentReference, Timestamp, Transaction, collection, deleteDoc, doc, runTransaction } from 'firebase/firestore';
 import { Injectable, inject } from '@angular/core';
-import { Auth, authState } from '@angular/fire/auth';
-import {
-  CollectionReference,
-  DocumentReference,
-  Firestore,
-  Timestamp,
-  Transaction,
-  collection,
-  collectionData,
-  deleteDoc,
-  doc,
-  runTransaction,
-} from '@angular/fire/firestore';
+
+
 import { Observable, of, switchMap } from 'rxjs';
 import {
   FixedExpenseCharge,
@@ -28,18 +20,19 @@ const CHARGES_PATH = 'fixed-expense-charges';
 
 @Injectable({ providedIn: 'root' })
 export class FixedExpenseChargesService {
+  private readonly firebaseStreams = inject(FirebaseStreamsService);
   private readonly firestore = inject(Firestore);
   private readonly auth = inject(Auth);
 
   getAll(): Observable<FixedExpenseCharge[]> {
-    return authState(this.auth).pipe(
+    return this.firebaseStreams.authState(this.auth).pipe(
       switchMap(user => {
         if (!user?.uid) return of<FixedExpenseCharge[]>([]);
         const charges = collection(
           this.firestore,
           `users/${user.uid}/${CHARGES_PATH}`
         ) as CollectionReference<FixedExpenseCharge>;
-        return collectionData(charges, { idField: 'uid' }) as Observable<FixedExpenseCharge[]>;
+        return this.firebaseStreams.collectionData(charges, { idField: 'uid' }) as Observable<FixedExpenseCharge[]>;
       })
     );
   }

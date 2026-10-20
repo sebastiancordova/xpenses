@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationsService } from '@core/services/notifications.service';
 import { Subject, debounceTime, take, takeUntil, tap } from 'rxjs';
 import { InstallmentPurchase } from '@core/models/installment-purchase';
 import { InstallmentPurchasesService } from '@core/services/installment-purchases.service';
@@ -9,6 +9,8 @@ import { AddInstallmentPurchaseComponent } from './add-installment-purchase/add-
 import { EditInstallmentPurchaseComponent } from './edit-installment-purchase/edit-installment-purchase.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-installment-purchases',
   templateUrl: './installment-purchases.component.html',
   styleUrls: ['./installment-purchases.component.scss']
@@ -26,7 +28,7 @@ export class InstallmentPurchasesComponent implements OnInit, OnDestroy {
 
   private service = inject(InstallmentPurchasesService);
   private fb = inject(FormBuilder);
-  private toastr = inject(ToastrService);
+  private notifications = inject(NotificationsService);
   private modalService = inject(NgbModal);
 
   private readonly months = [
@@ -107,9 +109,9 @@ export class InstallmentPurchasesComponent implements OnInit, OnDestroy {
     });
     modalRef.componentInstance.newInstallmentPurchase$.pipe(take(1)).subscribe((purchase: InstallmentPurchase) => {
       this.service.save(purchase).then(() => {
-        this.toastr.success('Compra en cuotas añadida');
+        this.notifications.success('Compra en cuotas añadida');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       });
     });
   }
@@ -123,16 +125,16 @@ export class InstallmentPurchasesComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.purchase = purchase;
     modalRef.componentInstance.editInstallmentPurchase$.pipe(take(1)).subscribe((updated: InstallmentPurchase) => {
       this.service.update(updated).then(() => {
-        this.toastr.success('Compra en cuotas actualizada');
+        this.notifications.success('Compra en cuotas actualizada');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       });
     });
     modalRef.componentInstance.deleteInstallmentPurchase$.pipe(take(1)).subscribe((id: string) => {
       this.service.delete(id).then(() => {
-        this.toastr.success('Compra en cuotas eliminada');
+        this.notifications.success('Compra en cuotas eliminada');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       });
     });
   }

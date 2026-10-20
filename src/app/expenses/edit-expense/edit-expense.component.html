@@ -34,7 +34,7 @@
 
     <div class="form-group">
       <label class="field-label" for="edit-expense-payment-method">Método de pago</label>
-      <select id="edit-expense-payment-method" class="form-control field-input" formControlName="paymentMethodId"
+      <select id="edit-expense-payment-method" class="form-control field-input form-select" formControlName="paymentMethodId"
         [attr.aria-invalid]="paymentMethodId?.invalid && paymentMethodId?.touched">
         <option value="" disabled>Selecciona un método</option>
         <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }}</option>
@@ -82,7 +82,7 @@
         <button type="button" class="btn-modal btn-modal--danger"
                 [class.btn-modal--danger-confirm]="confirmingDelete"
                 (click)="delete()">
-          <i class="fas mr-1" [ngClass]="confirmingDelete ? 'fa-triangle-exclamation' : 'fa-trash'" aria-hidden="true"></i>
+          <i class="fas me-1" [ngClass]="confirmingDelete ? 'fa-triangle-exclamation' : 'fa-trash'" aria-hidden="true"></i>
           {{ confirmingDelete ? '¿Confirmar?' : 'Eliminar' }}
         </button>
         <button *ngIf="confirmingDelete" type="button" class="btn-modal btn-modal--ghost"
@@ -92,7 +92,7 @@
       </div>
       <button type="submit" class="btn-modal btn-modal--primary" [disabled]="editExpenseForm.invalid || loading">
         <span *ngIf="!loading">Guardar</span>
-        <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>Guardando...</span>
+        <span *ngIf="loading"><i class="fas fa-spinner fa-spin me-1" aria-hidden="true"></i>Guardando...</span>
       </button>
     </div>
   </form>

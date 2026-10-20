@@ -1,18 +1,9 @@
+import { Auth, Firestore } from '@core/firebase/firebase.tokens';
+import { FirebaseStreamsService } from '@core/firebase/firebase-streams.service';
+import { CollectionReference, Timestamp, collection, doc, getDoc, getDocs, orderBy, query, runTransaction } from 'firebase/firestore';
 import { Injectable, inject } from '@angular/core';
-import { Auth, authState } from '@angular/fire/auth';
-import {
-  CollectionReference,
-  Firestore,
-  Timestamp,
-  collection,
-  collectionData,
-  doc,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-  runTransaction,
-} from '@angular/fire/firestore';
+
+
 import { Observable, of, switchMap } from 'rxjs';
 import {
   SavingsGoal,
@@ -36,18 +27,19 @@ const VALID_TRANSACTION_TYPES: SavingsTransactionType[] = ['contribution', 'with
 
 @Injectable({ providedIn: 'root' })
 export class SavingsGoalsService {
+  private readonly firebaseStreams = inject(FirebaseStreamsService);
   private readonly firestore = inject(Firestore);
   private readonly auth = inject(Auth);
 
   getGoals(): Observable<SavingsGoal[]> {
-    return authState(this.auth).pipe(
+    return this.firebaseStreams.authState(this.auth).pipe(
       switchMap(user => {
         if (!user?.uid) return of<SavingsGoal[]>([]);
         const goalsRef = collection(
           this.firestore,
           `users/${user.uid}/${GOALS_PATH}`
         ) as CollectionReference<SavingsGoal>;
-        return collectionData(
+        return this.firebaseStreams.collectionData(
           query(goalsRef, orderBy('createdAt', 'desc')),
           { idField: 'uid' }
         ) as Observable<SavingsGoal[]>;
@@ -56,14 +48,14 @@ export class SavingsGoalsService {
   }
 
   getTransactions(): Observable<SavingsTransaction[]> {
-    return authState(this.auth).pipe(
+    return this.firebaseStreams.authState(this.auth).pipe(
       switchMap(user => {
         if (!user?.uid) return of<SavingsTransaction[]>([]);
         const transactionsRef = collection(
           this.firestore,
           `users/${user.uid}/${TRANSACTIONS_PATH}`
         ) as CollectionReference<SavingsTransaction>;
-        return collectionData(
+        return this.firebaseStreams.collectionData(
           query(transactionsRef, orderBy('createdAt', 'desc')),
           { idField: 'uid' }
         ) as Observable<SavingsTransaction[]>;
@@ -77,7 +69,7 @@ export class SavingsGoalsService {
     const goalsRef = collection(this.firestore, `users/${uid}/${GOALS_PATH}`);
     const planningRef = doc(this.firestore, `users/${uid}/${PLANNING_STATE_PATH}`);
     const goalRef = goalId ? doc(goalsRef, validateDocumentId(goalId, 'goalId')) : doc(goalsRef);
-    // AngularFire's transaction API does not expose transactional collection queries.
+    // Firebase SDK transactions do not expose transactional collection queries.
     // This snapshot initializes the aggregate only; the planning document serializes
     // every save, and a retry uses its latest value after a concurrent first save.
     const initialPlanningState = await getDoc(planningRef);

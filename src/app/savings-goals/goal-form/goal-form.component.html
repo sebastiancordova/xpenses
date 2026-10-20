@@ -66,7 +66,7 @@
 
     <div class="savings-field" *ngIf="goal">
       <label for="goal-status">Estado</label>
-      <select id="goal-status" class="form-control savings-input" formControlName="status" (change)="updateStatusValidators()">
+      <select id="goal-status" class="form-control savings-input form-select" formControlName="status" (change)="updateStatusValidators()">
         <option value="active">Activa</option>
         <option value="paused">En pausa</option>
         <option value="completed">Completada</option>
@@ -79,7 +79,7 @@
       <button type="button" class="savings-button savings-button--secondary" (click)="activeModal.dismiss()" [disabled]="loading">Cancelar</button>
       <button type="submit" class="savings-button savings-button--primary" [disabled]="form.invalid || loading">
         <span *ngIf="!loading">{{ goal ? 'Guardar cambios' : 'Crear meta' }}</span>
-        <span *ngIf="loading"><i class="fa-solid fa-spinner fa-spin mr-1" aria-hidden="true"></i>Guardando…</span>
+        <span *ngIf="loading"><i class="fa-solid fa-spinner fa-spin me-1" aria-hidden="true"></i>Guardando…</span>
       </button>
     </div>
   </form>

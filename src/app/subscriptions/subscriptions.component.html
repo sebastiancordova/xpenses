@@ -7,7 +7,7 @@
       <p class="module-subtitle mb-0">Servicios con cobro recurrente</p>
     </div>
     <button type="button" class="btn-add" (click)="openCreateModal()">
-      <i class="fas fa-plus mr-2"></i>Nueva suscripción
+      <i class="fas fa-plus me-2"></i>Nueva suscripción
     </button>
   </div>
 
@@ -17,7 +17,7 @@
       <div class="d-flex flex-wrap align-items-center">
         <div class="filter-input-wrapper">
           <i class="fas fa-search filter-icon"></i>
-          <label class="sr-only" for="subscription-search">Buscar suscripciones</label>
+          <label class="visually-hidden" for="subscription-search">Buscar suscripciones</label>
           <input id="subscription-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar suscripciones" />
         </div>
       </div>
@@ -27,7 +27,7 @@
   <!-- Loading -->
   <div *ngIf="loadingPage" class="loading-state d-flex justify-content-center align-items-center py-5">
     <div class="spinner-border loading-state__spinner" role="status">
-      <span class="sr-only">Cargando...</span>
+      <span class="visually-hidden">Cargando...</span>
     </div>
   </div>
 
@@ -58,11 +58,11 @@
       <div class="table-card d-none d-md-block">
         <div class="table-responsive">
           <table class="table module-table mb-0">
-            <caption class="sr-only">Lista de suscripciones</caption>
+            <caption class="visually-hidden">Lista de suscripciones</caption>
             <thead>
               <tr>
                 <th scope="col">Nombre</th>
-                <th scope="col" class="text-right">Monto</th>
+                <th scope="col" class="text-end">Monto</th>
               </tr>
             </thead>
             <tbody>
@@ -70,13 +70,13 @@
                 <td>
                   <div class="item-title">{{ subscription.title }}</div>
                 </td>
-                <td class="item-amount text-right">{{ subscription.amount | currency: 'CLP':'$':'1.0-0' }}</td>
+                <td class="item-amount text-end">{{ subscription.amount | currency: 'CLP':'$':'1.0-0' }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr class="total-row">
-                <td class="font-weight-bold">Total</td>
-                <td class="font-weight-bold text-right">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
+                <td class="fw-bold">Total</td>
+                <td class="fw-bold text-end">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
               </tr>
             </tfoot>
           </table>
@@ -100,7 +100,7 @@
         <p class="empty-state__title">Sin suscripciones registradas</p>
         <p class="empty-state__sub">Añade tus servicios recurrentes para llevar un mejor control.</p>
         <button type="button" class="btn-add" (click)="openCreateModal()">
-          <i class="fas fa-plus mr-2"></i>Agregar primera suscripción
+          <i class="fas fa-plus me-2"></i>Agregar primera suscripción
         </button>
       </div>
     </ng-template>

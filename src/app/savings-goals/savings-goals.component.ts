@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Income } from '@core/models/income';
 import { SavingsGoal, SavingsGoalInput, SavingsTransaction } from '@core/models/savings-goal';
@@ -18,6 +18,8 @@ interface SavingsPageData {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-savings-goals',
   templateUrl: './savings-goals.component.html',
   styleUrls: ['./savings-goals.component.scss']

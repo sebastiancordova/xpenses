@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { firstValueFrom, take } from 'rxjs';
 import { UserPreferencesService } from '@core/services/user-preferences.service';
@@ -7,6 +7,8 @@ import { PAYMENT_METHOD_TYPE_LABELS, PaymentMethod, PaymentMethodType } from '@c
 import { PaymentMethodsService } from '@core/services/payment-methods.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']

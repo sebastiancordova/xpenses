@@ -131,7 +131,6 @@ h1, h2, h3, h4, p { overflow-wrap: anywhere; }
 .state-card--error .state-card__icon { background: #fff2f0; color: #84332d; }
 .loading-state { align-items: center; color: $color-grey; display: flex; gap: .7rem; justify-content: center; min-height: 12rem; }
 .loading-state__spinner { animation: spin .8s linear infinite; border: 3px solid #e9dfd9; border-radius: 50%; border-top-color: $color-brand-primary; height: 1.35rem; width: 1.35rem; }
-.sr-only { border: 0; clip: rect(0, 0, 0, 0); clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; white-space: nowrap; width: 1px; }
 .savings-notice { align-items: center; background: #f3eeeb; border: 1px solid #dfd0c7; border-radius: 9px; color: #513a2e; display: flex; font-size: .83rem; justify-content: space-between; gap: .75rem; margin: 0 0 1rem; padding: .65rem .75rem; }
 .savings-notice > span { align-items: flex-start; display: flex; gap: .5rem; }
 .savings-notice button { background: transparent; border: 0; color: #513a2e; cursor: pointer; font-size: .75rem; font-weight: 700; min-height: 44px; min-width: 44px; }

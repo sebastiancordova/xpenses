@@ -1,8 +1,8 @@
-import { Component, OnDestroy, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, ViewChild, inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { IUser } from '@core/models/user';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationsService } from '@core/services/notifications.service';
 import { BehaviorSubject, Subject, debounceTime, filter, switchMap, take, takeUntil, tap } from 'rxjs';
 import { AddExpenseComponent } from './add-expense/add-expense.component';
 import { ExpensesService } from '@core/services/expenses.service';
@@ -13,6 +13,8 @@ import { PaymentMethod } from '@core/models/payment-method';
 import { PaymentMethodsService } from '@core/services/payment-methods.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-expenses',
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.scss']
@@ -30,7 +32,7 @@ export class ExpensesComponent implements OnDestroy {
   public fireExpenses: Expense[] = [];
   private expensesService: ExpensesService = inject(ExpensesService);
   private fb: FormBuilder = inject(FormBuilder);
-  private toastr: ToastrService = inject(ToastrService);
+  private notifications: NotificationsService = inject(NotificationsService);
   private modalService: NgbModal = inject(NgbModal);
   public totalAmountFiltered = 0;
   public categoryOptions = EXPENSE_CATEGORY_OPTIONS;
@@ -240,9 +242,9 @@ export class ExpensesComponent implements OnDestroy {
     })
     modalRef.componentInstance.newExpense$.pipe(take(1)).subscribe((expense: Expense) => {
       this.expensesService.save(expense).then(() => {
-        this.toastr.success('Gasto creado');
+        this.notifications.success('Gasto creado');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       })
     })
   }
@@ -256,9 +258,9 @@ export class ExpensesComponent implements OnDestroy {
     modalRef.componentInstance.expense = expense;
     modalRef.componentInstance.editExpense$.pipe(take(1)).subscribe((expense: Expense) => {
       this.expensesService.update(expense).then(() => {
-        this.toastr.success('Gasto editado');
+        this.notifications.success('Gasto editado');
       }).catch(() => {
-        this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+        this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
       })
     })
     modalRef.componentInstance.deleteExpense$.pipe(take(1)).subscribe((id: string) => {
@@ -268,9 +270,9 @@ export class ExpensesComponent implements OnDestroy {
 
   delete(id: string) {
     this.expensesService.delete(id).then(() => {
-      this.toastr.success('Gasto eliminado');
+      this.notifications.success('Gasto eliminado');
     }).catch(() => {
-      this.toastr.error('Ocurrió un error, por favor intenta de nuevo');
+      this.notifications.error('Ocurrió un error, por favor intenta de nuevo');
     })
   }
 

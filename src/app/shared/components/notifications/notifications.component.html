@@ -1,0 +1,32 @@
+<div class="notifications-container" role="region" aria-label="Notificaciones">
+  <ngb-toast
+    *ngFor="let notification of notifications$ | async"
+    #toastRef="ngbToast"
+    class="notification-toast"
+    [ngClass]="'notification-toast--' + notification.type"
+    [attr.aria-live]="notification.type === 'error' ? 'assertive' : 'polite'"
+    [autohide]="!notification.options.disableTimeOut"
+    [delay]="notification.options.timeOut"
+    (click)="onToastTap(notification, toastRef)"
+    (hidden)="onToastHidden(notification.id)"
+  >
+    <div class="notification-toast__content">
+      <span class="notification-toast__icon" aria-hidden="true">
+        <i
+          class="fa-solid"
+          [ngClass]="notification.type === 'success' ? 'fa-circle-check' : notification.type === 'error' ? 'fa-circle-exclamation' : notification.type === 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-info'"
+        ></i>
+      </span>
+      <div class="notification-toast__copy">
+        <strong *ngIf="notification.title">{{ notification.title }}</strong>
+        <span>{{ notification.message }}</span>
+      </div>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Cerrar notificación"
+        (click)="closeToast(toastRef, $event)"
+      ></button>
+    </div>
+  </ngb-toast>
+</div>

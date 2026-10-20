@@ -1,7 +1,9 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbInputDatepicker } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-range-date-selector',
   templateUrl: './range-date-selector.component.html',
   styleUrls: ['./range-date-selector.component.scss']

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './dashboard.component';
-import { NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { SavingsSummaryModule } from '@shared/components/savings-summary/savings-summary.module';
 
 
@@ -14,8 +14,9 @@ import { SavingsSummaryModule } from '@shared/components/savings-summary/savings
   imports: [
     CommonModule,
     DashboardRoutingModule,
-    NgChartsModule,
+    BaseChartDirective,
     SavingsSummaryModule
-  ]
+  ],
+  providers: [provideCharts(withDefaultRegisterables())]
 })
 export class DashboardModule { }

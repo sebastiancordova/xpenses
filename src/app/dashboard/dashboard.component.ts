@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { Expense, ExpenseCategory, FixedExpense } from '@core/models/expense';
 import { Income } from '@core/models/income';
 import { InstallmentPurchase } from '@core/models/installment-purchase';
@@ -69,6 +69,8 @@ export interface DashboardInsights {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']

@@ -1,6 +1,8 @@
+import { Auth, Firestore } from '@core/firebase/firebase.tokens';
+import { DocumentReference, Timestamp, Transaction } from 'firebase/firestore';
 import { TestBed } from '@angular/core/testing';
-import { Auth } from '@angular/fire/auth';
-import { DocumentReference, Firestore, Timestamp, Transaction } from '@angular/fire/firestore';
+
+
 import { FixedExpenseChargeInput } from '@core/models/fixed-expense-charge';
 import { FixedExpenseChargesService, writeFixedExpenseCharge } from './fixed-expense-charges.service';
 import { getFixedExpenseChargeId, getFixedExpenseChargeMonth } from '@core/utils/fixed-expense-charges.utils';

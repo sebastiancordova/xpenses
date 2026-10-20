@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, inject } from '@angular/core';
 import { BehaviorSubject, Subject, catchError, combineLatest, map, of, switchMap, takeUntil, tap } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 import { IncomesService } from '@core/services/incomes.service';
@@ -13,6 +13,8 @@ export function getPeriodSavings(transactions: SavingsTransaction[], period: str
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-savings-summary',
   templateUrl: './savings-summary.component.html',
   styleUrls: ['./savings-summary.component.scss']

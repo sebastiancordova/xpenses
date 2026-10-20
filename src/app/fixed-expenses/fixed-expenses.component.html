@@ -1,7 +1,7 @@
 <div class="module-wrapper">
   <div class="module-header d-flex align-items-center justify-content-between flex-wrap">
     <div><h1 class="module-title mb-0">Gastos fijos</h1><p class="module-subtitle mb-0">Tus cuentas recurrentes, con el monto real de cada mes</p></div>
-    <button type="button" class="btn-add" (click)="openCreateModal()"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Nuevo gasto fijo</button>
+    <button type="button" class="btn-add" (click)="openCreateModal()"><i class="fas fa-plus me-2" aria-hidden="true"></i>Nuevo gasto fijo</button>
   </div>
 
   <section class="filters-card monthly-filters" aria-label="Filtrar gastos fijos">
@@ -10,10 +10,10 @@
       <div><label for="fixed-period">Mes calendario del gasto</label><input id="fixed-period" type="month" [value]="selectedPeriod" (change)="setPeriod($any($event.target).value)" /></div>
       <button type="button" (click)="moveMonth(1)" aria-label="Ver mes siguiente"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
     </div>
-    <form [formGroup]="filtersForm"><div class="filter-input-wrapper"><i class="fas fa-search filter-icon" aria-hidden="true"></i><label class="sr-only" for="fixed-expense-search">Buscar gastos fijos</label><input id="fixed-expense-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar gastos fijos" /></div></form>
+    <form [formGroup]="filtersForm"><div class="filter-input-wrapper"><i class="fas fa-search filter-icon" aria-hidden="true"></i><label class="visually-hidden" for="fixed-expense-search">Buscar gastos fijos</label><input id="fixed-expense-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar gastos fijos" /></div></form>
   </section>
 
-  <div *ngIf="loadingPage" class="loading-state text-center py-5" role="status"><span class="spinner-border loading-state__spinner" aria-hidden="true"></span><span class="sr-only">Cargando gastos fijos</span></div>
+  <div *ngIf="loadingPage" class="loading-state text-center py-5" role="status"><span class="spinner-border loading-state__spinner" aria-hidden="true"></span><span class="visually-hidden">Cargando gastos fijos</span></div>
   <div *ngIf="loadError" class="alert alert-warning" role="alert">No pudimos cargar tus gastos. <button type="button" class="btn monthly-action" (click)="loadMonthlyExpenses()">Reintentar</button></div>
 
   <ng-container *ngIf="!loadingPage && !loadError">
@@ -27,7 +27,7 @@
       <article class="monthly-card" *ngFor="let row of rows">
         <div class="monthly-card__top"><h2>{{ row.title }}</h2><span class="monthly-status" [class.monthly-status--confirmed]="row.charge?.status === 'confirmed'">{{ !row.charge ? 'Pendiente' : row.charge.status === 'confirmed' ? 'Confirmado' : 'Omitido' }}</span></div>
         <strong class="monthly-card__amount">{{ row.charge?.status === 'skipped' ? 'Sin cargo este mes' : (row.amount | currency: 'CLP':'$':'1.0-0') }}</strong>
-        <p class="monthly-card__meta">{{ paymentMethodName(row) }}<span *ngIf="row.charge?.status === 'confirmed'"> · Cargo el {{ row.charge?.chargeDate | date:'dd/MM/yyyy' }}</span><span *ngIf="!row.charge"> · Monto estimado</span></p>
+        <p class="monthly-card__meta">{{ paymentMethodName(row) }}<span *ngIf="row.charge?.status === 'confirmed'"> · Cargo el {{ $safeNavigationMigration(row.charge?.chargeDate) | date:'dd/MM/yyyy' }}</span><span *ngIf="!row.charge"> · Monto estimado</span></p>
         <small *ngIf="row.charge && row.charge.period !== selectedPeriod" class="monthly-card__meta">Cuenta de {{ periodName(row.charge.period) }}</small>
         <small *ngIf="!row.template" class="monthly-card__meta">Registro histórico · recurrente eliminado</small>
         <div class="monthly-card__actions">
@@ -48,7 +48,7 @@
       <div class="monthly-modal__body">
         <div class="form-group"><label for="monthly-amount">Monto real del cargo</label><input id="monthly-amount" class="form-control" type="text" inputmode="numeric" formControlName="amount" ngbAutofocus aria-describedby="monthly-amount-error" [attr.aria-invalid]="chargeForm.get('amount')?.invalid && chargeForm.get('amount')?.touched" /><small id="monthly-amount-error" class="text-danger" *ngIf="chargeForm.get('amount')?.invalid && chargeForm.get('amount')?.touched">Ingresa un monto entero mayor que cero, sin puntos.</small></div>
         <div class="form-group"><label for="monthly-date">Fecha de cargo</label><input id="monthly-date" class="form-control" type="date" formControlName="chargeDate" aria-describedby="monthly-date-help" /><small id="monthly-date-help">Usamos esta fecha para el período de facturación. Puede ser distinta al mes de la cuenta. El cargo se mostrará en el mes de su fecha real.</small><small *ngIf="chargeDisplayPeriod" aria-live="polite">Aparecerá en los cargos de {{ chargeDisplayPeriod }}.</small><small class="text-danger" *ngIf="chargeForm.get('chargeDate')?.invalid && chargeForm.get('chargeDate')?.touched">Selecciona una fecha válida.</small></div>
-        <div class="form-group"><label for="monthly-method">Método de pago</label><select id="monthly-method" class="form-control" formControlName="paymentMethodId"><option value="" disabled>Selecciona un método</option><option *ngFor="let method of selectableMethods" [value]="method.uid">{{ method.name }}</option></select><small class="text-danger" *ngIf="chargeForm.get('paymentMethodId')?.invalid && chargeForm.get('paymentMethodId')?.touched">Selecciona un método de pago.</small></div>
+        <div class="form-group"><label for="monthly-method">Método de pago</label><select id="monthly-method" class="form-control form-select" formControlName="paymentMethodId"><option value="" disabled>Selecciona un método</option><option *ngFor="let method of selectableMethods" [value]="method.uid">{{ method.name }}</option></select><small class="text-danger" *ngIf="chargeForm.get('paymentMethodId')?.invalid && chargeForm.get('paymentMethodId')?.touched">Selecciona un método de pago.</small></div>
         <p class="monthly-modal__hint">Este registro corresponde a la cuenta de {{ accountPeriodLabel }} y reemplaza su estimación. El cargo se muestra según su fecha real y ya contará en tus gastos: evita registrarlo también como gasto manual.</p>
         <p *ngIf="chargeError" class="text-danger" role="alert">{{ chargeError }}</p>
         <p *ngIf="resetRequested" role="alert">Se quitará el registro de la cuenta de {{ accountPeriodLabel }}. Si el recurrente existe, volverá a mostrarse como estimado en ese mes.</p>

@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, ViewEncapsulation, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild, ViewEncapsulation, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { SavingsGoal, SavingsTransactionType } from '@core/models/savings-goal';
 import { isSavingsDate } from '@core/utils/savings-goals.utils';
@@ -13,6 +13,8 @@ export interface TransactionSubmission {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-savings-transaction-form',
   templateUrl: './transaction-form.component.html',
   styleUrls: ['./transaction-form.component.scss'],

@@ -1,11 +1,12 @@
+import { Timestamp } from 'firebase/firestore';
 import { CommonModule } from '@angular/common';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { Timestamp } from '@angular/fire/firestore';
+
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExpensesService } from '@core/services/expenses.service';
 import { PaymentMethodsService } from '@core/services/payment-methods.service';
 import { SharedModule } from '@shared/shared.module';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationsService } from '@core/services/notifications.service';
 import { of, throwError } from 'rxjs';
 import { ExpensesComponent } from './expenses.component';
 
@@ -33,7 +34,7 @@ describe('ExpensesComponent payment-method filtering', () => {
       providers: [
         { provide: ExpensesService, useValue: expensesService },
         { provide: PaymentMethodsService, useValue: methodsService },
-        { provide: ToastrService, useValue: {} }
+        { provide: NotificationsService, useValue: {} }
       ]
     }).compileComponents();
   });

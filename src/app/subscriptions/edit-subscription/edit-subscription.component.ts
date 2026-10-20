@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from '@core/models/subscriptions';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -8,6 +8,8 @@ import { UserPreferencesService } from '@core/services/user-preferences.service'
 import { firstValueFrom } from 'rxjs';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-edit-subscription',
   templateUrl: './edit-subscription.component.html',
   styleUrls: ['./edit-subscription.component.scss'],

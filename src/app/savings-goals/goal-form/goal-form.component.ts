@@ -1,10 +1,12 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { SavingsGoal, SavingsGoalInput } from '@core/models/savings-goal';
 import { isSavingsDate } from '@core/utils/savings-goals.utils';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-savings-goal-form',
   templateUrl: './goal-form.component.html',
   styleUrls: ['./goal-form.component.scss'],

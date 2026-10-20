@@ -1,4 +1,5 @@
-import { Timestamp } from '@angular/fire/firestore';
+import { Timestamp } from 'firebase/firestore';
+
 import { FixedExpense } from '@core/models/expense';
 import { FixedExpenseCharge } from '@core/models/fixed-expense-charge';
 import {

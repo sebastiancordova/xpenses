@@ -206,6 +206,9 @@ div.label {
     }
 }
 .form-group {
+    // Bootstrap 5 removed Bootstrap 4's form-group spacing helper.
+    margin-bottom: 1rem;
+
     label {
         text-align: left;
         font-weight: bold;
@@ -255,6 +258,20 @@ div.label {
         }
     }
 }
+// Keep Bootstrap 4's compact form-row gutter for existing paired form fields.
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -5px;
+    margin-left: -5px;
+
+    > .col,
+    > [class*="col-"] {
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+}
+
 /* FIN Form */
 
 /* ============= Tooltip ============= */

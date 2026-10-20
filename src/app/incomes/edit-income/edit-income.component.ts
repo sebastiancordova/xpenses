@@ -1,9 +1,11 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Income } from '@core/models/income';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-edit-income',
   templateUrl: './edit-income.component.html',
   styleUrls: ['./edit-income.component.scss'],

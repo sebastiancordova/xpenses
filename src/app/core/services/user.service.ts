@@ -1,18 +1,18 @@
+import { Auth, Firestore } from '@core/firebase/firebase.tokens';
+import { FirebaseStreamsService } from '@core/firebase/firebase-streams.service';
+import { UserCredential } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { Injectable, inject } from '@angular/core';
-import {
-  Firestore,
-  docData,
-  doc,
-  setDoc
-} from '@angular/fire/firestore';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+
+import { BehaviorSubject, Subscription, catchError, of, switchMap } from 'rxjs';
 import { IUser } from '../models/user';
-import { UserCredential, Auth } from '@angular/fire/auth';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
+  private readonly firebaseStreams = inject(FirebaseStreamsService);
   private loggedUser = new BehaviorSubject<IUser>({ email: '', image: '', name: '', username: '' });
   private firestore: Firestore = inject(Firestore);
   private afAuth = inject(Auth)
@@ -20,11 +20,8 @@ export class UserService {
   }
 
   set user(user: IUser) {
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      this.loggedUser.next(user);
-      localStorage.setItem('currentUser', JSON.stringify(user));
-    }
+    this.loggedUser.next(user);
+    localStorage.setItem('currentUser', JSON.stringify(user));
   }
 
   get currentUser() {
@@ -39,13 +36,21 @@ export class UserService {
     return this.loggedUser.value;
   }
 
-  currentUser$() {
-    this.afAuth.onAuthStateChanged(async user => {
-      const docRef = doc(this.firestore, `users/${user?.uid}`);
-      const data = await firstValueFrom(docData(docRef, { idField: 'id' }));
-      this.user = data as IUser;
+  currentUser$(): Subscription {
+    return this.firebaseStreams.authState(this.afAuth).pipe(
+      switchMap(user => user?.uid
+        ? this.firebaseStreams.docData(doc(this.firestore, `users/${user.uid}`), { idField: 'id' }).pipe(
+          catchError(() => of(undefined))
+        )
+        : of(undefined))
+    ).subscribe(data => {
+      if (data) {
+        this.user = data as IUser;
+      } else {
+        this.loggedUser.next({ email: '', image: '', name: '', username: '' });
+        localStorage.removeItem('currentUser');
+      }
     });
-
   }
 
   storeUser(name: string, userCredential: UserCredential, nombre?: string) {

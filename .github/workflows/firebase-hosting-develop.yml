@@ -26,23 +26,88 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 22.17.0
+          node-version: 24.15.0
           cache: npm
+
+      - name: Validate Firebase service account secret
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_XPENSES_93552 }}
+        run: |
+          node <<'NODE'
+          const crypto = require('node:crypto');
+          const fs = require('node:fs');
+
+          function fail(reason) {
+            console.error(`Firebase deployment preflight failed: ${reason}. Secret contents and parser details were omitted.`);
+            process.exit(1);
+          }
+
+          const rawServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+          if (!rawServiceAccount) {
+            fail('the repository secret is missing or empty');
+          }
+
+          let serviceAccount;
+          try {
+            serviceAccount = JSON.parse(rawServiceAccount);
+          } catch {
+            fail('the repository secret is not valid JSON');
+          }
+
+          if (!serviceAccount || typeof serviceAccount !== 'object' || Array.isArray(serviceAccount)) {
+            fail('the repository secret must contain a JSON object');
+          }
+          if (serviceAccount.type !== 'service_account') {
+            fail('the JSON type field is invalid');
+          }
+          if (serviceAccount.project_id !== 'xpenses-93552') {
+            fail('the JSON project_id does not match the configured Firebase project');
+          }
+          if (typeof serviceAccount.client_email !== 'string' ||
+              !/^[a-z0-9-]+@xpenses-93552\.iam\.gserviceaccount\.com$/.test(serviceAccount.client_email)) {
+            fail('the JSON client_email is not a service account address for the configured project');
+          }
+          if (typeof serviceAccount.private_key !== 'string' || !serviceAccount.private_key.trim()) {
+            fail('the JSON private_key field is missing or empty');
+          }
+
+          let privateKey;
+          try {
+            privateKey = crypto.createPrivateKey(serviceAccount.private_key);
+          } catch {
+            fail('the JSON private_key is not a valid PEM private key');
+          }
+          if (privateKey.asymmetricKeyType !== 'rsa') {
+            fail('the JSON private_key is not an RSA key');
+          }
+
+          let firebaseConfig;
+          let firebaseRc;
+          try {
+            firebaseConfig = JSON.parse(fs.readFileSync('firebase.json', 'utf8'));
+            firebaseRc = JSON.parse(fs.readFileSync('.firebaserc', 'utf8'));
+          } catch {
+            fail('the local Firebase Hosting configuration is not valid JSON');
+          }
+
+          const hostingTarget = firebaseConfig?.hosting?.target;
+          const hostingSites = firebaseRc?.targets?.['xpenses-93552']?.hosting?.xpenses;
+          if (hostingTarget !== 'xpenses' ||
+              firebaseConfig?.hosting?.public !== 'dist/xpenses' ||
+              !Array.isArray(hostingSites) ||
+              hostingSites.length !== 1 ||
+              hostingSites[0] !== 'xpenses-93552') {
+            fail('the local Hosting target configuration does not match the deployment destination');
+          }
+
+          console.log('Service-account credential format and Hosting target configuration are valid; IAM access was not checked.');
+          NODE
 
       - name: Install dependencies
         run: npm ci
 
       - name: Build Angular app
         run: npm run build
-
-      - name: Require Firebase service account secret
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_XPENSES_93552 }}
-        run: |
-          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
-            printf '%s\n' 'Required repository secret FIREBASE_SERVICE_ACCOUNT_XPENSES_93552 is empty or unavailable.' >&2
-            exit 1
-          fi
 
       - name: Deploy Hosting site to live
         uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0

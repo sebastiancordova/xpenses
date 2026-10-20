@@ -1,10 +1,12 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AuthService } from '@core/services/auth.service';
 import { Router } from '@angular/router';
 import { UserService } from '@core/services/user.service';
 import { IUser } from '@core/models/user';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']

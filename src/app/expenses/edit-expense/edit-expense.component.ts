@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Expense, EXPENSE_CATEGORY_OPTIONS } from '@core/models/expense';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -8,6 +8,8 @@ import { UserPreferencesService } from '@core/services/user-preferences.service'
 import { firstValueFrom } from 'rxjs';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
   selector: 'app-edit-expense',
   templateUrl: './edit-expense.component.html',
   styleUrls: ['./edit-expense.component.scss'],

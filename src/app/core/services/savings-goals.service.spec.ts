@@ -1,6 +1,7 @@
+import { Auth, Firestore } from '@core/firebase/firebase.tokens';
 import { TestBed } from '@angular/core/testing';
-import { Auth } from '@angular/fire/auth';
-import { Firestore } from '@angular/fire/firestore';
+
+
 import { SavingsGoalsService } from './savings-goals.service';
 import { SavingsGoalInput } from '@core/models/savings-goal';
 

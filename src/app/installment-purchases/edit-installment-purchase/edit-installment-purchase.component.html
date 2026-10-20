@@ -53,7 +53,7 @@
 
     <div class="form-group">
       <label class="field-label" for="eip-payment-method">Tarjeta de crédito</label>
-      <select id="eip-payment-method" class="form-control field-input" formControlName="paymentMethodId">
+      <select id="eip-payment-method" class="form-control field-input form-select" formControlName="paymentMethodId">
         <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }} · Cierre día {{ method.billingCycleDay }}</option>
       </select>
       <small class="field-error" *ngIf="paymentMethodId?.invalid && paymentMethodId?.touched">Selecciona una tarjeta de crédito.</small>
@@ -104,7 +104,7 @@
         <button type="button" class="btn-modal btn-modal--danger"
                 [class.btn-modal--danger-confirm]="confirmingDelete"
                 (click)="delete()">
-          <i class="fas mr-1" [ngClass]="confirmingDelete ? 'fa-triangle-exclamation' : 'fa-trash'"></i>
+          <i class="fas me-1" [ngClass]="confirmingDelete ? 'fa-triangle-exclamation' : 'fa-trash'"></i>
           {{ confirmingDelete ? '¿Confirmar?' : 'Eliminar' }}
         </button>
         <button *ngIf="confirmingDelete" type="button" class="btn-modal btn-modal--ghost"
@@ -113,12 +113,12 @@
       <div class="right-actions">
         <button type="button" class="btn-modal btn-modal--secondary"
                 (click)="toggleStatus()" [title]="purchase.status === 'active' ? 'Marcar como finalizada' : 'Reactivar'">
-          <i class="fas mr-1" [ngClass]="purchase.status === 'active' ? 'fa-check-circle' : 'fa-rotate-left'"></i>
+          <i class="fas me-1" [ngClass]="purchase.status === 'active' ? 'fa-check-circle' : 'fa-rotate-left'"></i>
           {{ purchase.status === 'active' ? 'Finalizar' : 'Reactivar' }}
         </button>
         <button type="submit" class="btn-modal btn-modal--primary" [disabled]="form.invalid || loading">
           <span *ngIf="!loading">Guardar</span>
-          <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1"></i>Guardando...</span>
+          <span *ngIf="loading"><i class="fas fa-spinner fa-spin me-1"></i>Guardando...</span>
         </button>
       </div>
     </div>

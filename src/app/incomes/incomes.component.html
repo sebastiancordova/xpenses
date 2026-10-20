@@ -27,7 +27,7 @@
 
       <div class="filter-input-wrapper">
         <i class="fas fa-search filter-icon" aria-hidden="true"></i>
-        <label class="sr-only" for="income-search">Buscar ingresos</label>
+        <label class="visually-hidden" for="income-search">Buscar ingresos</label>
         <input id="income-search" type="search" formControlName="search" class="form-control filter-input" placeholder="Buscar ingresos…" />
       </div>
     </form>
@@ -87,13 +87,13 @@
         <div class="table-card d-none d-md-block">
           <div class="table-responsive">
             <table class="table module-table mb-0">
-              <caption class="sr-only">Ingresos registrados para {{ selectedPeriodLabel }}</caption>
+              <caption class="visually-hidden">Ingresos registrados para {{ selectedPeriodLabel }}</caption>
               <thead>
                 <tr>
                   <th scope="col">Nombre</th>
                   <th scope="col">Tipo</th>
-                  <th scope="col" class="text-right">Monto</th>
-                  <th scope="col" class="text-right">Acciones</th>
+                  <th scope="col" class="text-end">Monto</th>
+                  <th scope="col" class="text-end">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -104,8 +104,8 @@
                       {{ getIncomeTypeLabel(income) }}
                     </span>
                   </td>
-                  <td class="item-amount text-right">{{ income.amount | currency: 'CLP':'$':'1.0-0' }}</td>
-                  <td class="text-right">
+                  <td class="item-amount text-end">{{ income.amount | currency: 'CLP':'$':'1.0-0' }}</td>
+                  <td class="text-end">
                     <button type="button" class="income-edit-button" (click)="openEditModal(income)" [attr.aria-label]="'Editar ingreso: ' + income.title">
                       <i class="fas fa-pen" aria-hidden="true"></i><span>Editar</span>
                     </button>
@@ -114,8 +114,8 @@
               </tbody>
               <tfoot>
                 <tr class="total-row">
-                  <td class="font-weight-bold" colspan="2">Total del período</td>
-                  <td class="font-weight-bold text-right">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
+                  <td class="fw-bold" colspan="2">Total del período</td>
+                  <td class="fw-bold text-end">{{ totalAmountFiltered | currency: 'CLP':'$':'1.0-0' }}</td>
                   <td></td>
                 </tr>
               </tfoot>

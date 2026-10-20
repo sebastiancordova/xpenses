@@ -30,7 +30,7 @@
 
     <div class="form-group">
       <label class="field-label" for="edit-subscription-payment-method">Método de pago</label>
-      <select id="edit-subscription-payment-method" class="form-control field-input" formControlName="paymentMethodId">
+      <select id="edit-subscription-payment-method" class="form-control field-input form-select" formControlName="paymentMethodId">
         <option *ngFor="let method of paymentMethods" [value]="method.uid">{{ method.name }}</option>
       </select>
       <small class="field-error" *ngIf="paymentMethodId?.invalid && paymentMethodId?.touched">Selecciona un método de pago.</small>
@@ -38,11 +38,11 @@
 
     <div class="modal-actions">
       <button type="button" class="btn-modal btn-modal--danger" (click)="delete()">
-        <i class="fas fa-trash mr-1"></i>Eliminar
+        <i class="fas fa-trash me-1"></i>Eliminar
       </button>
       <button type="submit" class="btn-modal btn-modal--primary" [disabled]="editSubscriptionForm.invalid">
         <span *ngIf="!loading">Guardar</span>
-        <span *ngIf="loading"><i class="fas fa-spinner fa-spin mr-1"></i>Guardando...</span>
+        <span *ngIf="loading"><i class="fas fa-spinner fa-spin me-1"></i>Guardando...</span>
       </button>
     </div>
 

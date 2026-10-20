@@ -1,6 +1,6 @@
 # Xpenses
 
-Personal finance PWA built with Angular 16, TypeScript, RxJS, AngularFire, and Firebase.
+Personal finance PWA built with Angular 22, TypeScript, RxJS, the modular Firebase SDK, Bootstrap 5, and ng-bootstrap 21.
 
 ## Project context
 
@@ -49,8 +49,12 @@ Personal finance PWA built with Angular 16, TypeScript, RxJS, AngularFire, and F
 
 - Preserve existing local changes and other agents' work. Check Git status before editing;
   do not overwrite, discard, or reformat unrelated files.
-- Follow current conventions: NgModules, reactive forms, existing aliases, AngularFire/RxJS
-  services, and SCSS tokens. Consult `.github/design-system` for UI work.
+- Follow current conventions: NgModules, reactive forms, existing aliases, modular Firebase SDK/RxJS
+  services, Bootstrap 5/ng-bootstrap 21, and SCSS tokens. Consult `.github/design-system` for UI work.
+- For UI changes, apply the installed `ui-ux-pro-max` skill when available, then read
+  `.github/prompts/ui-ux-pro-max/PROMPT.md` and the relevant Xpenses Master/page design
+  references. Adapt its recommendations to the current Angular/Bootstrap stack and existing
+  tokens; do not treat unsupported stack output or generated files as project decisions.
 - Code and identifiers are in English; communication and user-facing app text are in Spanish.
 - Agree on schema or persisted-type changes; preserve compatibility with existing documents
   and precision for amounts, dates, installments, and billing periods.

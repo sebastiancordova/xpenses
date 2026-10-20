@@ -1,5 +1,8 @@
+import { Auth } from '@core/firebase/firebase.tokens';
+import { FirebaseStreamsService } from '@core/firebase/firebase-streams.service';
+import { User, UserCredential, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
 import { Injectable, inject } from '@angular/core';
-import { authState, signInWithEmailAndPassword, Auth, sendPasswordResetEmail, createUserWithEmailAndPassword, sendEmailVerification, UserCredential, User } from '@angular/fire/auth';
+
 import { environment } from '@environment/environment';
 import { Observable } from 'rxjs';
 
@@ -7,12 +10,13 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly firebaseStreams = inject(FirebaseStreamsService);
   private afAuth = inject(Auth)
 
   constructor() { }
 
   isAuthenticated(): Observable<User | null> {
-    return authState(this.afAuth);
+    return this.firebaseStreams.authState(this.afAuth);
   }
 
   login(email: string, password: string) {
