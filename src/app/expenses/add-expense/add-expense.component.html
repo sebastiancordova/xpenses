@@ -51,6 +51,7 @@
                 (click)="selectCategory(cat.category)" [attr.aria-pressed]="category?.value === cat.category">
           <i class="fas" [ngClass]="cat.icon" aria-hidden="true"></i>
           <span>{{ cat.category }}</span>
+          <i class="fas fa-check category-pill__selected" *ngIf="category?.value === cat.category" aria-hidden="true"></i>
         </button>
       </div>
       <div class="subcategory-picker" *ngIf="selectedCategory?.subcategories?.length">

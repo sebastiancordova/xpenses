@@ -169,31 +169,35 @@
   // ─── Category pill grid ───────────────────────────────────────────────────
   .category-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.45rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
     margin-bottom: 0.25rem;
   }
 
   .category-fieldset { border: 0; margin: 0 0 1rem; min-width: 0; padding: 0; }
 
   .category-pill {
-    display: flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.4rem 0.65rem;
-    min-height: 44px;
+    display: flex;
+    gap: 0.5rem;
+    min-height: 48px;
+    padding: 0.45rem 1.6rem 0.45rem 0.65rem;
+    position: relative;
     border: 1.5px solid $color-milky;
     border-radius: 8px;
     background: $color-milkiest;
     color: $color-grey;
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     font-weight: 500;
     cursor: pointer;
     transition: border-color 0.15s, background-color 0.15s, color 0.15s;
     width: 100%;
     text-align: left;
+    touch-action: manipulation;
 
-    i { font-size: 0.75rem; flex-shrink: 0; }
+    i { font-size: 0.88rem; flex: 0 0 auto; }
+    span { line-height: 1.2; overflow-wrap: break-word; }
+    .category-pill__selected { color: $color-brand-primary; font-size: 0.65rem; position: absolute; right: 0.5rem; top: 0.5rem; }
 
     &:hover {
       background: $color-milkier;
@@ -257,5 +261,9 @@
     .modal-dialog { margin: 0.75rem; }
     .expense-modal-body { padding: 1.25rem; }
     .modal-actions { gap: 0.75rem; }
+  }
+
+  @media (max-width: 400px) {
+    .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 }

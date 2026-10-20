@@ -38,9 +38,14 @@
     <div class="skeleton-card mb-3"><div class="skeleton-row mb-3"><div class="skeleton skeleton--label skeleton--wide"></div><div class="skeleton skeleton--label skeleton--medium"></div></div><div class="skeleton skeleton--bar"></div></div>
   </div>
 
-  <section *ngIf="loadError" class="alert alert-warning d-flex flex-wrap align-items-center mb-3" role="alert" aria-labelledby="dashboard-load-error-title">
-    <i class="fa-solid fa-cloud-exclamation" aria-hidden="true"></i><div><h2 id="dashboard-load-error-title">No pudimos cargar este período</h2><p>Revisa tu conexión e inténtalo nuevamente. Tus registros no se modificaron.</p></div>
-    <button type="button" class="quick-action ms-auto mt-2 mt-sm-0" (click)="retryLoadData()"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i><span>Reintentar</span></button>
+  <section *ngIf="loadError" class="alert alert-danger d-flex flex-wrap align-items-center gap-3 p-3 mb-3" role="alert" aria-labelledby="dashboard-load-error-title">
+    <div class="flex-grow-1">
+      <h2 id="dashboard-load-error-title" class="fs-6 mb-1"><i class="fa-solid fa-circle-exclamation text-danger me-2" aria-hidden="true"></i>No pudimos cargar este período</h2>
+      <p class="small mb-0">Revisa tu conexión e inténtalo nuevamente. Tus registros no se modificaron.</p>
+    </div>
+    <button type="button" class="quick-action ms-auto" (click)="retryLoadData()">
+      <i class="fa-solid fa-rotate-right" aria-hidden="true"></i><span>Reintentar</span>
+    </button>
   </section>
 
   <ng-container *ngIf="!isLoading && !loadError">
