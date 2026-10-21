@@ -11,9 +11,9 @@
       <label class="field-label" for="edit-expense-title">Título</label>
       <input autocomplete="off" type="text" class="form-control field-input" id="edit-expense-title" formControlName="title"
         placeholder="Ej: Compras del supermercado" ngbAutofocus aria-describedby="edit-expense-title-error"
-        [attr.aria-invalid]="title?.invalid && title?.touched"
+        [attr.aria-invalid]="title?.invalid && (title?.dirty || submitted)"
         [class.field-input--valid]="title?.valid && title?.touched">
-      <small id="edit-expense-title-error" class="field-error" role="alert" *ngIf="title?.invalid && title?.touched && title?.hasError('required')">
+      <small id="edit-expense-title-error" class="field-error" role="alert" *ngIf="title?.invalid && (title?.dirty || submitted) && title?.hasError('required')">
         El título es obligatorio
       </small>
     </div>

@@ -261,9 +261,21 @@
     .modal-dialog { margin: 0.75rem; }
     .expense-modal-body { padding: 1.25rem; }
     .modal-actions { gap: 0.75rem; }
+
+    .category-pill {
+      align-content: center;
+      display: grid;
+      gap: 0.25rem;
+      grid-template-rows: 1rem auto;
+      justify-items: center;
+      min-height: 68px;
+      padding: 0.5rem 0.35rem;
+      text-align: center;
+
+      i { font-size: 0.85rem; }
+      span { line-height: 1.15; }
+      .category-pill__selected { right: 0.3rem; top: 0.25rem; }
+    }
   }
 
-  @media (max-width: 400px) {
-    .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  }
 }

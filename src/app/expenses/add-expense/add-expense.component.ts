@@ -18,6 +18,7 @@ import { firstValueFrom } from 'rxjs';
 export class AddExpenseComponent {
   public addExpenseForm!: FormGroup;
   public loading = false
+  public submitted = false;
   public activeModal: NgbActiveModal = inject(NgbActiveModal);
   public categoryOptions = EXPENSE_CATEGORY_OPTIONS;
   public maxCommentLength = 120;
@@ -46,6 +47,7 @@ export class AddExpenseComponent {
   }
 
   submit(): void {
+    this.submitted = true;
     if (this.addExpenseForm.invalid || this.loading) {
       this.addExpenseForm.markAllAsTouched();
       return;

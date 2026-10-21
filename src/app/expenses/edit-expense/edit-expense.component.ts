@@ -21,6 +21,7 @@ export class EditExpenseComponent {
   @Input() expense!: Expense
   public editExpenseForm!: FormGroup;
   public loading = false
+  public submitted = false;
   public activeModal: NgbActiveModal = inject(NgbActiveModal);
   public categoryOptions = EXPENSE_CATEGORY_OPTIONS;
   public confirmingDelete = false;
@@ -61,6 +62,7 @@ export class EditExpenseComponent {
   }
 
   submit(): void {
+    this.submitted = true;
     if (this.editExpenseForm.invalid || this.loading) {
       this.editExpenseForm.markAllAsTouched();
       return;
