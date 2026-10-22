@@ -196,12 +196,11 @@ $danger: #b42318;
 .stat-card__watermark { bottom: .75rem; color: #fff; font-size: 3rem; opacity: .12; pointer-events: none; position: absolute; right: 1rem; }
 
 .budget-health-card, .dashboard-card, .expense-composition { padding: 1.2rem 1.25rem; }
-.budget-health-card__left { align-items: baseline; display: flex; gap: 1rem; justify-content: space-between; }
 .budget-health-card__label, .dashboard-card__header, .kpi__label, .expense-composition__label { color: $muted; font-size: .72rem; font-weight: 800; text-transform: uppercase; }
-.budget-health-card__pct { flex-shrink: 0; font-size: 1.18rem; font-variant-numeric: tabular-nums; font-weight: 800; }
-.budget-health-card__pct--ok, .kpi__value--good, .insight-message--ok > i { color: $success; }
-.budget-health-card__pct--warn, .insight-message--warn > i { color: $warning; }
-.budget-health-card__pct--danger, .kpi__value--bad, .insight-message--danger > i { color: $danger; }
+.budget-health-card__pct { flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.budget-health-card__pct.budget-bar__pct--ok, .kpi__value--good, .insight-message--ok > i { color: $success; }
+.budget-health-card__pct.budget-bar__pct--warn, .insight-message--warn > i { color: $warning; }
+.budget-health-card__pct.budget-bar__pct--danger, .kpi__value--bad, .insight-message--danger > i { color: $danger; }
 .kpi { align-items: flex-start; background: $color-milkier; border-radius: 8px; display: flex; flex-direction: column; gap: .35rem; min-width: 0; padding: .85rem; }
 .kpi__label { font-size: .68rem; }
 .kpi__value { color: $color-grey-darker; font-size: .86rem; font-variant-numeric: tabular-nums; font-weight: 800; overflow-wrap: anywhere; }
@@ -316,18 +315,15 @@ $danger: #b42318;
 .category-installments > .analysis-toggle { width: auto; }
 .category-installments .installment-list { border-top: 1px solid $border; gap: .75rem; margin-top: .5rem; padding-top: 1rem; }
 .daily-spend-card, .dashboard-disclosure { overflow: hidden; }
-.dashboard-disclosure { background: #fff; border: 1px solid $border; border-radius: 10px; box-shadow: 0 5px 18px rgba(27, 32, 43, .045); }
-.dashboard-disclosure > summary { align-items: center; color: $color-grey-darker; cursor: pointer; display: flex; gap: 1rem; justify-content: space-between; list-style: none; min-height: 68px; padding: .85rem 1rem; touch-action: manipulation; }
+.dashboard-insight { background: #fff; border: 1px solid $border; border-radius: 12px; overflow: hidden; }
+.dashboard-disclosure { border-top: 1px solid $border; }
+.dashboard-disclosure > summary { color: $color-brand-primary; cursor: pointer; font-size: .82rem; font-weight: 800; list-style: none; min-height: 48px; touch-action: manipulation; }
 .dashboard-disclosure > summary::-webkit-details-marker,
 .calculation-note > summary::-webkit-details-marker { display: none; }
-.dashboard-disclosure > summary > span { display: grid; gap: .35rem; min-width: 0; }
-.dashboard-disclosure > summary strong { font-size: .9rem; }
-.dashboard-disclosure > summary small { color: $muted; font-size: .74rem; line-height: 1.35; }
 .dashboard-disclosure > summary > i { color: $color-brand-primary; transition: transform .18s ease; }
 .dashboard-disclosure[open] > summary > i { transform: rotate(180deg); }
-.dashboard-disclosure__body { background: $color-milkier; border-top: 1px solid $border; display: grid; gap: 1.25rem; padding: 1rem; }
-.dashboard-disclosure__body > section, .dashboard-budget-group { background: #fff; border: 1px solid $border; border-radius: 12px; box-shadow: none; margin: 0; min-width: 0; overflow: hidden; }
-.dashboard-budget-group .budget-health-card { border: 0; border-radius: 0; box-shadow: none; margin: 0; }
+.dashboard-disclosure__body { background: $color-milkier; border-top: 1px solid $border; }
+.dashboard-disclosure__body > section { background: #fff; border: 1px solid $border; border-radius: 10px; margin: 0; min-width: 0; overflow: hidden; }
 .analysis-section-title { color: $color-grey-darker; font-size: 1rem; font-weight: 800; line-height: 1.4; margin: 0 0 1rem; }
 .expense-composition > .analysis-section-title { grid-column: 1 / -1; margin: 0; }
 .calculation-note { border-top: 1px solid $border; }
@@ -348,22 +344,23 @@ $danger: #b42318;
 .insight-message--ok { background: #f0f7f1; border-color: $success; }
 .insight-message--warn { background: #fff8e8; border-color: $warning; }
 .insight-message--danger { background: #fff2f0; border-color: $danger; }
-.dashboard-budget-group .insight-message { border-bottom: 1px solid $border; padding: 1.1rem 1.25rem; }
-
-.budget-health-card { display: flex; flex-direction: column; gap: 1rem; }
-.budget-health-card__top { display: contents; }
-.budget-health-card__kpis { display: grid; gap: .75rem; grid-template-columns: repeat(3, minmax(0, 1fr)); order: 2; }
-.kpi--divider { display: none; }
+.budget-health-card { display: flex; flex-direction: column; gap: .8rem; }
+.budget-health-card__left { align-items: center; display: flex; flex-wrap: wrap; gap: .75rem 1rem; justify-content: space-between; }
+.budget-health-card__label { color: $color-grey-darker; font-size: .86rem; font-weight: 800; margin: 0; }
+.budget-health-card__hint { color: $muted; font-size: .75rem; line-height: 1.4; margin: .2rem 0 0; }
+.budget-health-card__pct { color: $color-grey-darker; flex-shrink: 0; font-size: clamp(1.65rem, 4vw, 2.1rem); font-variant-numeric: tabular-nums; font-weight: 800; }
+.budget-health-card__pct.budget-bar__pct--ok { color: $success; }
+.budget-health-card__pct.budget-bar__pct--warn { color: $warning; }
+.budget-health-card__pct.budget-bar__pct--danger { color: $danger; }
+.budget-health-card__unavailable { color: $muted; font-size: .9rem; font-weight: 700; }
+.dashboard-disclosure > summary:focus-visible { border-radius: 4px; outline-offset: -4px; }
 @media (max-width: $break-sm) {
-  .dashboard-disclosure__body { gap: 1rem; padding: .75rem; }
   .daily-spend-card__header { padding: 1rem; }
   .daily-spend-card__metrics { padding: 0 1rem 1rem; }
   .daily-spend-card__controls { gap: .75rem; }
   .daily-spend-card__date-input { font-size: 1rem; max-width: 100%; min-width: 0; }
-  .budget-health-card, .expense-composition { padding: 1rem; }
-  .budget-health-card__kpis { grid-template-columns: 1fr; }
+  .expense-composition { padding: 1rem; }
   .kpi { align-items: baseline; flex-direction: row; flex-wrap: wrap; gap: .35rem .75rem; justify-content: space-between; }
-  .dashboard-budget-group .insight-message { padding: 1rem; }
 }
 
 @media (max-width: $break-md) {
@@ -386,6 +383,10 @@ $danger: #b42318;
 
 @media (max-width: 359px) {
   .category-list { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-disclosure > summary > i { transition: none; }
 }
 
 @media (min-width: 768px) {

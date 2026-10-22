@@ -80,6 +80,78 @@
         </details>
       </section>
 
+    <section class="dashboard-insight mb-3" *ngIf="insights as currentInsights" aria-labelledby="dashboard-insight-title">
+      <header class="d-flex flex-wrap align-items-center justify-content-between gap-3 p-3">
+        <div>
+          <span class="dashboard-eyebrow">Análisis del período</span>
+          <h2 id="dashboard-insight-title" class="h5 fw-bold mb-0">Proyección y alertas</h2>
+        </div>
+        <span class="small text-muted">Presupuesto del período</span>
+      </header>
+
+      <div class="insight-message mx-3 mb-3"
+        [class.insight-message--empty]="!currentInsights.hasIncome"
+        [class.insight-message--ok]="currentInsights.hasIncome && currentInsights.alertLevel === 'ok'"
+        [class.insight-message--warn]="currentInsights.hasIncome && currentInsights.alertLevel === 'warn'"
+        [class.insight-message--danger]="currentInsights.hasIncome && currentInsights.alertLevel === 'danger'"
+        [attr.role]="currentInsights.hasIncome && currentInsights.alertLevel === 'danger' ? 'alert' : 'status'"
+        [attr.aria-live]="currentInsights.hasIncome && currentInsights.alertLevel === 'danger' ? 'assertive' : 'polite'">
+        <i class="fas" [ngClass]="!currentInsights.hasIncome ? 'fa-circle-info' : currentInsights.alertLevel === 'danger' ? 'fa-triangle-exclamation' : currentInsights.alertLevel === 'warn' ? 'fa-circle-exclamation' : 'fa-circle-check'" aria-hidden="true"></i>
+        <span><strong>{{ !currentInsights.hasIncome ? 'Sin ingresos registrados' : currentInsights.alertLevel === 'danger' ? 'Proyección por sobre tus ingresos' : currentInsights.alertLevel === 'warn' ? 'Poco margen para ahorro' : 'Período dentro del plan' }}</strong><span>{{ primaryInsightText }}</span></span>
+      </div>
+
+      <section class="budget-health-card pt-0 px-3 pb-3" aria-label="Consumo del presupuesto">
+        <div class="budget-health-card__left">
+            <div>
+              <h3 class="budget-health-card__label">Consumo del presupuesto</h3>
+              <p class="budget-health-card__hint">Gastos del período en relación con tus ingresos</p>
+            </div>
+            <span *ngIf="currentInsights.hasIncome; else noIncomeBudget"
+              class="budget-health-card__pct" [ngClass]="budgetPctClass">{{ currentInsights.budgetPct | number: '1.0-1' }}%</span>
+            <ng-template #noIncomeBudget><span class="budget-health-card__unavailable">Sin ingresos registrados</span></ng-template>
+        </div>
+        <div *ngIf="currentInsights.hasIncome" class="budget-bar" role="progressbar"
+          aria-label="Porcentaje de ingresos consumidos"
+          [attr.aria-valuenow]="currentInsights.budgetPct > 100 ? 100 : currentInsights.budgetPct"
+          [attr.aria-valuetext]="(currentInsights.budgetPct | number: '1.0-1') + '% de ingresos consumidos'"
+          aria-valuemin="0" aria-valuemax="100">
+          <div class="budget-bar__fill" [ngClass]="budgetBarClass" [style.width.%]="currentInsights.budgetPct > 100 ? 100 : currentInsights.budgetPct"></div>
+        </div>
+        <p *ngIf="currentInsights.hasIncome && currentInsights.budgetPct > 100" class="text-danger fw-bold small mb-0">
+          El consumo supera tus ingresos por {{ currentInsights.budgetPct - 100 | number: '1.0-1' }} puntos porcentuales.
+        </p>
+      </section>
+
+      <details class="dashboard-disclosure">
+        <summary class="d-flex align-items-center justify-content-between px-3 py-2" aria-label="Ver desglose y proyección">
+          <span>Ver desglose y proyección</span><i class="fas fa-chevron-down" aria-hidden="true"></i>
+        </summary>
+        <div class="dashboard-disclosure__body d-grid gap-3 p-3">
+          <section class="row row-cols-1 row-cols-md-3 g-2" aria-label="Indicadores del período">
+            <article class="kpi col">
+              <span class="kpi__label">Margen de ingresos</span>
+              <span class="kpi__value" [ngClass]="currentInsights.hasIncome ? (currentInsights.savingsRate >= prefs.savingsRate ? 'kpi__value--good' : 'kpi__value--bad') : ''">
+                <ng-container *ngIf="currentInsights.hasIncome; else noIncomeMargin">{{ currentInsights.savingsRate | number: '1.0-1' }}%</ng-container>
+                <ng-template #noIncomeMargin>Sin ingresos registrados</ng-template>
+              </span>
+            </article>
+            <article class="kpi col"><span class="kpi__label">Gasto variable diario</span><span class="kpi__value">{{ currentInsights.burnRate | currency: 'CLP':'$':'1.0-0' }}/día</span></article>
+            <article class="kpi col">
+              <span class="kpi__label">Proyección al cierre</span>
+              <span class="kpi__value" [ngClass]="currentInsights.projectedExpenses > totalIncome && totalIncome > 0 ? 'kpi__value--bad' : ''">{{ currentInsights.projectedExpenses | currency: 'CLP':'$':'1.0-0' }}</span>
+            </article>
+          </section>
+
+          <section class="expense-composition" *ngIf="total > 0" aria-label="Composición del gasto">
+            <h3 class="analysis-section-title">Cómo se distribuye tu gasto</h3>
+            <div class="expense-composition__item"><span class="expense-composition__label">Variables</span><strong>{{ totalVariable | currency: 'CLP':'$':'1.0-0' }}</strong><span>{{ variableExpensePct | number: '1.0-1' }}%</span></div>
+            <div class="expense-composition__track" aria-hidden="true"><span class="expense-composition__fill expense-composition__fill--variable" [style.width.%]="variableExpensePct"></span><span class="expense-composition__fill expense-composition__fill--recurring" [style.width.%]="recurringExpensePct"></span></div>
+            <div class="expense-composition__item expense-composition__item--right"><span class="expense-composition__label">Recurrentes y cuotas</span><strong>{{ totalFixedAndSubs | currency: 'CLP':'$':'1.0-0' }}</strong><span>{{ recurringExpensePct | number: '1.0-1' }}%</span></div>
+          </section>
+        </div>
+      </details>
+    </section>
+
     <ng-container *ngIf="hasExpenses; else emptyState">
       <section class="dashboard-card category-overview mb-3" aria-labelledby="category-overview-title">
         <div class="dashboard-card__header dashboard-card__header--stack flex-row align-items-start justify-content-between">
@@ -153,35 +225,6 @@
     </ng-template>
 
 
-    <details class="dashboard-disclosure mb-3">
-      <summary><span><strong>Proyección y alertas</strong><small>Presupuesto y distribución del gasto del período</small></span><i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
-      <div class="dashboard-disclosure__body">
-      <div class="dashboard-budget-group">
-      <div class="insight-message" *ngIf="insights as currentInsights"
-        [class.insight-message--empty]="!currentInsights.hasIncome"
-        [class.insight-message--ok]="currentInsights.hasIncome && currentInsights.alertLevel === 'ok'"
-        [class.insight-message--warn]="currentInsights.hasIncome && currentInsights.alertLevel === 'warn'"
-        [class.insight-message--danger]="currentInsights.hasIncome && currentInsights.alertLevel === 'danger'"
-        [attr.role]="currentInsights.hasIncome && currentInsights.alertLevel === 'danger' ? 'alert' : 'status'"
-        [attr.aria-live]="currentInsights.hasIncome && currentInsights.alertLevel === 'danger' ? 'assertive' : 'polite'">
-        <i class="fas" [ngClass]="!currentInsights.hasIncome ? 'fa-circle-info' : currentInsights.alertLevel === 'danger' ? 'fa-triangle-exclamation' : currentInsights.alertLevel === 'warn' ? 'fa-circle-exclamation' : 'fa-circle-check'" aria-hidden="true"></i>
-        <span><strong>{{ !currentInsights.hasIncome ? 'Falta registrar ingresos' : currentInsights.alertLevel === 'danger' ? 'Proyección por sobre tus ingresos' : currentInsights.alertLevel === 'warn' ? 'Poco margen para ahorro' : 'Período dentro del plan' }}</strong><span>{{ primaryInsightText }}</span></span>
-      </div>
-      <section class="budget-health-card" *ngIf="insights" aria-label="Salud del presupuesto">
-        <h2 class="analysis-section-title">Tu presupuesto</h2>
-        <div class="budget-health-card__top"><div class="budget-health-card__left"><span class="budget-health-card__label">Consumo del presupuesto</span><span class="budget-health-card__pct" [ngClass]="budgetPctClass">{{ insights.budgetPct | number: '1.0-1' }}%</span></div>
-          <div class="budget-health-card__kpis"><span class="kpi"><span class="kpi__label">Margen de ingresos</span><span class="kpi__value" [ngClass]="insights.savingsRate >= prefs.savingsRate ? 'kpi__value--good' : 'kpi__value--bad'">{{ insights.savingsRate | number: '1.0-1' }}%</span></span><span class="kpi kpi--divider" aria-hidden="true"></span><span class="kpi"><span class="kpi__label">Gasto diario</span><span class="kpi__value">{{ insights.burnRate | currency: 'CLP':'$':'1.0-0' }}/día</span></span><span class="kpi kpi--divider" aria-hidden="true"></span><span class="kpi"><span class="kpi__label">Proyección</span><span class="kpi__value" [ngClass]="insights.projectedExpenses > totalIncome && totalIncome > 0 ? 'kpi__value--bad' : ''">{{ insights.projectedExpenses | currency: 'CLP':'$':'1.0-0' }}</span></span></div>
-        </div>
-        <div class="budget-bar" role="progressbar" aria-label="Porcentaje de ingresos consumidos" [attr.aria-valuenow]="insights.budgetPct | number:'1.0-0'" aria-valuemin="0" aria-valuemax="100"><div class="budget-bar__fill" [ngClass]="budgetBarClass" [style.width.%]="insights.budgetPct > 100 ? 100 : insights.budgetPct"></div></div>
-      </section>
-      </div>
-      <section class="expense-composition" *ngIf="total > 0" aria-label="Composición del gasto">
-        <h2 class="analysis-section-title">Cómo se distribuye tu gasto</h2>
-        <div class="expense-composition__item"><span class="expense-composition__label">Variables</span><strong>{{ totalVariable | currency: 'CLP':'$':'1.0-0' }}</strong><span>{{ variableExpensePct | number: '1.0-1' }}%</span></div>
-        <div class="expense-composition__track" aria-hidden="true"><span class="expense-composition__fill expense-composition__fill--variable" [style.width.%]="variableExpensePct"></span><span class="expense-composition__fill expense-composition__fill--recurring" [style.width.%]="recurringExpensePct"></span></div>
-        <div class="expense-composition__item expense-composition__item--right"><span class="expense-composition__label">Recurrentes y cuotas</span><strong>{{ totalFixedAndSubs | currency: 'CLP':'$':'1.0-0' }}</strong><span>{{ recurringExpensePct | number: '1.0-1' }}%</span></div>
-      </section>
-      </div>
-    </details>
+
   </ng-container>
 </div>
