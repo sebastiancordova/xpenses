@@ -196,25 +196,27 @@ $danger: #b42318;
 .stat-card__watermark { bottom: .75rem; color: #fff; font-size: 3rem; opacity: .12; pointer-events: none; position: absolute; right: 1rem; }
 
 .budget-health-card, .dashboard-card, .expense-composition { padding: 1.2rem 1.25rem; }
-.budget-health-card__label, .dashboard-card__header, .kpi__label, .expense-composition__label { color: $muted; font-size: .72rem; font-weight: 800; text-transform: uppercase; }
+.budget-health-card__label, .dashboard-card__header, .expense-composition__label { color: $muted; font-size: .72rem; font-weight: 800; text-transform: uppercase; }
 .budget-health-card__pct { flex-shrink: 0; font-variant-numeric: tabular-nums; }
-.budget-health-card__pct.budget-bar__pct--ok, .kpi__value--good, .insight-message--ok > i { color: $success; }
+.budget-health-card__pct.budget-bar__pct--ok, .insight-message--ok > i { color: $success; }
 .budget-health-card__pct.budget-bar__pct--warn, .insight-message--warn > i { color: $warning; }
-.budget-health-card__pct.budget-bar__pct--danger, .kpi__value--bad, .insight-message--danger > i { color: $danger; }
-.kpi { align-items: flex-start; background: $color-milkier; border-radius: 8px; display: flex; flex-direction: column; gap: .35rem; min-width: 0; padding: .85rem; }
-.kpi__label { font-size: .68rem; }
-.kpi__value { color: $color-grey-darker; font-size: .86rem; font-variant-numeric: tabular-nums; font-weight: 800; overflow-wrap: anywhere; }
+.budget-health-card__pct.budget-bar__pct--danger, .insight-message--danger > i { color: $danger; }
 
 .budget-bar, .expense-composition__track, .category-item__bar { background: $color-milkier; border-radius: 999px; overflow: hidden; }
-.budget-bar { height: 10px; order: 1; }
+.budget-bar { height: 12px; order: 1; }
 .budget-bar__fill, .expense-composition__fill, .category-item__bar-fill { display: block; height: 100%; }
 .budget-bar__fill--ok { background: $success; }
 .budget-bar__fill--warn { background: #d99000; }
 .budget-bar__fill--danger { background: $danger; }
 
-.expense-composition { align-items: center; display: grid; gap: 1.25rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.expense-composition { align-items: start; border-top: 1px solid $border; display: grid; gap: .8rem; grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 1rem; }
 .expense-composition__item { color: $muted; display: flex; flex-direction: column; font-size: .76rem; gap: .35rem; line-height: 1.35; min-width: 0; }
+.expense-composition__label { align-items: center; display: flex; gap: .4rem; }
+.expense-composition__item:not(.expense-composition__item--right) .expense-composition__label::before, .expense-composition__item--right .expense-composition__label::before { border-radius: 50%; content: ''; flex: 0 0 .55rem; height: .55rem; }
+.expense-composition__item:not(.expense-composition__item--right) .expense-composition__label::before { background: $color-brand-primary; }
+.expense-composition__item--right .expense-composition__label::before { background: $color-brand-quaternary; }
 .expense-composition__item strong { color: $color-grey-darker; font-size: 1rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.expense-composition__item > span:last-child { color: $color-grey-darker; font-size: .82rem; font-variant-numeric: tabular-nums; font-weight: 700; }
 .expense-composition__track { display: flex; grid-column: 1 / -1; grid-row: 3; height: 12px; }
 .expense-composition__fill--variable { background: $color-brand-primary; }
 .expense-composition__fill--recurring { background: $color-brand-quaternary; }
@@ -314,36 +316,36 @@ $danger: #b42318;
 .category-installments__note { margin-top: .6rem; }
 .category-installments > .analysis-toggle { width: auto; }
 .category-installments .installment-list { border-top: 1px solid $border; gap: .75rem; margin-top: .5rem; padding-top: 1rem; }
-.daily-spend-card, .dashboard-disclosure { overflow: hidden; }
+.daily-spend-card { overflow: hidden; }
 .dashboard-insight { background: #fff; border: 1px solid $border; border-radius: 12px; overflow: hidden; }
-.dashboard-disclosure { border-top: 1px solid $border; }
-.dashboard-disclosure > summary { color: $color-brand-primary; cursor: pointer; font-size: .82rem; font-weight: 800; list-style: none; min-height: 48px; touch-action: manipulation; }
-.dashboard-disclosure > summary::-webkit-details-marker,
+.dashboard-insight__header { align-items: center; background: rgba($color-milkier, .72); border-bottom: 1px solid $border; display: flex; gap: .75rem; }
+.dashboard-insight__header h2 { color: $color-brand-primary; }
+.dashboard-insight__icon { align-items: center; background: rgba($color-brand-primary, .1); border-radius: 10px; color: $color-brand-primary; display: inline-flex; flex: 0 0 2.5rem; height: 2.5rem; justify-content: center; }
+.dashboard-insight .budget-health-card,
+.dashboard-insight .expense-composition { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
 .calculation-note > summary::-webkit-details-marker { display: none; }
-.dashboard-disclosure > summary > i { color: $color-brand-primary; transition: transform .18s ease; }
-.dashboard-disclosure[open] > summary > i { transform: rotate(180deg); }
-.dashboard-disclosure__body { background: $color-milkier; border-top: 1px solid $border; }
-.dashboard-disclosure__body > section { background: #fff; border: 1px solid $border; border-radius: 10px; margin: 0; min-width: 0; overflow: hidden; }
 .analysis-section-title { color: $color-grey-darker; font-size: 1rem; font-weight: 800; line-height: 1.4; margin: 0 0 1rem; }
 .expense-composition > .analysis-section-title { grid-column: 1 / -1; margin: 0; }
 .calculation-note { border-top: 1px solid $border; }
 .calculation-note > summary { align-items: center; color: $color-brand-primary; cursor: pointer; display: flex; font-size: .8rem; font-weight: 700; gap: .75rem; justify-content: space-between; list-style: none; min-height: 48px; padding: .75rem 1.25rem; }
 .calculation-note > summary > span { align-items: center; display: flex; gap: .5rem; }
-.calculation-note > summary:focus-visible,
-.dashboard-disclosure > summary:focus-visible { outline: 2px solid $color-brand-primary; outline-offset: -3px; }
+.calculation-note > summary:focus-visible { outline: 2px solid $color-brand-primary; outline-offset: -3px; }
 .calculation-note[open] > summary > i { transform: rotate(180deg); }
 .calculation-note .daily-spend-card__note { background: #fff; display: block; padding-top: 0; }
 
-.insight-message { align-items: flex-start; border-left: 3px solid; display: flex; gap: .75rem; margin: 0; padding: 1rem 1.1rem; }
-.insight-message > i { flex: 0 0 auto; margin-top: .12rem; }
+.insight-message { align-items: flex-start; border: 1px solid; border-radius: 10px; display: flex; gap: .75rem; margin: 0; padding: .9rem 1rem; }
+.insight-message > i { align-items: center; border-radius: 50%; display: inline-flex; flex: 0 0 2rem; height: 2rem; justify-content: center; margin-top: .05rem; }
 .insight-message > span { display: grid; gap: .2rem; line-height: 1.45; min-width: 0; }
 .insight-message strong { color: $color-grey-darker; font-size: .86rem; }
 .insight-message > span > span { color: $muted; font-size: .8rem; }
-.insight-message--empty { background: #f6f7fb; border-color: $muted; }
+.insight-message--empty { background: #f6f7fb; border-color: rgba($muted, .24); }
 .insight-message--empty > i { color: $muted; }
-.insight-message--ok { background: #f0f7f1; border-color: $success; }
-.insight-message--warn { background: #fff8e8; border-color: $warning; }
-.insight-message--danger { background: #fff2f0; border-color: $danger; }
+.insight-message--ok { background: #f0f7f1; border-color: rgba($success, .28); }
+.insight-message--ok > i { background: rgba($success, .1); }
+.insight-message--warn { background: #fff8e8; border-color: rgba($warning, .32); }
+.insight-message--warn > i { background: rgba($warning, .12); }
+.insight-message--danger { background: #fff2f0; border-color: rgba($danger, .28); }
+.insight-message--danger > i { background: rgba($danger, .1); }
 .budget-health-card { display: flex; flex-direction: column; gap: .8rem; }
 .budget-health-card__left { align-items: center; display: flex; flex-wrap: wrap; gap: .75rem 1rem; justify-content: space-between; }
 .budget-health-card__label { color: $color-grey-darker; font-size: .86rem; font-weight: 800; margin: 0; }
@@ -353,14 +355,12 @@ $danger: #b42318;
 .budget-health-card__pct.budget-bar__pct--warn { color: $warning; }
 .budget-health-card__pct.budget-bar__pct--danger { color: $danger; }
 .budget-health-card__unavailable { color: $muted; font-size: .9rem; font-weight: 700; }
-.dashboard-disclosure > summary:focus-visible { border-radius: 4px; outline-offset: -4px; }
 @media (max-width: $break-sm) {
   .daily-spend-card__header { padding: 1rem; }
   .daily-spend-card__metrics { padding: 0 1rem 1rem; }
   .daily-spend-card__controls { gap: .75rem; }
   .daily-spend-card__date-input { font-size: 1rem; max-width: 100%; min-width: 0; }
   .expense-composition { padding: 1rem; }
-  .kpi { align-items: baseline; flex-direction: row; flex-wrap: wrap; gap: .35rem .75rem; justify-content: space-between; }
 }
 
 @media (max-width: $break-md) {
@@ -385,15 +385,11 @@ $danger: #b42318;
   .category-list { grid-template-columns: 1fr; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .dashboard-disclosure > summary > i { transition: none; }
-}
-
 @media (min-width: 768px) {
   .category-subcategory { align-items: baseline; column-gap: .5rem; grid-template-columns: minmax(0, 1fr) auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .analysis-toggle { transition: none; }
-  .category-item__chevron, .dashboard-disclosure > summary > i { transition: none; }
+  .category-item__chevron { transition: none; }
 }

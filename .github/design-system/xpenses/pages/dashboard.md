@@ -25,9 +25,14 @@ python3 .github/prompts/ui-ux-pro-max/scripts/search.py 'Personal finance mobile
   and a prominent percentage with its progress bar.
 - Place the diagnosis after daily tracking and before the category overview so its
   message is visible before detailed expense analysis.
-- Put income margin, daily variable spending, closing projection, and expense composition
-  inside a native, initially closed `details` disclosure. Keep expansion reversible by
-  keyboard and touch. Daily tracking remains before categories.
+- Keep expense composition visible below consumption without a disclosure. Omit the
+  income-margin card, daily variable spending, and closing projection as separate
+  metrics here; preserve their calculations for contextual alerts. Daily tracking
+  remains before categories.
+- Use a concise heading, a softly tinted contextual alert, a prominent consumption
+  percentage and progress bar, and a separated composition area. Avoid repeated
+  introductory labels and nested cards; keep both composition groups labeled with
+  amounts and percentages on narrow screens using the existing Lato and brand tokens.
 - Budget consumption means total period expenses divided by income; it is separate from
   variable-budget availability. Preserve the existing projection-alert and consumption-bar
   thresholds, which describe different signals. Composition retains two groups: variable
